@@ -34,5 +34,8 @@ jobs:
           fi
           node site/smoke.mjs
           npm run test:browser
+          npm run test:analytics
+          GA4_MEASUREMENT_ID=G-RRTEST0001 GA4_PRIVACY_READY=true npm run build
+          EXPECT_GA4=1 npm run test:analytics
         env:
           WRANGLER_SEND_METRICS: 'false'

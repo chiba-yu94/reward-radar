@@ -8,6 +8,10 @@ const configured = process.env.SITE_ORIGIN;
 const origin = new URL(configured || 'http://localhost:8787');
 if (configured && (origin.protocol !== 'https:' || !origin.hostname.endsWith('.workers.dev') ||
     configured !== origin.origin)) throw new Error('SITE_ORIGIN must be the HTTPS workers.dev origin');
+const measurementId = process.env.GA4_MEASUREMENT_ID || '';
+if (measurementId && !/^G-[A-Z0-9]{4,20}$/.test(measurementId)) throw new Error('Invalid GA4 measurement ID');
+const analytics = measurementId && process.env.GA4_PRIVACY_READY === 'true' ? measurementId : '';
+if (measurementId && !analytics) console.warn('GA4 is disabled pending the property privacy setup');
 const dataset = JSON.parse(await readFile('var/published.json', 'utf8'));
 const now = Date.now();
 const rows = ordered(dataset.records.filter(row => !expired(row, now)), now);
@@ -18,7 +22,13 @@ const write = (file, data) => writeFile(dist + '/' + file, data);
 for (const asset of ['style.css', 'client.mjs', 'domain.mjs', 'mark.svg']) {
   await copyFile('site/' + asset, dist + '/assets/' + asset);
 }
-await copyFile('site/_headers', dist + '/_headers');
+if (analytics) await copyFile('site/analytics.mjs', dist + '/assets/analytics.mjs');
+const headers = await readFile('site/_headers', 'utf8');
+const collection = 'https://www.google-analytics.com https://region1.google-analytics.com https://analytics.google.com';
+await write('_headers', analytics ? headers
+  .replace("script-src 'self';", "script-src 'self' https://www.googletagmanager.com/gtag/;")
+  .replace("img-src 'self';", `img-src 'self' ${collection};`)
+  .replace("connect-src 'self';", `connect-src 'self' ${collection} https://www.googletagmanager.com;`) : headers);
 await write('opportunities.json', JSON.stringify({...dataset, records:rows}));
 
 export const escape = value => String(value).replace(/[&<>"']/g, char => ({
@@ -50,16 +60,36 @@ const amount = (row, lang) => {
 const fields = pairs => '<dl class="facts">' + pairs.map(([label, value]) =>
   `<div><dt>${e(label)}</dt><dd>${value}</dd></div>`).join('') + '</dl>';
 
-function external(destination, label, sponsored = false) {
+function external(destination, label, event = null) {
+  const sponsored = event === 'affiliate_click';
   const parsed = new URL(destination);
   if (parsed.protocol !== 'https:' || parsed.username || parsed.password) throw new Error('Unsafe destination');
-  return `<a class="button ${sponsored ? 'secondary' : ''}" href="${e(destination)}" rel="${sponsored ? 'sponsored nofollow ' : ''}noopener noreferrer">${e(label)}</a>`;
+  return `<a class="button ${sponsored ? 'secondary' : ''}" href="${e(destination)}" rel="${sponsored ? 'sponsored nofollow ' : ''}noopener noreferrer"${event && analytics ? ` data-analytics-click="${event}"` : ''}>${e(label)}</a>`;
+}
+
+function consentControls(t, lang) {
+  const c = t.analytics;
+  const settings = `<button type="button" data-analytics-settings>${c.settings}</button>`;
+  const choices = `<button type="button" data-analytics-choice="accept">${c.accept}</button>
+<button type="button" data-analytics-choice="reject">${c.reject}</button>`;
+  return {
+    settings,
+    panel: `<section class="analytics-notice wrap" data-analytics-id="${analytics}" aria-labelledby="analytics-title" hidden>
+<h2 id="analytics-title">${c.title}</h2><p>${c.summary} <a href="${url(lang,'privacy')}">${t.pages.privacy[0]}</a></p>
+<div class="actions">${choices}${settings}</div></section>
+<dialog id="analytics-dialog" aria-labelledby="analytics-settings-title">
+<h2 id="analytics-settings-title">${c.settings}</h2><p>${c.details}</p>
+<p data-analytics-status="accept" hidden>${c.allowed}</p><p data-analytics-status="reject" hidden>${c.denied}</p>
+<p data-analytics-status="unset" hidden>${c.undecided}</p>
+<div class="actions">${choices}<button type="button" data-analytics-close>${c.close}</button></div></dialog>`,
+  };
 }
 
 function layout(lang, page, title, description, content, indexable = true) {
   const t = copy[lang];
   const other = lang === 'ja' ? 'en' : 'ja';
   const current = url(lang, page);
+  const consent = analytics ? consentControls(t,lang) : null;
   const switcher = `<a class="language" href="${url(other, page)}" lang="${other}" hreflang="${other}">${t.otherLanguage}</a>`;
   const links = keys => keys.map(key => `<a href="${url(lang, key)}"${key === page ? ' aria-current="page"' : ''}>${e(t.pages[key][0])}</a>`).join('');
   const fullTitle = e(page ? title + ' | Reward Radar' : 'Reward Radar · ' + title);
@@ -77,17 +107,19 @@ ${languages.map(locale => `<link rel="alternate" hreflang="${locale}" href="${or
 <meta property="og:locale" content="${lang === 'ja' ? 'ja_JP' : 'en_US'}"><meta property="og:locale:alternate" content="${other === 'ja' ? 'ja_JP' : 'en_US'}">
 <meta property="og:url" content="${origin.origin}${current}">
 <link rel="icon" type="image/svg+xml" href="/assets/mark.svg"><link rel="stylesheet" href="/assets/style.css">
-<script type="module" src="/assets/client.mjs"></script></head>
+<script type="module" src="/assets/client.mjs"></script>
+${consent ? '<script type="module" src="/assets/analytics.mjs"></script>' : ''}</head>
 <body><a class="skip" href="#main">${t.skip}</a><header class="masthead"><div class="wrap header-inner">
 <a href="${url(lang)}" class="brand">${brand}</a>${switcher}
 <nav aria-label="${e(t.navigation)}">${links(primary)}</nav></div></header>
+${consent?.panel || ''}
 <main id="main" class="wrap"${page === '' ? ' itemscope itemtype="https://schema.org/WebSite"' : ''}>
 ${page === '' ? `<meta itemprop="name" content="Reward Radar"><meta itemprop="url" content="${origin.origin}${current}"><meta itemprop="inLanguage" content="${lang}">` : ''}
 ${content}</main>
 <footer><div class="wrap foot-inner"><div><a href="${url(lang)}" class="brand">${brand}</a>
 <p class="muted">${t.legalContact} · ${address}</p></div>
 <nav aria-label="${e(t.footerNavigation)}">${links(secondary)}${switcher}</nav>
-<p class="muted">© ${t.copyright}</p></div></footer></body></html>`;
+${consent?.settings || ''}<p class="muted">© ${t.copyright}</p></div></footer></body></html>`;
 }
 
 function card(row, lang) {
@@ -169,7 +201,7 @@ function details(lang, row) {
     [t.structure,e(t.structures[c.structure])], [t.duration,e(c.months ?? t.unknown)],
     [t.threshold,e(format(c.threshold,c.threshold_currency,lang))],
   ])}` : '';
-  return `<article class="article"><a href="${url(lang,c ? 'affiliates' : 'opportunities')}">← ${c ? t.affiliateBack : t.back}</a>
+  return `<article class="article"${analytics ? ` data-analytics-opportunity="${e(row.id)}" data-analytics-category="${e(row.category)}"` : ''}><a href="${url(lang,c ? 'affiliates' : 'opportunities')}">← ${c ? t.affiliateBack : t.back}</a>
 <div class="eyebrow">${e(t.categories[row.category])}</div><h1>${e(row['title_' + lang])}</h1>
 <p class="lead">${e(row['description_' + lang])}</p>
 <p class="stamp">${t.checked} · ${time(row.last_checked_at,lang)}</p>
@@ -181,8 +213,8 @@ ${row.entry.steps ? `<h2>${t.steps}</h2><p>${e(row.entry.steps[lang])}</p>` : ''
 ${row.category === 'sweepstakes' ? `<p class="notice">${t.odds}</p>` : ''}${terms}
 ${flags ? `<h2>${t.flags}</h2><ul>${flags}</ul>` : ''}
 <p class="notice">${t.safer}</p>
-<div class="actions" data-expiring="${e(row.deadline || '')}">${external(row.official_url,t.official)}
-${row.affiliate_url ? `<span data-affiliate-expires="${e(row.affiliate_expires_at || '')}">${external(row.affiliate_url,t.sponsored,true)}</span>` : ''}</div>
+<div class="actions" data-expiring="${e(row.deadline || '')}">${external(row.official_url,t.official,c ? null : 'application_click')}
+${row.affiliate_url ? `<span data-affiliate-expires="${e(row.affiliate_expires_at || '')}">${external(row.affiliate_url,t.sponsored,'affiliate_click')}</span>` : ''}</div>
 <p><a href="${e(new URL(row.source_url).href)}" rel="noopener noreferrer">${t.source}</a></p>
 ${row.supporting_urls.map((link,index) => `<p><a href="${e(new URL(link).href)}" rel="noopener noreferrer">${t.moreSources} ${index + 1}</a></p>`).join('')}
 <template id="adsense-slot"></template></article>`;
@@ -228,7 +260,8 @@ for (const lang of languages) {
     const [title, description] = t.pages[key];
     const sections = t.articles[key].map(([heading, body]) => `<h2>${e(heading)}</h2><p>${e(body)}</p>`).join('');
     await page(lang,key,title,description,`<article class="article"><h1>${e(title)}</h1><p class="lead">${e(description)}</p>
-${sections}${['contact','privacy','disclosure'].includes(key) ? `<p>${t.legalContact} · ${address}</p>` : ''}</article>`);
+${sections}${key === 'privacy' ? `<p><a href="https://policies.google.com/technologies/partner-sites?hl=${lang}" rel="noopener noreferrer">${t.analytics.googlePolicy}</a></p>` : ''}
+${key === 'privacy' && analytics ? `<p><button type="button" data-analytics-settings>${t.analytics.settings}</button></p>` : ''}${['contact','privacy','disclosure'].includes(key) ? `<p>${t.legalContact} · ${address}</p>` : ''}</article>`);
   }
   for (const row of rows) {
     await page(lang,'opportunities/' + row.id,row['title_' + lang],row['description_' + lang],details(lang,row));

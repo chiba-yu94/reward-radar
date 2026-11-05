@@ -64,6 +64,8 @@ jobs:
       - run: npm run build
         env:
           SITE_ORIGIN: ${{ vars.SITE_ORIGIN }}
+          GA4_MEASUREMENT_ID: ${{ vars.GA4_MEASUREMENT_ID }}
+          GA4_PRIVACY_READY: ${{ vars.GA4_PRIVACY_READY }}
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
         with:
           name: validated-static-site

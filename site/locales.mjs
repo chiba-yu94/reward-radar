@@ -3,6 +3,14 @@ export const email = 'rewardradar.support@gmail.com';
 export const copy = {
   ja: {
     language: '日本語', otherLanguage: 'English', skip: '本文へ移動', home: 'ホーム',
+    analytics: {
+      title:'任意のアクセス解析', settings:'アクセス解析の設定', accept:'許可する', reject:'拒否する', close:'閉じる',
+      summary:'同意すると、Google Analytics で閲覧ページと公式応募リンクの利用を計測します。',
+      details:'閲覧ページ、表示言語、参照元の種類、応募リンクのクリックを、サイト改善のために計測します。設定はいつでも変更できます。',
+      googlePolicy:'Google による情報の利用について',
+      allowed:'現在は許可されています。拒否すると同意を取り消せます。',
+      denied:'現在は拒否されています。', undecided:'まだ選択されていません。',
+    },
     prizeCategory: '賞品ジャンル', registration: 'アカウント・登録', applicationData: '応募時に必要と確認した情報', winnerData: '当選後に必要と確認した情報',
     steps: '応募手順', organizerVerified: '公式主催者を確認済み', organizerFilter: '主催者確認済みのみ', emailOnly: 'メールアドレスのみで応募',
     noPersonal: '提供不要', prizes: {food:'食品・飲料', 'cash-gift':'現金・ギフトカード', electronics:'家電・ゲーム', household:'日用品', digital:'デジタル特典', other:'その他'},
@@ -67,7 +75,8 @@ export const copy = {
       ],
       contact: [['掲載内容を知らせる', '案件名、該当するページ、公式情報へのリンクをメールに添えてください。本人確認書類、決済情報、パスワードは送らないでください。']],
       privacy: [
-        ['サイトの利用', '利用者アカウント、広告用 Cookie、アクセス解析を設けていません。絞り込みはブラウザー内で行います。ホスティング事業者が配信と安全対策のために接続情報を処理する場合があります。'],
+        ['サイトの利用', '利用者アカウントと広告用 Cookie は使用していません。絞り込みはブラウザー内で行います。ホスティング事業者が配信と安全対策のために接続情報を処理する場合があります。'],
+        ['任意のアクセス解析', '計測が設定されている場合、許可を選んだ後に Google Analytics 4 が読み込まれます。ページ、表示言語、参照元の種類、応募・広告リンクのクリックをサイト改善に使います。検索語、氏名、メールアドレス、外部リンク先の URL は送信しません。Google は計測用の Cookie 識別子と接続・端末情報を処理します。選択はブラウザーに保存され、フッターの設定から取り消せます。取り消すとこのサイトの計測用 Cookie を消去し、以降の計測を停止します。'],
         ['お問い合わせと外部リンク', 'メールでご連絡いただいた場合、返信と掲載の確認に必要な範囲で内容を取り扱います。第三者サイトに移動すると、移動先の規約とプライバシー方針が適用されます。'],
       ],
       disclosure: [
@@ -78,6 +87,14 @@ export const copy = {
   },
   en: {
     language: 'English', otherLanguage: '日本語', skip: 'Skip to content', home: 'Home',
+    analytics: {
+      title:'Optional analytics', settings:'Analytics settings', accept:'Accept', reject:'Reject', close:'Close',
+      summary:'With your permission, Google Analytics measures page visits and clicks on official application links.',
+      details:'We measure the pages you visit, the site language, broad referral categories and application-link clicks to improve the site. You can change this choice at any time.',
+      googlePolicy:'How Google uses information from this site',
+      allowed:'Analytics is currently allowed. Choose Reject to withdraw your consent.',
+      denied:'Analytics is currently declined.', undecided:'You have not made a choice yet.',
+    },
     prizeCategory: 'Prize category', registration: 'Account or registration', applicationData: 'Information confirmed at entry', winnerData: 'Information confirmed after winning',
     steps: 'How to enter', organizerVerified: 'Official organizer verified', organizerFilter: 'Verified organizers only', emailOnly: 'Email-only entry',
     noPersonal: 'None required', prizes: {food:'Food and drinks', 'cash-gift':'Cash and gift cards', electronics:'Electronics and games', household:'Household goods', digital:'Digital gifts', other:'Other'},
@@ -143,7 +160,8 @@ export const copy = {
       ],
       contact: [['Report a listing', 'Include the listing name, its Reward Radar URL and a link to the official information. Please keep passwords, payment information and identity documents out of your email.']],
       privacy: [
-        ['Using this site', 'The site has no user accounts, advertising cookies or analytics. Filtering runs in your browser. Our hosting provider may process connection data to deliver the site and protect it from abuse.'],
+        ['Using this site', 'The site has no user accounts or advertising cookies. Filtering runs in your browser. Our hosting provider may process connection data to deliver the site and protect it from abuse.'],
+        ['Optional analytics', 'When analytics is configured, Google Analytics 4 loads after you choose Accept. We use page visits, site language, broad referral categories and application or affiliate link clicks to improve the site. We do not send search terms, names, email addresses or external link URLs. Google processes analytics cookie identifiers and connection and device information. Your choice is stored in your browser. You can withdraw it in the footer settings. This clears the site’s analytics cookies and stops future measurement.'],
         ['Email and external links', 'If you email us, we use the message to respond and investigate the listing where needed. External providers apply their own terms and privacy policies when you visit them.'],
       ],
       disclosure: [

@@ -10,7 +10,8 @@
     "test": "python3 -m unittest discover -s tests && node --test tests/*.test.mjs",
     "dev": "wrangler dev --ip 127.0.0.1",
     "deploy": "wrangler deploy",
-    "test:browser": "node tests/browser.mjs"
+    "test:browser": "node tests/browser.mjs",
+    "test:analytics": "node tests/analytics-browser.mjs"
   },
   "private": true
 }
