@@ -16,3 +16,5 @@ Editorial comparisons can be published before program approval. Prioritize compa
 
 - [Google AdSense site approval help](https://support.google.com/adsense/answer/12169212?hl=en)
 - Support [rewardradar.support@gmail.com](mailto:rewardradar.support@gmail.com)
+
+Keep the affiliate page separate from the giveaway directory. The operator may start by documenting relevant consumer comparisons, applying to an eligible program, and measuring confirmed receipts against the monthly goal.

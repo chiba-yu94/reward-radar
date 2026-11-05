@@ -45,7 +45,13 @@
     "description_ja": "アンケートに回答してポイントを貯める日本向けモニター制度です。",
     "description_en": "A Japan-based survey panel that awards points for eligible responses.",
     "eligibility_ja": "日本在住で6歳以上。中学生以下は保護者の同意が必要です。市場調査会社・広告代理店の関係者は登録を控えるよう案内されています。",
-    "eligibility_en": "Residents of Japan aged 6 or older. Junior-high students and younger need guardian consent. People working in market research or advertising agencies are asked to refrain from registering."
+    "eligibility_en": "Residents of Japan aged 6 or older. Junior-high students and younger need guardian consent. People working in market research or advertising agencies are asked to refrain from registering.",
+    "entry": {
+      "registration": "organizer",
+      "application": null,
+      "winner": null,
+      "steps": null
+    }
   },
   {
     "id": "infoq",
@@ -93,7 +99,13 @@
     "description_ja": "案内されたアンケートに回答してポイントを貯めるモニター制度です。",
     "description_en": "A panel where invited participants can earn points from eligible surveys.",
     "eligibility_ja": "日本国内に住む15歳以上。通信費は参加者負担です。",
-    "eligibility_en": "Residents of Japan aged 15 or older. Participants cover their own internet access costs."
+    "eligibility_en": "Residents of Japan aged 15 or older. Participants cover their own internet access costs.",
+    "entry": {
+      "registration": "organizer",
+      "application": null,
+      "winner": null,
+      "steps": null
+    }
   },
   {
     "id": "research-panel",
@@ -141,7 +153,13 @@
     "description_ja": "オンライン調査や座談会に参加できるモニター制度です。",
     "description_en": "A panel offering online surveys and discussion groups.",
     "eligibility_ja": "日本在住の6歳以上。16歳未満は保護者の同意が必要です。市場調査会社・広告代理店の勤務者はアンケート対象外です。",
-    "eligibility_en": "Residents of Japan aged 6 or older. Under-16s need guardian consent. People employed by market research or advertising agencies cannot take surveys."
+    "eligibility_en": "Residents of Japan aged 6 or older. Under-16s need guardian consent. People employed by market research or advertising agencies cannot take surveys.",
+    "entry": {
+      "registration": "organizer",
+      "application": null,
+      "winner": null,
+      "steps": null
+    }
   },
   {
     "id": "rakuten-insight",
@@ -189,7 +207,13 @@
     "description_ja": "調査に回答して楽天ポイントを受け取るモニター制度です。",
     "description_en": "A survey panel that awards Rakuten Points for eligible responses.",
     "eligibility_ja": "日本国内居住者。楽天会員登録とモニター登録・承認が必要です。未成年者、成年被後見人、被保佐人、被補助人は保護者または法定代理人の同意が必要です。",
-    "eligibility_en": "Residents of Japan must register as Rakuten members and obtain panel approval. Minors and applicants under guardianship, curatorship or assistance need consent from a guardian or legal representative."
+    "eligibility_en": "Residents of Japan must register as Rakuten members and obtain panel approval. Minors and applicants under guardianship, curatorship or assistance need consent from a guardian or legal representative.",
+    "entry": {
+      "registration": "organizer",
+      "application": null,
+      "winner": null,
+      "steps": null
+    }
   },
   {
     "id": "prolific",
@@ -291,7 +315,15 @@
     "reward_currencies": [
       "GBP",
       "USD"
-    ]
+    ],
+    "entry": {
+      "registration": "organizer",
+      "application": [
+        "identity"
+      ],
+      "winner": null,
+      "steps": null
+    }
   },
   {
     "id": "usertesting",
@@ -338,7 +370,13 @@
     "description_ja": "サイトやアプリの操作について、提供元の募集に応じてフィードバックします。",
     "description_en": "Give feedback about websites and apps when a matching test is available.",
     "eligibility_ja": "対象国は変動するため、提供元が案内する方法で居住国の受付状況を確認してください。",
-    "eligibility_en": "Country availability can change. Use the provider’s suggested method to check whether it accepts residents of your country."
+    "eligibility_en": "Country availability can change. Use the provider’s suggested method to check whether it accepts residents of your country.",
+    "entry": {
+      "registration": "organizer",
+      "application": null,
+      "winner": null,
+      "steps": null
+    }
   },
   {
     "id": "docomo-daily-draw",
@@ -480,7 +518,13 @@
     "description_ja": "対応地域で対象の検索や活動を行い、ポイントを獲得するプログラムです。",
     "description_en": "Earn points through qualifying searches and activities in supported markets.",
     "eligibility_ja": "公式地域一覧に日本があります。付与・交換の内容は市場によって異なります。 ここに表示する国は公式一覧の一部です。",
-    "eligibility_en": "Japan appears on the official list of markets. Earning and redemption options vary by market. The country filter covers a verified subset of the official list."
+    "eligibility_en": "Japan appears on the official list of markets. Earning and redemption options vary by market. The country filter covers a verified subset of the official list.",
+    "entry": {
+      "registration": "organizer",
+      "application": null,
+      "winner": null,
+      "steps": null
+    }
   },
   {
     "id": "rakuten-rebates",
@@ -572,7 +616,13 @@
     "description_ja": "会員サイトでのログインなど、対象の活動に応じて会員用ポイントを獲得できます。",
     "description_en": "Members can earn site-specific points through qualifying activities including login.",
     "eligibility_ja": "COCORO MEMBERS への会員登録が必要です。居住地の要件は掲載資料から確定していません。",
-    "eligibility_en": "COCORO MEMBERS registration is required. The linked material does not establish residency eligibility."
+    "eligibility_en": "COCORO MEMBERS registration is required. The linked material does not establish residency eligibility.",
+    "entry": {
+      "registration": "organizer",
+      "application": null,
+      "winner": null,
+      "steps": null
+    }
   },
   {
     "id": "github-student",
@@ -619,7 +669,8 @@
     "description_ja": "対象の学生が GitHub Education に申請し、学習・開発向けの特典を利用できます。",
     "description_en": "Eligible students can apply for GitHub Education benefits for learning and software development.",
     "eligibility_ja": "13歳以上で、学位や卒業資格を取得できる課程に在籍し、個人 GitHub アカウントと在籍証明が必要です。学校によっては学校メールの認証も必須です。対象国は未確認です。",
-    "eligibility_en": "Applicants must be at least 13, enrolled in a degree- or diploma-granting course, and have a personal GitHub account and current enrollment evidence. Academic email verification is mandatory for some schools. Eligible countries are unverified."
+    "eligibility_en": "Applicants must be at least 13, enrolled in a degree- or diploma-granting course, and have a personal GitHub account and current enrollment evidence. Academic email verification is mandatory for some schools. Eligible countries are unverified.",
+    "audience": "professional"
   },
   {
     "id": "hubspot-affiliate",
@@ -767,7 +818,15 @@
     "description_ja": "提供元は本登録の完了に対する16ポイントを案内しています。",
     "description_en": "The provider lists 16 points for completing panel registration.",
     "eligibility_ja": "14歳以上。電話認証が必要で、中学生は保護者への案内を伴う別の手続きです。対象の居住地はこの登録案内から未確認です。",
-    "eligibility_en": "Applicants must be at least 14 and verify a phone number. Junior-high students follow a separate process that includes notifying a guardian. The registration page does not establish eligible residence."
+    "eligibility_en": "Applicants must be at least 14 and verify a phone number. Junior-high students follow a separate process that includes notifying a guardian. The registration page does not establish eligible residence.",
+    "entry": {
+      "registration": "organizer",
+      "application": [
+        "phone"
+      ],
+      "winner": null,
+      "steps": null
+    }
   },
   {
     "id": "google-opinion-android",
@@ -848,6 +907,500 @@
     "description_ja": "Android 端末で案内されるアンケートに回答し、対象の回答で Google Play クレジットを受け取ります。",
     "description_en": "Answer surveys offered through the Android app and earn Google Play credits for qualifying responses.",
     "eligibility_ja": "日本を含む対象地域の18歳超で、対象 Android 端末と Google Play アカウントが必要です。",
-    "eligibility_en": "Available on Android to users over 18 in the listed regions, including Japan. A Google Play account is required."
+    "eligibility_en": "Available on Android to users over 18 in the listed regions, including Japan. A Google Play account is required.",
+    "entry": {
+      "registration": "organizer",
+      "application": null,
+      "winner": null,
+      "steps": null
+    }
+  },
+  {
+    "id": "calbee-jagabee-2026",
+    "source_id": "calbee-jagabee-2026",
+    "provider": "Calbee",
+    "category": "sweepstakes",
+    "eligible_countries": [
+      "JP"
+    ],
+    "eligibility_verified": true,
+    "reward_type": "prize",
+    "reward_currency": null,
+    "reward_amount": null,
+    "reward_conditions": {
+      "ja": "当選者は公式XのDMを確認し、カルビールビープログラムのスマートフォンアプリを入れて指定アカウントで連携します。賞品送付情報は当選後に登録します。",
+      "en": "Winners receive a DM from the official X account. Claiming requires the Calbee Ruby Program smartphone app, an accepted linked account and shipping details."
+    },
+    "required_expense": {
+      "kind": "free",
+      "amount": 0,
+      "currency": null
+    },
+    "estimated_effort_minutes": null,
+    "participation_method": "social",
+    "deadline": "2027-01-31T14:59:00Z",
+    "official_url": "https://www.calbee.co.jp/jagabee/hokkoricampaign/",
+    "affiliate_url": null,
+    "affiliate_approval_status": "none",
+    "source_url": "https://www.calbee.co.jp/jagabee/hokkoricampaign/",
+    "source_permission_status": "editorial-summary",
+    "first_seen_at": "2026-11-05T07:10:00Z",
+    "last_checked_at": "2026-11-05T07:10:00Z",
+    "verification_status": "verified",
+    "risk_flags": [
+      "account"
+    ],
+    "published_status": "approved",
+    "language": "ja",
+    "certainty": "chance",
+    "redemption_difficulty": null,
+    "commission": null,
+    "title_ja": "Jagabee うすしお味1年分の抽選",
+    "title_en": "Calbee Jagabee snack giveaway",
+    "description_ja": "うすしお味365袋相当を、3回の抽選で計100名に。賞品は2回に分けて届きます。",
+    "description_en": "Calbee is drawing 100 winners across three rounds. Each receives 365 individual bags of lightly salted Jagabee snacks in two shipments.",
+    "eligibility_ja": "日本在住で国内配送先があり、公開のXアカウントを使える人が対象です。",
+    "eligibility_en": "Open to Japan residents with a domestic shipping address and a public X account.",
+    "entry": {
+      "registration": "social",
+      "application": [
+        "social-account"
+      ],
+      "winner": [
+        "address",
+        "social-account"
+      ],
+      "steps": {
+        "ja": "公開のXアカウントで @calbee_PR をフォローし、指定のハッシュタグを付けて通常投稿します。",
+        "en": "Follow @calbee_PR on a public X account and create a regular post with the campaign hashtag shown in the rules."
+      }
+    },
+    "prize_category": "food"
+  },
+  {
+    "id": "ja-wakayama-rice-2026-11",
+    "source_id": "ja-wakayama-rice-2026-11",
+    "provider": "JA Group Wakayama Marketplace",
+    "category": "sweepstakes",
+    "eligible_countries": [
+      "JP"
+    ],
+    "eligibility_verified": true,
+    "reward_type": "prize",
+    "reward_currency": null,
+    "reward_amount": null,
+    "reward_conditions": {
+      "ja": "当選発表は賞品の発送をもって行われます。公式ページは締切日までを案内しています。締切時刻は記載されていません。",
+      "en": "Prizes are shipped directly to winners. The organizer publishes the closing date without a time."
+    },
+    "required_expense": {
+      "kind": "free",
+      "amount": 0,
+      "currency": null
+    },
+    "estimated_effort_minutes": null,
+    "participation_method": "form",
+    "deadline": "2026-11-30T14:59:59Z",
+    "official_url": "https://www.ja-town.com/shop/pages/5610/presentforyou.aspx",
+    "affiliate_url": null,
+    "affiliate_approval_status": "none",
+    "source_url": "https://www.ja-town.com/shop/pages/5610/presentforyou.aspx",
+    "source_permission_status": "editorial-summary",
+    "first_seen_at": "2026-11-05T07:10:00Z",
+    "last_checked_at": "2026-11-05T07:10:00Z",
+    "verification_status": "verified",
+    "risk_flags": [
+      "account"
+    ],
+    "published_status": "approved",
+    "language": "ja",
+    "certainty": "chance",
+    "redemption_difficulty": null,
+    "commission": null,
+    "title_ja": "和歌山県産きぬむすめ2kgの抽選",
+    "title_en": "Wakayama Kinumusume rice giveaway",
+    "description_ja": "和歌山県産のきぬむすめ2kgが5名に当たります。",
+    "description_en": "Five entrants win 2 kg of Kinumusume rice grown in Wakayama.",
+    "eligibility_ja": "18歳以上で日本在住、発送先も日本国内。対象ショップのメールマガジンに登録していることが条件です。",
+    "eligibility_en": "Entrants must be at least 18, live in Japan, have a Japanese shipping address and subscribe to the shop newsletter.",
+    "entry": {
+      "registration": "organizer",
+      "application": [
+        "name",
+        "address",
+        "phone",
+        "email"
+      ],
+      "winner": null,
+      "steps": {
+        "ja": "対象ショップのメールマガジンに登録し、公式ページ記載の宛先へ、氏名、住所・郵便番号、電話番号、登録メールアドレスを送ります。1人1回です。",
+        "en": "Subscribe to the shop newsletter, then email the address listed in the rules with your name, postal address and code, phone number and subscribed email address. One entry per person."
+      }
+    },
+    "prize_category": "food",
+    "deadline_date_only": true
+  },
+  {
+    "id": "yamazaki-nikuman-2026",
+    "source_id": "yamazaki-nikuman-2026",
+    "provider": "Yamazaki Baking",
+    "category": "sweepstakes",
+    "eligible_countries": [
+      "JP"
+    ],
+    "eligibility_verified": true,
+    "reward_type": "gift-card",
+    "reward_currency": "JPY",
+    "reward_amount": 1129,
+    "reward_conditions": {
+      "ja": "当選連絡はXのDMです。賞品発送先の登録とデジタル特典の受取手続きが必要です。デジタル特典の利用には原則スマートフォンが必要です。",
+      "en": "Winners are contacted by X DM and must submit shipping details and claim the digital reward. A smartphone is generally needed to redeem it."
+    },
+    "required_expense": {
+      "kind": "free",
+      "amount": 0,
+      "currency": null
+    },
+    "estimated_effort_minutes": null,
+    "participation_method": "social",
+    "deadline": "2026-11-29T14:59:00Z",
+    "official_url": "https://www.yamazakipan.co.jp/feature/nikuman_xcp/",
+    "affiliate_url": null,
+    "affiliate_approval_status": "none",
+    "source_url": "https://www.yamazakipan.co.jp/feature/nikuman_xcp/",
+    "source_permission_status": "editorial-summary",
+    "first_seen_at": "2026-11-05T07:10:00Z",
+    "last_checked_at": "2026-11-05T07:10:00Z",
+    "verification_status": "verified",
+    "risk_flags": [
+      "account"
+    ],
+    "published_status": "approved",
+    "language": "ja",
+    "certainty": "chance",
+    "redemption_difficulty": null,
+    "commission": null,
+    "title_ja": "肉まんチャームとえらべるPayの抽選",
+    "title_en": "Yamazaki bun charm and digital reward giveaway",
+    "description_ja": "肉まん型チャームとえらべるPay 1,129円分が、3回の抽選で最大30名に当たります。",
+    "description_en": "Up to 30 winners across three rounds receive a steamed-bun charm and ¥1,129 in Eraberu Pay digital rewards.",
+    "eligibility_ja": "日本在住で公開のXアカウントを使用する方が対象です。山崎製パンの社員・関係者は対象外です。",
+    "eligibility_en": "Open to Japan residents with a public X account. Yamazaki employees and people associated with the company are excluded.",
+    "entry": {
+      "registration": "social",
+      "application": [
+        "social-account"
+      ],
+      "winner": [
+        "address"
+      ],
+      "steps": {
+        "ja": "@yamazakipan_cp をフォローし、対象回の投稿をリポストします。引用投稿は無効です。",
+        "en": "Follow @yamazakipan_cp and repost the entry post for the current round. Quote posts do not qualify."
+      }
+    },
+    "prize_category": "cash-gift"
+  },
+  {
+    "id": "saitama-seasonal-produce-2026",
+    "source_id": "saitama-seasonal-produce-2026",
+    "provider": "Saitama Prefecture",
+    "category": "sweepstakes",
+    "eligible_countries": null,
+    "eligibility_verified": false,
+    "reward_type": "prize",
+    "reward_currency": null,
+    "reward_amount": null,
+    "reward_conditions": {
+      "ja": "当選者は公式アカウントのDMに指定期間内に応答し、発送先を登録します。非公開アカウントなどでは当選連絡や発送ができない場合があります。公式案内に締切時刻の記載はありません。",
+      "en": "Winners must respond to the official account’s DM by the stated deadline and provide delivery details. Private accounts may prevent notification or delivery. The published deadline has no time."
+    },
+    "required_expense": {
+      "kind": "free",
+      "amount": 0,
+      "currency": null
+    },
+    "estimated_effort_minutes": null,
+    "participation_method": "social",
+    "deadline": "2026-11-16T14:59:59Z",
+    "official_url": "https://www.pref.saitama.lg.jp/saitama-wassyoi/enjoy/news081027.html",
+    "affiliate_url": null,
+    "affiliate_approval_status": "none",
+    "source_url": "https://www.pref.saitama.lg.jp/saitama-wassyoi/enjoy/news081027.html",
+    "source_permission_status": "editorial-summary",
+    "first_seen_at": "2026-11-05T07:10:00Z",
+    "last_checked_at": "2026-11-05T07:10:00Z",
+    "verification_status": "verified",
+    "risk_flags": [
+      "account"
+    ],
+    "published_status": "approved",
+    "language": "ja",
+    "certainty": "chance",
+    "redemption_difficulty": null,
+    "commission": null,
+    "title_ja": "埼玉県産の旬の農産物セットの抽選",
+    "title_en": "Saitama seasonal produce giveaway",
+    "description_ja": "JAいるま野の旬の農産物詰め合わせが10名に当たります。",
+    "description_en": "Ten entrants win an assortment of seasonal produce from JA Irumano.",
+    "eligibility_ja": "Instagramアカウントで参加します。18歳未満は保護者の同意が必要です。居住国の明示条件は確認できていません。",
+    "eligibility_en": "Entrants use an Instagram account. Under-18s need parental or guardian consent. An explicit country-of-residence rule has not been verified.",
+    "entry": {
+      "registration": "social",
+      "application": [
+        "social-account"
+      ],
+      "winner": [
+        "address"
+      ],
+      "steps": {
+        "ja": "@saitama_wassyoi をフォローし、対象投稿にいいねを付け、すすめたい埼玉の野菜や果物をコメントします。",
+        "en": "Follow @saitama_wassyoi, like the campaign post and comment with a Saitama fruit or vegetable you would recommend."
+      }
+    },
+    "prize_category": "food",
+    "deadline_date_only": true
+  },
+  {
+    "id": "doutor-latte-2026",
+    "source_id": "doutor-latte-2026",
+    "provider": "Doutor Coffee",
+    "category": "sweepstakes",
+    "eligible_countries": null,
+    "eligibility_verified": false,
+    "reward_type": "prize",
+    "reward_currency": null,
+    "reward_amount": null,
+    "reward_conditions": {
+      "ja": "当選者は公式アカウントからのDMを確認し、期限内に配送先を登録します。賞品発送時にもフォローを継続してください。",
+      "en": "Winners receive a DM from the official account and must provide a shipping address by its deadline. Keep following the account until shipment."
+    },
+    "required_expense": {
+      "kind": "free",
+      "amount": 0,
+      "currency": null
+    },
+    "estimated_effort_minutes": null,
+    "participation_method": "social",
+    "deadline": "2026-11-09T14:59:00Z",
+    "official_url": "https://www.doutor.co.jp/business/wholesale/campaign/05.html",
+    "affiliate_url": null,
+    "affiliate_approval_status": "none",
+    "source_url": "https://www.doutor.co.jp/business/wholesale/campaign/05.html",
+    "source_permission_status": "editorial-summary",
+    "first_seen_at": "2026-11-05T07:10:00Z",
+    "last_checked_at": "2026-11-05T07:10:00Z",
+    "verification_status": "verified",
+    "risk_flags": [
+      "account"
+    ],
+    "published_status": "approved",
+    "language": "ja",
+    "certainty": "chance",
+    "redemption_difficulty": null,
+    "commission": null,
+    "title_ja": "ドトールのカフェラテ4箱セットの抽選",
+    "title_en": "Doutor instant latte giveaway",
+    "description_ja": "ハニーカフェラテと黒糖カフェラテを各2箱、計4箱のセットで30名に。",
+    "description_en": "Thirty winners receive four boxes of instant latte, two honey and two brown sugar.",
+    "eligibility_ja": "Instagramアカウントが必要です。未成年は親権者の同意が必要です。発送は日本国内のみで、居住国の条件は未確認です。",
+    "eligibility_en": "An Instagram account is required, and minors need parental consent. Prizes ship only within Japan. A residency rule has not been verified.",
+    "entry": {
+      "registration": "social",
+      "application": [
+        "social-account"
+      ],
+      "winner": [
+        "address"
+      ],
+      "steps": {
+        "ja": "@doutor_coffee_wholesale をフォローし、対象投稿に飲みたい方の味をコメントします。",
+        "en": "Follow @doutor_coffee_wholesale and comment on the campaign post with the flavour you would like to try."
+      }
+    },
+    "prize_category": "food"
+  },
+  {
+    "id": "takaratomy-conan-card-2026",
+    "source_id": "takaratomy-conan-card-2026",
+    "provider": "Takara Tomy",
+    "category": "sweepstakes",
+    "eligible_countries": [
+      "JP"
+    ],
+    "eligibility_verified": true,
+    "reward_type": "prize",
+    "reward_currency": null,
+    "reward_amount": null,
+    "reward_conditions": {
+      "ja": "応募は1人1回。公式アカウントからDMを受け取った当選者は、本人の住所を発送先として登録します。",
+      "en": "One entry per person. Winners receive an official DM and must provide their own address for delivery."
+    },
+    "required_expense": {
+      "kind": "free",
+      "amount": 0,
+      "currency": null
+    },
+    "estimated_effort_minutes": null,
+    "participation_method": "social",
+    "deadline": "2026-11-08T14:59:00Z",
+    "official_url": "https://www.takaratomy.co.jp/products/conan-cardgame/news_detail/hashtag_202611_furuya",
+    "affiliate_url": null,
+    "affiliate_approval_status": "none",
+    "source_url": "https://www.takaratomy.co.jp/products/conan-cardgame/news_detail/hashtag_202611_furuya",
+    "source_permission_status": "editorial-summary",
+    "first_seen_at": "2026-11-05T07:10:00Z",
+    "last_checked_at": "2026-11-05T07:10:00Z",
+    "verification_status": "verified",
+    "risk_flags": [
+      "account"
+    ],
+    "published_status": "approved",
+    "language": "ja",
+    "certainty": "chance",
+    "redemption_difficulty": null,
+    "commission": null,
+    "title_ja": "名探偵コナンカード「降谷零」の抽選",
+    "title_en": "Detective Conan Rei Furuya card giveaway",
+    "description_ja": "PRカード「降谷零（PR343）」1枚が10名に当たります。",
+    "description_en": "Ten entrants win one Rei Furuya promotional card (PR343).",
+    "eligibility_ja": "日本在住で公開のXアカウントを利用する方が対象です。16歳未満は保護者同意が必要で、タカラトミーグループ社員・関係者などは対象外です。",
+    "eligibility_en": "Open to residents of Japan with a public X account. Under-16s need guardian consent. Takara Tomy Group employees and associates are among those excluded.",
+    "entry": {
+      "registration": "social",
+      "application": [
+        "social-account"
+      ],
+      "winner": [
+        "address"
+      ],
+      "steps": {
+        "ja": "@CONAN_tcg をフォローし、対象投稿を指定のハッシュタグ付きで引用投稿します。",
+        "en": "Follow @CONAN_tcg and quote-post the campaign post with the specified hashtag."
+      }
+    },
+    "prize_category": "other"
+  },
+  {
+    "id": "kotobukiya-noa-2026",
+    "source_id": "kotobukiya-noa-2026",
+    "provider": "Kotobukiya",
+    "category": "sweepstakes",
+    "eligible_countries": [
+      "JP"
+    ],
+    "eligibility_verified": true,
+    "reward_type": "prize",
+    "reward_currency": null,
+    "reward_amount": null,
+    "reward_conditions": {
+      "ja": "当選通知から1週間以内の返信と、配送先の確認が必要です。",
+      "en": "The winner must reply within a week of notification and provide a deliverable address."
+    },
+    "required_expense": {
+      "kind": "free",
+      "amount": 0,
+      "currency": null
+    },
+    "estimated_effort_minutes": null,
+    "participation_method": "social",
+    "deadline": "2026-11-12T14:59:00Z",
+    "official_url": "https://www.kotobukiya.co.jp/campaign/detail/1366/",
+    "affiliate_url": null,
+    "affiliate_approval_status": "none",
+    "source_url": "https://www.kotobukiya.co.jp/campaign/detail/1366/",
+    "source_permission_status": "editorial-summary",
+    "first_seen_at": "2026-11-05T07:10:00Z",
+    "last_checked_at": "2026-11-05T07:10:00Z",
+    "verification_status": "verified",
+    "risk_flags": [
+      "account"
+    ],
+    "published_status": "approved",
+    "language": "ja",
+    "certainty": "chance",
+    "redemption_difficulty": null,
+    "commission": null,
+    "title_ja": "ブルーアーカイブ「ノア（パジャマ）」フィギュアの抽選",
+    "title_en": "Kotobukiya Blue Archive Noa figure giveaway",
+    "description_ja": "ノア（パジャマ）のフィギュアが1名に当たります。発送は2027年6月頃の予定です。",
+    "description_en": "One entrant wins a Noa (Pajamas) figure from Blue Archive, expected to ship around June 2027.",
+    "eligibility_ja": "日本在住でXを利用し、主催者からDMを受け取れることが条件です。",
+    "eligibility_en": "Open to Japan residents who use X and can receive a DM from the organizer.",
+    "entry": {
+      "registration": "social",
+      "application": [
+        "social-account"
+      ],
+      "winner": [
+        "address"
+      ],
+      "steps": {
+        "ja": "Xで @kotobukiyas をフォローし、対象のキャンペーン投稿をリポストします。",
+        "en": "Follow @kotobukiyas on X and repost the campaign post."
+      }
+    },
+    "prize_category": "other"
+  },
+  {
+    "id": "tombow-mono-2026",
+    "source_id": "tombow-mono-2026",
+    "provider": "Tombow Pencil",
+    "category": "sweepstakes",
+    "eligible_countries": [
+      "JP"
+    ],
+    "eligibility_verified": true,
+    "reward_type": "prize",
+    "reward_currency": null,
+    "reward_amount": null,
+    "reward_conditions": {
+      "ja": "当選者には公式SNSからDMが届きます。同一住所への発送は1世帯1点までです。",
+      "en": "Winners are contacted by DM from the official account. Shipments are limited to one item per household at the same address."
+    },
+    "required_expense": {
+      "kind": "free",
+      "amount": 0,
+      "currency": null
+    },
+    "estimated_effort_minutes": null,
+    "participation_method": "social",
+    "deadline": "2026-11-10T14:59:00Z",
+    "official_url": "https://www.tombow.com/sp/monoday2026/",
+    "affiliate_url": null,
+    "affiliate_approval_status": "none",
+    "source_url": "https://www.tombow.com/sp/monoday2026/",
+    "source_permission_status": "editorial-summary",
+    "first_seen_at": "2026-11-05T07:10:00Z",
+    "last_checked_at": "2026-11-05T07:10:00Z",
+    "verification_status": "verified",
+    "risk_flags": [
+      "account"
+    ],
+    "published_status": "approved",
+    "language": "ja",
+    "certainty": "chance",
+    "redemption_difficulty": null,
+    "commission": null,
+    "title_ja": "MONOの日の文具・オリジナルグッズ抽選",
+    "title_en": "Tombow MONO Day giveaway",
+    "description_ja": "ジャンボ消しゴム、缶バッジ、チャーム、腕時計などのグッズが、XとInstagramで計111名に当たります。",
+    "description_en": "Across X and Instagram, 111 entrants win MONO merchandise such as jumbo erasers, pins, charms and watches.",
+    "eligibility_ja": "日本在住で郵便や宅配便を受け取れ、公開のSNSアカウントを使う方が対象です。トンボ鉛筆の社員・関係者は対象外です。",
+    "eligibility_en": "Open to Japan residents who can receive mail and parcels and use a public social account. Tombow staff and associates are excluded.",
+    "entry": {
+      "registration": "social",
+      "application": [
+        "social-account"
+      ],
+      "winner": [
+        "address"
+      ],
+      "steps": {
+        "ja": "Xで @tombowpencil をフォローして対象投稿をリポストするか、Instagramで同アカウントをフォローし対象投稿にハートの絵文字をコメントします。",
+        "en": "On X, follow @tombowpencil and repost the campaign post. On Instagram, follow the same handle and leave a heart emoji on the campaign post."
+      }
+    },
+    "prize_category": "household"
   }
 ]

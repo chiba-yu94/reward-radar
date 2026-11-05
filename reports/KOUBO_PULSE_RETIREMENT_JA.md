@@ -22,3 +22,9 @@ curl -sS -o /dev/null -w '%{http_code}\n' https://koubo-pulse.onrender.com/
 curl -sS -o /dev/null -w '%{http_code}\n' https://koubo-pulse-info.onrender.com/
 curl -sS -o /dev/null -w '%{http_code}\n' https://note.com/behind_specs/n/nb55ae90264c8
 ```
+
+## 管理画面の認証
+
+- [Supabase ログイン](https://supabase.com/dashboard/sign-in) を開き、Koubo Pulse を運用していたアカウントでログインし、対象 Organization と Project を開いてください。Project Settings、Integrations、Cron、Edge Functions、Auth と組織の請求を確認します。接続文字列や秘密鍵の共有は不要です。
+- [Resend ログイン](https://resend.com/login) を開き、Koubo Pulse を運用していたアカウントでログインしてください。API Keys、Domains、送信履歴、Billing を確認し、共有キーかどうかを照合します。キー値は共有不要です。
+- 認証後に依存関係と保持期限を確認し、必要データを保護した上で専用リソースの扱いを判断します。今回の調査範囲では両サービスの料金と稼働状態は未確認です。

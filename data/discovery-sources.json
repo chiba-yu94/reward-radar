@@ -1,0 +1,18 @@
+[
+  {
+    "id": "saitama-press",
+    "provider": "Saitama Prefecture",
+    "endpoint": "https://www.pref.saitama.lg.jp/news/news.xml",
+    "permission_url": "https://www.pref.saitama.lg.jp/kense/koho/homepage/rss.html",
+    "reviewed_on": "2026-11-05",
+    "scope": "Official RSS subscription. Keep only same-host article URLs for editorial review."
+  },
+  {
+    "id": "saitama-highlights",
+    "provider": "Saitama Prefecture",
+    "endpoint": "https://www.pref.saitama.lg.jp/chumoku/chumoku.xml",
+    "permission_url": "https://www.pref.saitama.lg.jp/kense/koho/homepage/rss.html",
+    "reviewed_on": "2026-11-05",
+    "scope": "Official RSS subscription. Keep only same-host article URLs for editorial review."
+  }
+]

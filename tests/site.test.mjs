@@ -14,14 +14,14 @@ build();
 const read = path => readFileSync('dist/' + path,'utf8');
 const rows = JSON.parse(read('opportunities.json')).records;
 const jp = rows.find(row => row.id === 'macromill');
-const draw = rows.find(row => row.id === 'docomo-daily-draw');
+const draw = {...jp, eligible_countries:null, eligibility_verified:false, deadline:null};
 const now = Date.parse('2026-11-06T00:00:00Z');
 
 test('locale structure, missing translation and actual HTML', () => {
   verifyLocales();
   assert.throws(() => verifyLocales(copy.ja,{...copy.en,search:''}), /localization/);
-  assert.match(read('ja/index.html'), /html lang="ja".*公式情報/s);
-  assert.match(read('en/index.html'), /html lang="en".*Find rewards/s);
+  assert.match(read('ja/index.html'), /html lang="ja".*無料でもらえる/s);
+  assert.match(read('en/index.html'), /html lang="en".*Find free giveaways/s);
   assert.match(read('ja/opportunities/index.html'), /検索・絞り込み/);
   assert.match(read('en/opportunities/index.html'), /Search and filters/);
   for (const lang of ['ja','en']) {
@@ -78,8 +78,21 @@ test('expiration, stale ranking, and unknown winning odds', () => {
   assert.equal(stale({...jp,stale_at:'2026-11-05T18:00:00Z'},now),true);
   const old = {...jp,id:'older',stale_at:'2026-11-05T18:00:00Z'};
   assert.equal(ordered([old,jp],now)[0].id,jp.id);
-  assert.match(read('en/opportunities/docomo-daily-draw/index.html'), /no verified winning odds/);
-  assert.ok(!Object.hasOwn(draw,'winning_probability'));
+  for (const live of rows.filter(row => row.category === 'sweepstakes')) {
+    assert.match(read(`en/opportunities/${live.id}/index.html`), /no verified winning odds/);
+    assert.ok(!Object.hasOwn(live,'winning_probability'));
+  }
+});
+
+test('consumer filters do not turn unverified requirements into promises', () => {
+  const candidate = {...jp, prize_category:'food', organizer_verified:true,
+    entry:{registration:'none',application:['email']}};
+  assert.equal(matches(candidate,{emailOnly:'yes',organizer:'yes',prize_category:'food'},'en',now),true);
+  assert.equal(matches({...candidate,entry:{registration:'none',application:null}},{emailOnly:'yes'},'en',now),false);
+  assert.equal(matches({...candidate,entry:{registration:'social',application:['social-account']}},{registration:'none'},'en',now),false);
+  assert.equal(matches({...candidate,organizer_verified:false},{organizer:'yes'},'en',now),false);
+  assert.ok(rows.every(row => row.category === 'affiliate' || row.required_expense.kind === 'free'));
+  assert.ok(!rows.some(row => row.id === 'github-student'));
 });
 
 test('sponsored link attributes only after validated approval', () => {

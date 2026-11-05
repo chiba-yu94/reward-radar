@@ -10,13 +10,18 @@
 4. Add the bilingual record. Use a country list only where explicit, null for unverified, and `worldwide_reviewed: true` in the source registry only where the official source explicitly permits worldwide participation. When a country list is partial, explain that in both translations. Keep amounts, currency, cost or times null if missing. For purchase-only programs with a variable price, use `kind: purchase` and null amount.
 5. Review the changes and run `npm test`. Changed sources and destinations stay pending until the reviewed inputs are updated. For GitHub Contents, a new blob identifier requires review of the underlying file and any referenced conditions.
 
-## Initial review and ongoing checks
+## Discovery and review
 
-The initial registry holds 15 live listings and one expired historical entry. The d POINT daily draw states its maximum advertised points and directs users to in-app terms. The Rakuten Ichiba draw has an explicit end notice and is excluded from active data. Prolific's residency list includes Japan. Microsoft Rewards lists more markets than the filter's verified subset. UserTesting's location eligibility depends on current recruitment. The source registry and details preserve those distinctions.
+`data/discovery-sources.json` lists the Saitama Prefecture press and highlights RSS feeds. The prefecture explicitly offers these feeds for automated reading. The reviewed endpoints serve RSS 1.0, and the published robots file did not disallow them for the collector. The collector fetches each exact endpoint once per run. It matches giveaway terms in headlines and retains only deduplicated first-party article URLs and feed IDs. It neither follows candidate URLs nor republishes headlines or summaries. The Asahi Group RSS terms explicitly prohibit reuse beyond private use, so that feed is excluded.
 
-The only automated source is GitHub Education. The unauthenticated public REST Contents endpoint publishes a blob identifier. The collector checks the identifier and discards the response without republishing text. An unchanged document does not establish current availability of every downstream benefit. Review other sources manually at least every 30 days, and more often for dated promotions.
+Run `python3 -m radar.discovery` or download the `discovery-candidates` artifact. For each candidate, verify the organizer, original rules, all redirects, geographic and age restrictions, free participation and prize claim, personal information at both stages, translations and expiry. Only then add the exact source and destination to the reviewed registry. Dated campaign deadlines are converted from the provider's time zone. If a Japanese source only states a date, display the date without a time and stop listing it after that date in Japan.
 
+Free sweepstakes need documented organizer, cost and privacy checks. Cash, gift-card, electronics and other exceptional prizes additionally require explicit country eligibility and known data requirements for entry and claim. Check fees, impersonation indicators, official claim channel and prize details before setting the enhanced review flag. A shipping-only restriction never supplies missing evidence about residence.
+
+## November 5 expansion
+
+Eight manual campaigns came from official organizer pages. The registry has 23 manual records, of which 20 appear in the revised release. It retains the ended Rakuten app draw, the purchase-required Rebates listing, and the d POINT draw whose entry cost was unconfirmed. The professional GitHub student benefit remains in operational history and is monitored by one official API endpoint; it is excluded from public results. The two RSS endpoints are separate discovery inputs. Their first checked run yielded no candidates.
+
+- [Saitama Prefecture RSS instructions](https://www.pref.saitama.lg.jp/kense/koho/homepage/rss.html)
+- [Asahi Group RSS terms](https://www.asahigroup-holdings.com/newsroom/rss.html)
 - [GitHub REST Contents API](https://docs.github.com/en/rest/repos/contents#get-repository-content)
-- [GitHub Docs repository license](https://github.com/github/docs/blob/main/LICENSE)
-- [Prolific participant eligibility](https://participant-help.prolific.com/en/articles/445007-who-can-participate-in-studies-on-prolific)
-- [Official d POINT draw details](https://dpoint.docomo.ne.jp/content/daily_kuji/index.html)

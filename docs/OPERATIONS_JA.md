@@ -11,15 +11,21 @@ gh run view RUN_ID --log-failed
 gh run download RUN_ID -n source-observation -D var/observations/RUN_ID
 ```
 
-失敗した日は本番を前回成功版に維持します。GitHub Education のリビジョンが変わった場合は、原文とリンク先を確認し、掲載への影響を判断してからレビュー済み識別子を更新します。手動ソースは30日以内に再確認します。掲載ページは古い確認に警告を表示し、日次の実行概要にも該当案件 ID が出ます。
+公開工程に失敗した日は本番を前回成功版に維持します。
 
-## 無料プランで公開
+`gh run list --workflow publish.yml --event schedule --limit 5` で自動起動時刻を確認してください。翌朝、予定時刻を過ぎても実行がなければ GitHub の状態とワークフロー有効状態を確認し、手動起動します。
+
+候補確認には `gh run download RUN_ID -n discovery-candidates -D var/discovery/RUN_ID` を使います。RSS 失敗の警告と「候補0件」の正常結果を区別します。候補は本文を取得せず、公式 URL のみ出力します。GitHub Education のリビジョンが変わった場合は、原文とリンク先を確認し、掲載への影響を判断してからレビュー済み識別子を更新します。手動ソースは30日以内に再確認します。掲載ページは古い確認に警告を表示し、日次の実行概要にも該当案件 ID が出ます。
+
+## 無料プランで手動更新
+
+本番は `https://reward-radar.rewardradar42.workers.dev` です。現行の運用方針は手動デプロイです。期限切れはブラウザーで非表示になり、次回の手動デプロイ時に詳細ページとサイトマップから外れます。
 
 1. Cloudflare にログインし、メール確認を済ませます。Workers & Pages で Workers Free と workers.dev のアカウントサブドメインを確認します。
 2. `npm ci --ignore-scripts`、`npm test`、`python3 -m radar.pipeline collect --observation var/observation.json`、`python3 -m radar.pipeline publish --observation var/observation.json` を実行します。
-3. 実際の本番 URL を `SITE_ORIGIN` に設定し `npm run build` を実行します。Wrangler は `npm exec -- wrangler login --use-keyring` で認証できます。デプロイは `WRANGLER_SEND_METRICS=false npm run deploy` です。Cloudflare ダッシュボードから直接アップロードする場合は `dist/` の中身をアップロードし、HTML の末尾スラッシュとカスタム 404 の挙動を確認してください。
+3. 実際の本番 URL を `SITE_ORIGIN` に設定し `npm run build` を実行します。Wrangler は `npm exec -- wrangler login --use-keyring --scopes account:read workers_scripts:write` で認証できます。デプロイは `WRANGLER_SEND_METRICS=false npm run deploy` です。初回はダッシュボードから静的アセットをアップロードしました。既存 Worker の更新は Wrangler で行い、HTML の末尾スラッシュとカスタム 404 の挙動を確認します。
 4. `SITE_ORIGIN=https://実際のホスト node site/smoke.mjs` で日英ルート、CSP、JSON、404 を検査します。日英の検索、居住地フィルター、詳細への言語切り替えをブラウザーでも確認します。
-5. 自動デプロイには GitHub の production Environment を作り、main からのデプロイに制限します。Environment Secret に Cloudflare の対象アカウントのみに絞った Workers Scripts 編集用 `CLOUDFLARE_API_TOKEN` を登録します。リポジトリ変数 `CLOUDFLARE_ACCOUNT_ID`、`SITE_ORIGIN` を設定し、最後に `DEPLOY_ENABLED=true` を設定します。Actions を手動起動し、deploy と本番スモークの成功を確認します。秘密値はチャット、ログ、リポジトリに貼らないでください。
+5. 将来、自動デプロイに切り替える場合は、main のみに制限済みの GitHub production Environment を使用します。Environment Secret に Cloudflare の対象アカウントのみに絞った Workers Scripts 編集用 `CLOUDFLARE_API_TOKEN` を登録します。リポジトリ変数 `CLOUDFLARE_ACCOUNT_ID`、`SITE_ORIGIN` を設定し、最後に `DEPLOY_ENABLED=true` を設定します。Actions を手動起動し、deploy と本番スモークの成功を確認します。秘密値はチャット、ログ、リポジトリに貼らないでください。
 6. Search Console で本番 URL の URL プレフィックスプロパティを登録します。HTML ファイル方式を選び、発行された検証ファイルを静的ビルドに追加します。検証後に `sitemap.xml` を送信します。
 
 ### 復旧

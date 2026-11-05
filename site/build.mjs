@@ -30,8 +30,8 @@ const detail = (lang, row) => url(lang, 'opportunities/' + row.id);
 const time = (value, lang, full = false) => `<time datetime="${e(value)}">${e(date(value, lang, full))}</time>`;
 const address = `<a href="mailto:${email}">${email}</a>`;
 const brand = '<img src="/assets/mark.svg" alt="" width="32" height="32"><span>Reward Radar</span>';
-const primary = ['opportunities', 'sweepstakes', 'guaranteed', 'international', 'affiliates'];
-const secondary = ['ranking', 'about', 'contact', 'privacy', 'disclosure'];
+const primary = ['opportunities', 'sweepstakes', 'guaranteed', 'international'];
+const secondary = ['affiliates', 'ranking', 'about', 'contact', 'privacy', 'disclosure'];
 const maps = [];
 const localeFor = lang => lang === 'ja' ? 'ja-JP' : 'en';
 const name = (lang, country) => new Intl.DisplayNames(localeFor(lang), {type:'region'}).of(country);
@@ -93,12 +93,12 @@ ${content}</main>
 function card(row, lang) {
   const t = copy[lang];
   return `<article class="card" data-record="${e(row.id)}" data-deadline="${e(row.deadline || '')}">
-<div class="labels"><span>${e(t.categories[row.category])}</span><span>${e(t.expenses[row.required_expense.kind])}</span></div>
+<div class="labels"><span>${e(row.prize_category ? t.prizes[row.prize_category] : t.categories[row.category])}</span><span>${e(t.expenses[row.required_expense.kind])}</span></div>
 <h3><a href="${detail(lang,row)}">${e(row['title_' + lang])}</a></h3>
 <p class="provider">${e(row.provider)}</p><p>${e(row['description_' + lang])}</p>
 <p class="card-region">${e(row.eligibility_verified && Array.isArray(row.eligible_countries) && row.eligible_countries.length > 5
   ? row['eligibility_' + lang] : t.country + ' · ' + countryText(row,lang))}</p>
-${row.deadline ? `<p class="small">${t.deadline} · ${time(row.deadline,lang,true)}</p>` : ''}
+${row.deadline ? `<p class="small">${t.deadline} · ${time(row.deadline,lang,!row.deadline_date_only)}</p>` : ''}
 <p class="stamp">${t.checked} · ${time(row.last_checked_at,lang)}</p>
 <p class="notice" data-stale="${e(row.stale_at)}"${stale(row,now) ? '' : ' hidden'}>${t.stale}</p></article>`;
 }
@@ -118,6 +118,8 @@ function filters(lang, available) {
 ${options('country', t.country, {...Object.fromEntries(countries.map(c => [c,name(lang,c)])),unknown:t.unknown})}
 ${options('language',t.sourceLanguage,t.languages)}
 ${options('category',t.category,t.categories)}
+${options('prize_category',t.prizeCategory,t.prizes)}
+${options('registration',t.registration,t.registrations)}
 ${options('reward_type',t.reward,t.rewards)}
 ${options('reward_currency',t.currency,{...Object.fromEntries(currencies.map(c => [c,c])),unknown:t.unknown})}
 ${options('expense',t.expense,t.expenses)}
@@ -126,6 +128,8 @@ ${options('deadline',t.deadline,{any:t.hasDeadline,7:t.within7,30:t.within30})}
 ${options('certainty',t.certainty,t.certainties)}
 ${options('effort',t.maxEffort,Object.fromEntries([5,15,30,60].map(n => [n,n + t.minutes + t.within])))}
 </div><div class="filter-actions"><label class="checkbox"><input type="checkbox" name="explicitJapan" value="yes">${t.japan}</label>
+<label class="checkbox"><input type="checkbox" name="emailOnly" value="yes">${t.emailOnly}</label>
+<label class="checkbox"><input type="checkbox" name="organizer" value="yes">${t.organizerFilter}</label>
 <button type="reset">${t.reset}</button></div></form>
 <noscript><p class="notice">${t.javascript}</p></noscript>
 <p class="notice" data-filter-error hidden>${t.failure}</p>`;
@@ -142,15 +146,21 @@ function directory(lang, available) {
 function details(lang, row) {
   const t = copy[lang];
   const expense = row.required_expense;
+  const personal = values => e(values === null ? t.unknown : values.length
+    ? values.map(value => t.personal[value]).join(lang === 'ja' ? '、' : ', ') : t.noPersonal);
   const base = [
-    [t.provider,e(row.provider)], [t.category,e(t.categories[row.category])],
+    [t.provider,e(row.provider) + (row.organizer_verified ? ' · ' + e(t.organizerVerified) : '')],
+    [t.category,e(t.categories[row.category])], [t.prizeCategory,e(t.prizes[row.prize_category] || t.unknown)],
+    [t.registration,e(t.registrations[row.entry.registration])],
+    [t.applicationData,personal(row.entry.application)],
+    ...(row.certainty === 'chance' ? [[t.winnerData,personal(row.entry.winner)]] : []),
     [t.listed,e(countryText(row,lang))], [t.sourceLanguage,e(t.languages[row.language])],
     [t.reward,e(t.rewards[row.reward_type])], [t.amount,e(amount(row,lang))],
     [t.currency,e(row.reward_currency || row.reward_currencies.join(' / ') || t.unknown)],
     [t.expense,e(t.expenses[expense.kind]) + (expense.amount > 0 ? ' · ' + e(format(expense.amount,expense.currency,lang)) : '')],
     [t.method,e(t.methods[row.participation_method])], [t.certainty,e(t.certainties[row.certainty])],
     [t.effort,row.estimated_effort_minutes === null ? t.unknown : e(row.estimated_effort_minutes + t.minutes)],
-    [t.deadline,row.deadline ? time(row.deadline,lang,true) : t.noDeadline],
+    [t.deadline,row.deadline ? time(row.deadline,lang,!row.deadline_date_only) : t.noDeadline],
   ];
   const flags = row.risk_flags.map(flag => `<li>${e(t.risks[flag])}</li>`).join('');
   const c = row.commission;
@@ -167,6 +177,7 @@ function details(lang, row) {
 <p class="notice" data-ended hidden>${t.expired}</p>
 ${fields(base)}<h2>${t.eligibility}</h2><p>${e(row['eligibility_' + lang])}</p>
 <h2>${t.conditions}</h2><p>${e(row.reward_conditions[lang])}</p>
+${row.entry.steps ? `<h2>${t.steps}</h2><p>${e(row.entry.steps[lang])}</p>` : ''}
 ${row.category === 'sweepstakes' ? `<p class="notice">${t.odds}</p>` : ''}${terms}
 ${flags ? `<h2>${t.flags}</h2><ul>${flags}</ul>` : ''}
 <p class="notice">${t.safer}</p>
@@ -186,7 +197,7 @@ async function page(lang, key, title, description, content, indexable = true) {
 const consumer = rows.filter(row => row.category !== 'affiliate');
 for (const lang of languages) {
   const t = copy[lang];
-  const featured = consumer.filter(row => row.required_expense.kind === 'free').slice(0,3);
+  const featured = consumer.filter(row => row.category === 'sweepstakes').slice(0,3);
   const comparison = ['macromill','research-panel','prolific'].map(id => consumer.find(row => row.id === id)).filter(Boolean);
   const table = `<section class="section"><h2>${t.compare}</h2><p>${t.compareLead}</p>
 <div class="comparison">${comparison.map(row => `<article><h3><a href="${detail(lang,row)}">${e(row['title_' + lang])}</a></h3>
@@ -199,7 +210,7 @@ for (const lang of languages) {
 <p class="notice">${t.regionNotice}</p><section class="section"><h2>${t.explore}</h2>
 <div class="tiles">${primary.slice(1).map(key => `<a href="${url(lang,key)}"><strong>${e(t.pages[key][0])}</strong><span aria-hidden="true">↗</span></a>`).join('')}</div></section>
 <section class="section"><h2>${t.featured}</h2><p>${t.featuredLead}</p>
-<div class="cards">${featured.map(row => card(row,lang)).join('')}</div></section>${table}`);
+<div class="cards">${featured.length ? featured.map(row => card(row,lang)).join('') : `<p>${t.empty}</p>`}</div></section>${table}`);
   const pages = {
     opportunities: consumer,
     sweepstakes: consumer.filter(row => row.category === 'sweepstakes'),
@@ -213,7 +224,7 @@ for (const lang of languages) {
     await page(lang,key,title,description,`<header class="intro"><h1>${e(title)}</h1><p class="lead">${e(description)}</p>
 <p class="notice">${t.regionNotice}</p></header>${directory(lang,available)}`,available.length > 0);
   }
-  for (const key of secondary) {
+  for (const key of secondary.filter(key => key !== 'affiliates')) {
     const [title, description] = t.pages[key];
     const sections = t.articles[key].map(([heading, body]) => `<h2>${e(heading)}</h2><p>${e(body)}</p>`).join('');
     await page(lang,key,title,description,`<article class="article"><h1>${e(title)}</h1><p class="lead">${e(description)}</p>

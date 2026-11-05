@@ -12,11 +12,15 @@ export function matches(row, query, lang, now) {
   if (expired(row, now)) return false;
   if (query.explicitJapan && !(Array.isArray(row.eligible_countries) && eligible(row, 'JP'))) return false;
   if (query.country === 'unknown' ? row.eligibility_verified : query.country && !eligible(row, query.country)) return false;
-  for (const field of ['category', 'language', 'reward_type', 'participation_method', 'certainty']) {
+  for (const field of ['category', 'prize_category', 'language', 'reward_type', 'participation_method', 'certainty']) {
     if (query[field] && (row[field] ?? 'unknown') !== query[field]) return false;
   }
   const currencies = row.reward_currencies?.length ? row.reward_currencies : [row.reward_currency ?? 'unknown'];
   if (query.reward_currency && !currencies.includes(query.reward_currency)) return false;
+  if (query.organizer && !row.organizer_verified) return false;
+  if (query.registration && row.entry?.registration !== query.registration) return false;
+  if (query.emailOnly && (row.entry?.registration !== 'none' ||
+      row.entry.application?.length !== 1 || row.entry.application[0] !== 'email')) return false;
   if (query.expense && row.required_expense.kind !== query.expense) return false;
   if (query.effort && (row.estimated_effort_minutes === null || row.estimated_effort_minutes > Number(query.effort))) return false;
   if (query.deadline && (!row.deadline || (query.deadline !== 'any' && expiration(row) > now + Number(query.deadline) * DAY))) return false;

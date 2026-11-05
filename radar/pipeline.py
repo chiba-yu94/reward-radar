@@ -17,12 +17,15 @@ ROOT = Path(__file__).resolve().parents[1]
 CATEGORIES = {"sweepstakes", "guaranteed", "points", "survey", "research",
               "gift", "cashback", "registration", "international", "affiliate"}
 KINDS = {"cash", "points", "gift-card", "prize", "cashback", "commission", "software"}
-METHODS = {"form", "account", "survey", "study", "shopping", "application", "app"}
+METHODS = {"form", "account", "survey", "study", "shopping", "application", "app", "social"}
 CERTAINTIES = {"guaranteed", "conditional", "chance"}
 GEO = re.compile(r"[A-Z]{2}")
 ID = re.compile(r"[a-z0-9]+(?:-[a-z0-9]+)*")
 UTC = re.compile(r"\d{4}-\d\d-\d\dT\d\d:\d\d:\d\dZ")
 SHA = re.compile(r"[a-f0-9]{40}")
+PRIZES = {"food", "cash-gift", "electronics", "household", "digital", "other"}
+PERSONAL = {"email", "name", "address", "phone", "social-account", "identity"}
+UNKNOWN_ENTRY = {"registration": "unknown", "application": None, "winner": None, "steps": None}
 STALE = timedelta(days=30)
 CLOCK_SKEW = timedelta(minutes=5)
 PUBLIC = (
@@ -110,6 +113,37 @@ def inputs():
     return rows, index
 
 
+def consumer_public(row):
+    return (row.get("audience", "consumer") == "consumer"
+            and row["required_expense"]["kind"] == "free")
+
+
+def validate_entry(row, source):
+    enum(row.get("audience", "consumer"), {"consumer", "professional"})
+    enum(row.get("prize_category"), PRIZES | {None})
+    entry = row.get("entry", UNKNOWN_ENTRY)
+    require(isinstance(entry, dict) and set(entry) == set(UNKNOWN_ENTRY), "Invalid entry requirements")
+    enum(entry["registration"], {"none", "organizer", "social", "unknown"})
+    for stage in ("application", "winner"):
+        values = entry[stage]
+        require(values is None or isinstance(values, list) and len(values) == len(set(values))
+                and set(values) <= PERSONAL, "Invalid personal information requirements")
+    if entry["steps"] is not None:
+        require(set(entry["steps"]) == {"ja", "en"}, "Missing entry steps translation")
+        for value in entry["steps"].values():
+            plain(value)
+    if row["category"] != "sweepstakes" or not consumer_public(row) or row["published_status"] != "approved":
+        return
+    require(row["prize_category"] in PRIZES and entry["steps"]
+            and source.get("organizer_verified") is True
+            and source.get("free_entry_reviewed") is True
+            and source.get("privacy_reviewed") is True, "Giveaway requires a documented consumer review")
+    if row["reward_type"] in {"cash", "gift-card"} or row["prize_category"] == "electronics" or row.get("high_value"):
+        require(source.get("enhanced_review") is True and row["eligibility_verified"]
+                and entry["application"] is not None and entry["winner"] is not None,
+                "Cash, gift card or high-value giveaway requires enhanced review")
+
+
 def validate(row, source, now):
     missing = set(PUBLIC) - row.keys()
     require(not missing, f"Missing fields: {sorted(missing)}")
@@ -183,11 +217,14 @@ def validate(row, source, now):
                 and len(set(countries)) == len(countries) and row["eligibility_verified"], "Invalid countries")
     first, checked = stamp(row["first_seen_at"]), stamp(row["last_checked_at"])
     require(first <= checked <= now + CLOCK_SKEW, "Invalid verification dates")
+    require(type(row.get("deadline_date_only", False)) is bool
+            and (not row.get("deadline_date_only") or row["deadline"] is not None), "Invalid deadline precision")
     if row["deadline"] is not None:
         stamp(row["deadline"])
     require(isinstance(row["risk_flags"], list) and all(flag in {
         "waitlist", "third-party-id", "approval", "purchase", "variable", "capacity", "account",
     } for flag in row["risk_flags"]), "Invalid risk flags")
+    validate_entry(row, source)
     enum(row["affiliate_approval_status"], {"none", "pending", "approved", "revoked"})
     if row["affiliate_approval_status"] == "approved":
         approval = row["affiliate_review"]
@@ -262,9 +299,13 @@ def publish(rows, sources, observation, output, database, now):
                     and row["verification_status"] == "verified"):
                 continue
             expired = row["deadline"] is not None and stamp(row["deadline"]) <= now
-            if expired:
-                continue  # The reviewed snapshot and SQLite retain expired entries.
+            if expired or (row["category"] != "affiliate" and not consumer_public(row)):
+                continue  # The reviewed snapshot and SQLite retain these entries.
             public = {key: row[key] for key in PUBLIC}
+            public["deadline_date_only"] = row.get("deadline_date_only", False)
+            public["entry"] = row.get("entry", UNKNOWN_ENTRY)
+            public["prize_category"] = row.get("prize_category")
+            public["organizer_verified"] = source.get("organizer_verified") is True
             public["stale_at"] = utc(stamp(row["last_checked_at"]) + STALE)
             public["reward_currencies"] = row.get("reward_currencies", [])
             public["supporting_urls"] = source.get("supporting_urls", [])
@@ -278,7 +319,8 @@ def publish(rows, sources, observation, output, database, now):
                     public["affiliate_expires_at"] = expiry
             approved.append(public)
             active.append(row["id"])
-        require(approved, "Refusing to replace the dataset with an empty publication")
+        require(any(row["category"] != "affiliate" for row in approved),
+                "Refusing to replace the dataset with an empty consumer directory")
     dump(output, {"generated_at": utc(now), "records": sorted(approved, key=lambda item: item["id"])})
     return active
 

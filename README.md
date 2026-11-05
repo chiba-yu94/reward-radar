@@ -1,6 +1,8 @@
 # Reward Radar
 
-A Japanese and English directory of consumer rewards and separately listed SaaS affiliate programs. Official terms, residence eligibility, spending and verification dates are visible on each listing. Any operating proceeds support independent game development, including PATCH_03.
+A Japanese and English directory of free consumer giveaways and gifts. Surveys and rewards are secondary; affiliate programs have a separate page. Official terms, residence eligibility, spending and verification dates are visible on each listing. Any operating proceeds support independent game development, including PATCH_03.
+
+Production: [Japanese](https://reward-radar.rewardradar42.workers.dev/ja/) · [English](https://reward-radar.rewardradar42.workers.dev/en/)
 
 ## Run locally
 
@@ -9,6 +11,7 @@ Requires Python 3.11+ and Node.js 22+. The collector and static site have no run
 ```sh
 npm ci --ignore-scripts
 npm test
+python3 -m radar.discovery
 python3 -m radar.pipeline collect --observation var/observation.json
 python3 -m radar.pipeline publish --observation var/observation.json
 npm run build

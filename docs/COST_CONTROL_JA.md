@@ -8,3 +8,5 @@
 
 - [Cloudflare Static Assets の料金と制限](https://developers.cloudflare.com/workers/static-assets/billing-and-limitations/)
 - [GitHub Actions の課金](https://docs.github.com/en/billing/managing-billing-for-your-products/managing-billing-for-github-actions/about-billing-for-github-actions)
+
+2026-11-05 に Workers & Pages の無料枠を確認し、静的アセットのみで公開しました。現在は手動デプロイで、配信に課金機能を追加していません。

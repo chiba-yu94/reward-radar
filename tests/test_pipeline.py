@@ -5,18 +5,18 @@ import sqlite3
 import tempfile
 import unittest
 from contextlib import closing
-from datetime import datetime, timezone
+from datetime import timedelta
 from pathlib import Path
 from unittest.mock import patch
 
 from radar.net import fetch_json, https_url, PinnedHTTPS, public_ip
-from radar.pipeline import collect, inputs, publish, validate
+from radar.pipeline import collect, inputs, publish, stamp, utc, validate
 
 
 class TestPipeline(unittest.TestCase):
     def setUp(self):
         self.rows, self.sources = inputs()
-        self.now = datetime(2026, 11, 5, 7, tzinfo=timezone.utc)
+        self.now = max(stamp(row["last_checked_at"]) for row in self.rows) + timedelta(minutes=1)
         self.record = self.rows[0]
         self.source = self.sources[self.record["source_id"]]
         temp = tempfile.TemporaryDirectory()
@@ -30,7 +30,8 @@ class TestPipeline(unittest.TestCase):
     def test_publish_and_retain_expired(self):
         active = self.run_publish()
         self.assertIn("prolific", active)
-        self.assertNotIn("rakuten-app-draw", active)
+        for excluded in ("rakuten-app-draw", "rakuten-rebates", "docomo-daily-draw", "github-student"):
+            self.assertNotIn(excluded, active)
         with closing(sqlite3.connect(self.database)) as db:
             self.assertEqual(db.execute("SELECT COUNT(*) FROM opportunities").fetchone()[0], len(self.rows))
         public = json.loads(self.output.read_text())["records"]
@@ -60,8 +61,23 @@ class TestPipeline(unittest.TestCase):
         self.assertEqual(list(report), ["github-student"])
         self.run_publish(report)
         public = {row["id"]: row for row in json.loads(self.output.read_text())["records"]}
-        self.assertEqual(public["github-student"]["last_checked_at"], "2026-11-05T07:00:00Z")
+        self.assertNotIn("github-student", public)
+        with closing(sqlite3.connect(self.database)) as db:
+            row = db.execute("SELECT record FROM opportunities WHERE id=?", ("github-student",)).fetchone()
+        self.assertEqual(json.loads(row[0])["last_checked_at"], utc(self.now))
         self.assertEqual(public["macromill"]["last_checked_at"], self.record["last_checked_at"])
+
+    def test_giveaway_requires_review_and_enhanced_approval(self):
+        record = next(row for row in self.rows if row["id"] == "yamazaki-nikuman-2026")
+        source = self.sources[record["source_id"]]
+        for flag in ("organizer_verified", "free_entry_reviewed", "privacy_reviewed", "enhanced_review"):
+            with self.subTest(flag=flag), self.assertRaisesRegex(ValueError, "review"):
+                validate(record, {**source, flag: False}, self.now)
+        with self.assertRaisesRegex(ValueError, "Destination"):
+            validate({**record, "official_url": "https://example.com/changed"}, source, self.now)
+        with self.assertRaisesRegex(ValueError, "personal information"):
+            bad_entry = {**record["entry"], "application": ["credit-card"]}
+            validate({**record, "entry": bad_entry}, source, self.now)
 
     def test_duplicates_do_not_overwrite(self):
         self.run_publish()

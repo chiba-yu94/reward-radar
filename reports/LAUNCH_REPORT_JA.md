@@ -1,29 +1,29 @@
 # Reward Radar 公開報告
 
-2026-11-05 に日英の静的サイト、Python 収集と SQLite、検索・絞り込み、公開用 JSON、検証・デプロイの GitHub Actions 定義を作成しました。初期データは掲載候補15件（消費者向け13件、SaaS提携2件）と、保持のみの期限切れ1件です。うち自動確認は GitHub Education の公開 API 1件で、その他は提供元の公式資料を手動で確認した要約です。
+2026-11-05 に Cloudflare Workers Free の Static Assets で Reward Radar を公開しました。本番は [日本語](https://reward-radar.rewardradar42.workers.dev/ja/) と [English](https://reward-radar.rewardradar42.workers.dev/en/) です。初回公開版で日英トップ、一覧、検索、国フィルター、詳細、言語切り替え、CSP、robots、サイトマップ、404 を確認しました。ブラウザーは375px・1280pxです。現在は手動デプロイの運用です。
 
-広告リンクは0件です。AdSense、外部アクセス解析は無効です。収益レポートはローカル台帳から集計できます。閲覧数、クリック数、成果数、入金はこの公開前報告では未計測です。新たな有料契約は発生していません。
+## 消費者向け拡張
 
-## 確認記録
+新版の公開用成果物は20件です。購入不要の懸賞8件、条件達成型の無料特典3件、アンケート・調査6件、デジタル特典1件、別ページのSaaS提携2件です。デジタル特典1件はアンケート回答によるクレジットです。購入が必要な還元、費用を確認できなかった抽選、学生向けの開発特典は履歴に保持し、一般一覧から外しました。
 
-- [GitHub Actions の検証](https://github.com/chiba-yu94/reward-radar/actions/runs/41982635482)
-- [収集と静的成果物の生成](https://github.com/chiba-yu94/reward-radar/actions/runs/41982636099)
-- Wrangler のローカル応答で `/ja/` と `/en/`、それぞれの掲載一覧、公開 JSON は HTTP 200、不明なパスは HTTP 404 でした。
-- GitHub の production Environment は main のみに制限しました。Cloudflare ダッシュボードはアカウントのメール確認を要求しており、この記録時点ではデプロイと本番の URL 検証が保留です。予約実行の時刻到達による起動と自動デプロイは別々に確認します。
+追加した懸賞は、Calbee Jagabee、JA和歌山の米、山崎製パンのチャームとデジタル特典、埼玉県の旬の農産物、ドトールのカフェラテ、タカラトミーのコナンカード、コトブキヤのフィギュア、トンボ鉛筆の文具・グッズです。
 
-## 再現
+手動登録は台帳23件中、現行の公開用成果物に20件です。自動入力は GitHub Education の監視1本と埼玉県の発見用RSS 2本です。RSS 初回確認は2本とも取得成功、未レビューの新規候補0件でした。公式ページの事実を確認した日英の要約だけを掲載します。
+
+## 再現と運用
 
 ```sh
 npm ci --ignore-scripts
 npm audit --audit-level=high
 npm test
+python3 -m radar.discovery
 python3 -m radar.pipeline collect --observation var/observation.json
 python3 -m radar.pipeline publish --observation var/observation.json
-python3 -m radar.health
+export SITE_ORIGIN=https://reward-radar.rewardradar42.workers.dev
 npm run build
 WRANGLER_SEND_METRICS=false npm exec -- wrangler deploy --dry-run
+node site/smoke.mjs
+TEST_ORIGIN="$SITE_ORIGIN" npm run test:browser
 ```
 
-日英のページに加え、言語切り替え、ソースの失敗、国フィルター、通貨・タイムゾーン、期限切れ、広告承認、CSP、SSRF 防止と出力内の秘密値パターンを回帰試験しました。
-
-公開リポジトリを作成し main をプッシュしました。手動起動した GitHub Actions で collect と publish が成功し、source-observation と validated-static-site が保存されました。Chromium の375px・1280pxで日英の主要5ルート、横スクロール、検索、国絞り込み、詳細の言語切り替えを確認しました。月5,000円に向けて、公式資料に基づく比較を公開し、申請・承認を経た提携先だけを対象に、月ごとに実入金と費用を照合します。
+日次設定は05:23 JST。初回の時刻起動は別途確認します。広告リンクは0件で、AdSense と第三者のアクセス解析は無効です。新規の月額費用は0円です。月5,000円の純収益に向け、食品・日用品の比較を充実させ、承認済みの提携先で実入金と費用を月次照合します。

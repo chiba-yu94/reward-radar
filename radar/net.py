@@ -52,6 +52,13 @@ class PinnedHTTPS(http.client.HTTPSConnection):
 
 
 def fetch_json(url, allowed_url):
+    return fetch_document(url, allowed_url, ("application/json",), {
+        "Accept": "application/vnd.github+json",
+        "X-GitHub-Api-Version": "2022-11-28",
+    })
+
+
+def fetch_document(url, allowed_url, media_types, request_headers=None):
     parts = https_url(url)
     if url != allowed_url or parts.fragment:
         raise ValueError("Unreviewed fetch URL")
@@ -61,17 +68,16 @@ def fetch_json(url, allowed_url):
         if parts.query:
             target += "?" + parts.query
         connection.request("GET", target, headers={
-            "Accept": "application/vnd.github+json",
             "User-Agent": "RewardRadar/1.0",
             "Accept-Encoding": "identity",
-            "X-GitHub-Api-Version": "2022-11-28",
+            **(request_headers or {}),
         })
         response = connection.getresponse()
         if 300 <= response.status < 400:
             raise ValueError("Redirect requires review")
         if response.status != 200:
             raise ValueError(f"Upstream HTTP {response.status}")
-        if not response.getheader("Content-Type", "").lower().startswith("application/json"):
+        if response.getheader("Content-Type", "").partition(";")[0].strip().lower() not in media_types:
             raise ValueError("Unexpected content type")
         body = response.read(LIMIT + 1)
         if len(body) > LIMIT:
