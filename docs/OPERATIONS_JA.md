@@ -17,16 +17,23 @@ gh run download RUN_ID -n source-observation -D var/observations/RUN_ID
 
 候補確認には `gh run download RUN_ID -n discovery-candidates -D var/discovery/RUN_ID` を使います。RSS 失敗の警告と「候補0件」の正常結果を区別します。候補は本文を取得せず、公式 URL のみ出力します。GitHub Education のリビジョンが変わった場合は、原文とリンク先を確認し、掲載への影響を判断してからレビュー済み識別子を更新します。手動ソースは30日以内に再確認します。掲載ページは古い確認に警告を表示し、日次の実行概要にも該当案件 ID が出ます。
 
-## 無料プランで手動更新
+## 本番の自動更新
 
-本番は `https://reward-radar.rewardradar42.workers.dev` です。現行の運用方針は手動デプロイです。期限切れはブラウザーで非表示になり、次回の手動デプロイ時に詳細ページとサイトマップから外れます。
+本番は [Reward Radar](https://reward-radar.rewardradar42.workers.dev/) です。日次実行は収集とテストを通過した静的成果物を Workers Free に配信します。期限を過ぎた案件はブラウザーで非表示になり、次回の成功したデプロイで詳細ページとサイトマップから外れます。
 
-1. Cloudflare にログインし、メール確認を済ませます。Workers & Pages で Workers Free と workers.dev のアカウントサブドメインを確認します。
-2. `npm ci --ignore-scripts`、`npm test`、`python3 -m radar.pipeline collect --observation var/observation.json`、`python3 -m radar.pipeline publish --observation var/observation.json` を実行します。
-3. 実際の本番 URL を `SITE_ORIGIN` に設定し `npm run build` を実行します。Wrangler は `npm exec -- wrangler login --use-keyring --scopes account:read workers_scripts:write` で認証できます。デプロイは `WRANGLER_SEND_METRICS=false npm run deploy` です。初回はダッシュボードから静的アセットをアップロードしました。既存 Worker の更新は Wrangler で行い、HTML の末尾スラッシュとカスタム 404 の挙動を確認します。
-4. `SITE_ORIGIN=https://実際のホスト node site/smoke.mjs` で日英ルート、CSP、JSON、404 を検査します。日英の検索、居住地フィルター、詳細への言語切り替えをブラウザーでも確認します。
-5. 将来、自動デプロイに切り替える場合は、main のみに制限済みの GitHub production Environment を使用します。Environment Secret に Cloudflare の対象アカウントのみに絞った Workers Scripts 編集用 `CLOUDFLARE_API_TOKEN` を登録します。リポジトリ変数 `CLOUDFLARE_ACCOUNT_ID`、`SITE_ORIGIN` を設定し、最後に `DEPLOY_ENABLED=true` を設定します。Actions を手動起動し、deploy と本番スモークの成功を確認します。秘密値はチャット、ログ、リポジトリに貼らないでください。
-6. Search Console で本番 URL の URL プレフィックスプロパティを登録します。HTML ファイル方式を選び、発行された検証ファイルを静的ビルドに追加します。検証後に `sitemap.xml` を送信します。
+GitHub の `production` Environment は `main` に制限しています。Cloudflare の対象アカウントに限定した Workers Scripts 編集用トークンを `CLOUDFLARE_API_TOKEN` として登録します。リポジトリ変数は `CLOUDFLARE_ACCOUNT_ID`、`SITE_ORIGIN`、`DEPLOY_ENABLED` です。トークンはデプロイ工程だけが参照します。秘密値はチャット、ログ、リポジトリに貼らないでください。
+
+```sh
+gh variable set DEPLOY_ENABLED --body false  # 停止または配信なしの検証
+gh workflow run publish.yml --ref main
+gh run list --workflow publish.yml --limit 5
+```
+
+再開時は無効の状態でビルドが成功したことを確認し、`gh variable set DEPLOY_ENABLED --body true` を実行します。手動でワークフローを起動し、`deploy` とその後の本番スモークテストの成功を確認します。停止設定は次に起動する実行に適用されます。既に配信中のジョブは必要に応じて Actions からキャンセルします。
+
+Cloudflare の認証済みローカル環境から緊急で配信する場合は、公開用データの再生成・テスト後に本番 `SITE_ORIGIN` を指定して `npm run build` を行い、`WRANGLER_SEND_METRICS=false npm run deploy` を実行します。`SITE_ORIGIN=https://reward-radar.rewardradar42.workers.dev node site/smoke.mjs` で本番応答を確認します。
+
+Search Console で本番 URL の URL プレフィックスプロパティを登録する場合は、HTML ファイル方式で発行された検証ファイルを静的ビルドに追加し、検証後に `sitemap.xml` を送信します。
 
 ### 復旧
 

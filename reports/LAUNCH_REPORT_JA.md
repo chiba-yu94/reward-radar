@@ -1,6 +1,6 @@
 # Reward Radar 公開報告
 
-2026-11-05 に Cloudflare Workers Free の Static Assets で Reward Radar を公開しました。本番は [日本語](https://reward-radar.rewardradar42.workers.dev/ja/) と [English](https://reward-radar.rewardradar42.workers.dev/en/) です。初回公開版で日英トップ、一覧、検索、国フィルター、詳細、言語切り替え、CSP、robots、サイトマップ、404 を確認しました。ブラウザーは375px・1280pxです。現在は手動デプロイの運用です。
+2026-11-05 に Cloudflare Workers Free の Static Assets で Reward Radar を公開しました。本番は [日本語](https://reward-radar.rewardradar42.workers.dev/ja/) と [English](https://reward-radar.rewardradar42.workers.dev/en/) です。初回公開版で日英トップ、一覧、検索、国フィルター、詳細、言語切り替え、CSP、robots、サイトマップ、404 を確認しました。ブラウザーは375px・1280pxです。初回は手動で公開しました。
 
 ## 消費者向け拡張
 
@@ -12,12 +12,19 @@
 
 ## 本番確認
 
-2026-11-05 16:18 JST に実装コミット `10ce981` を Wrangler で公開しました。Cloudflare の配信版 `7b8ecb15-feb8-4579-acb5-146a11b0a428` がトラフィックの100%を受けています。本番の公開 JSON とサイトマップはローカル成果物と一致しました。新版でも日英のホーム、一覧、検索、居住地、詳細、言語切り替え、CSP、robots、404 を確認しました。除外した3件の詳細 URL は HTTP 404 を返しました。追加した公式リンクは7件を HTTP 200、コトブキヤ1件を通常のブラウザー表示で確認しました。
+2026-11-05 16:18 JST に実装コミット `10ce981` を Wrangler で公開しました。Cloudflare の配信版 `7b8ecb15-feb8-4579-acb5-146a11b0a428` に100%を配信しました。本番の公開 JSON とサイトマップはローカル成果物と一致しました。新版でも日英のホーム、一覧、検索、居住地、詳細、言語切り替え、CSP、robots、404 を確認しました。除外した3件の詳細 URL は HTTP 404 を返しました。追加した公式リンクは7件を HTTP 200、コトブキヤ1件を通常のブラウザー表示で確認しました。
 
 - [GitHub Actions の回帰・ブラウザー検証](https://github.com/chiba-yu94/reward-radar/actions/runs/41986259407)
 - [収集・発見・公開用成果物の生成](https://github.com/chiba-yu94/reward-radar/actions/runs/41986260229)
 
-GitHub Actions の Cloudflare デプロイは手動運用の指定に従い無効です。手動運用中はブラウザー内の期限チェックが先に働き、HTML とサイトマップからの削除は次のデプロイ時です。
+## GitHub Actions による自動デプロイ
+
+2026-11-05 17:34 JST に、既存ワークフローの手動起動で本番配信に成功しました。Cloudflare の配信版 `4621c3da-0416-4973-b650-1a65729576f7` に100%を配信しています。
+
+- [事前検証](https://github.com/chiba-yu94/reward-radar/actions/runs/41995264782) は `DEPLOY_ENABLED=false` で実行しました。公開用ビルドが成功し、デプロイはスキップされ、既存の Cloudflare 配信版に変更はありませんでした。
+- [本番デプロイ](https://github.com/chiba-yu94/reward-radar/actions/runs/41995435229) は `DEPLOY_ENABLED=true` で `main` から実行しました。production Environment は `main` のみを許可しています。Wrangler の認証先とリポジトリに登録された Cloudflare Account ID を照合しました。
+- 本番の公開 JSON、サイトマップ、`robots.txt` は Actions の成果物と一致しました。日英のブラウザーテストに加え、期限を過ぎると懸賞が一覧から消え、詳細ページで応募リンクが非表示になることを、本番に対するブラウザー内の時刻変更で確認しました。
+- 日次の実行予定は05:23 JSTです。時刻起動の初回実績は未確認です。期限切れ案件の詳細ページとサイトマップは、次回の成功したデプロイで更新されます。
 
 ## 再現と運用
 
