@@ -4,6 +4,13 @@
 
 広告リンクは0件です。AdSense、外部アクセス解析は無効です。収益レポートはローカル台帳から集計できます。閲覧数、クリック数、成果数、入金はこの公開前報告では未計測です。新たな有料契約は発生していません。
 
+## 確認記録
+
+- [GitHub Actions の検証](https://github.com/chiba-yu94/reward-radar/actions/runs/41982635482)
+- [収集と静的成果物の生成](https://github.com/chiba-yu94/reward-radar/actions/runs/41982636099)
+- Wrangler のローカル応答で `/ja/` と `/en/`、それぞれの掲載一覧、公開 JSON は HTTP 200、不明なパスは HTTP 404 でした。
+- GitHub の production Environment は main のみに制限しました。Cloudflare ダッシュボードはアカウントのメール確認を要求しており、この記録時点ではデプロイと本番の URL 検証が保留です。予約実行の時刻到達による起動と自動デプロイは別々に確認します。
+
 ## 再現
 
 ```sh
