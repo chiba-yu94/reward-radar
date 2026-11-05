@@ -45,7 +45,10 @@
     "last_successful_collection": null,
     "error_status": null,
     "collection_frequency": "manual; review within 30 days",
-    "active": true
+    "active": true,
+    "supporting_urls": [
+      "https://research-panel.jp/"
+    ]
   },
   {
     "id": "rakuten-insight",
@@ -77,7 +80,10 @@
     "last_successful_collection": null,
     "error_status": null,
     "collection_frequency": "manual; review within 30 days",
-    "active": true
+    "active": true,
+    "supporting_urls": [
+      "https://participant-help.prolific.com/en/articles/445062-how-do-i-cash-out-on-prolific"
+    ]
   },
   {
     "id": "usertesting",
@@ -209,7 +215,10 @@
     "last_successful_collection": null,
     "error_status": null,
     "collection_frequency": "manual; review within 30 days",
-    "active": true
+    "active": true,
+    "supporting_urls": [
+      "https://www.hubspot.com/partners/affiliates?iframeView=true"
+    ]
   },
   {
     "id": "kit-affiliate",

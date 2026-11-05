@@ -97,6 +97,8 @@ def inputs():
         require(type(source["active"]) is bool, "Invalid source status")
         stamp(source["last_verification_date"])
         https_url(source["official_url"])
+        for link in source.get("supporting_urls", []):
+            https_url(link)
         if source["method"] == "github-content":
             url = https_url(source["endpoint"])
             require(url.hostname == "api.github.com" and url.path.startswith("/repos/github/docs/contents/")
@@ -135,6 +137,11 @@ def validate(row, source, now):
     enum(row["redemption_difficulty"], {None, "low", "medium", "high"})
     require(row["reward_currency"] is None or re.fullmatch(r"[A-Z]{3}", row["reward_currency"]),
             "Invalid currency")
+    currencies = row.get("reward_currencies", [])
+    require(isinstance(currencies, list) and len(set(currencies)) == len(currencies)
+            and all(re.fullmatch(r"[A-Z]{3}", currency) for currency in currencies)
+            and (not currencies or (row["reward_currency"] is None and row["reward_amount"] is None)),
+            "Invalid variable currencies")
     if row["category"] == "sweepstakes":
         require(row["certainty"] == "chance", "Sweepstakes certainty mismatch")
     if row["category"] == "affiliate":
@@ -232,8 +239,11 @@ def publish(rows, sources, observation, output, database, now):
         db.execute("CREATE TABLE IF NOT EXISTS opportunities (id TEXT PRIMARY KEY, record TEXT NOT NULL)")
         db.execute("CREATE TABLE IF NOT EXISTS sources (id TEXT PRIMARY KEY, registry TEXT NOT NULL, observation TEXT)")
         for sid, source in sources.items():
-            db.execute("INSERT OR REPLACE INTO sources VALUES (?, ?, ?)", (
-                sid, json.dumps(source), json.dumps(observation.get(sid))))
+            result = observation.get(sid)
+            db.execute("""INSERT INTO sources VALUES (?, ?, ?)
+                          ON CONFLICT(id) DO UPDATE SET registry=excluded.registry,
+                          observation=COALESCE(excluded.observation, sources.observation)""", (
+                sid, json.dumps(source), json.dumps(result) if result else None))
         for record in rows:
             row = dict(record)
             sid = row["source_id"]
@@ -256,6 +266,8 @@ def publish(rows, sources, observation, output, database, now):
                 continue  # The reviewed snapshot and SQLite retain expired entries.
             public = {key: row[key] for key in PUBLIC}
             public["stale_at"] = utc(stamp(row["last_checked_at"]) + STALE)
+            public["reward_currencies"] = row.get("reward_currencies", [])
+            public["supporting_urls"] = source.get("supporting_urls", [])
             public["affiliate_expires_at"] = None
             if row["affiliate_approval_status"] == "approved":
                 expiry = row["affiliate_review"]["expires_at"]
@@ -267,7 +279,7 @@ def publish(rows, sources, observation, output, database, now):
             approved.append(public)
             active.append(row["id"])
         require(approved, "Refusing to replace the dataset with an empty publication")
-        dump(output, {"generated_at": utc(now), "records": sorted(approved, key=lambda item: item["id"])})
+    dump(output, {"generated_at": utc(now), "records": sorted(approved, key=lambda item: item["id"])})
     return active
 
 

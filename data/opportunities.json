@@ -253,8 +253,8 @@
     "reward_currency": null,
     "reward_amount": null,
     "reward_conditions": {
-      "ja": "謝礼額と通貨は個別の研究で確認してください。登録や待機リスト入りで謝礼は発生しません。",
-      "en": "Check individual studies for the amount and currency. Signing up or joining the waitlist does not earn compensation."
+      "ja": "謝礼額は研究によって異なります。対象の回答への謝礼は GBP または USD で、出金には PayPal と提供元が定める最低残高が必要です。",
+      "en": "Amounts vary by study. Qualifying rewards are paid in GBP or USD. Cashing out requires PayPal and the provider’s minimum balance."
     },
     "required_expense": {
       "kind": "free",
@@ -287,7 +287,11 @@
     "description_ja": "募集条件に合う学術・市場調査に参加するプラットフォームです。",
     "description_en": "A platform for joining academic and market research studies that match your profile.",
     "eligibility_ja": "日本を含む掲載対象地域の在住者で18歳超。認証済みアカウントが必要で、待機や個別の参加条件があります。",
-    "eligibility_en": "You must be over 18, live in a supported country including Japan, and have a verified account. Waitlists and study-specific criteria can apply."
+    "eligibility_en": "You must be over 18, live in a supported country including Japan, and have a verified account. Waitlists and study-specific criteria can apply.",
+    "reward_currencies": [
+      "GBP",
+      "USD"
+    ]
   },
   {
     "id": "usertesting",
@@ -658,8 +662,8 @@
       "percent": 30,
       "structure": "recurring",
       "months": 12,
-      "threshold": null,
-      "threshold_currency": null
+      "threshold": 10,
+      "threshold_currency": "USD"
     },
     "title_ja": "HubSpot の SaaS アフィリエイト",
     "title_en": "HubSpot SaaS affiliate program",

@@ -17,6 +17,7 @@ h1 { font-size: clamp(2rem, 5vw, 3.75rem); line-height: 1.13; letter-spacing: -.
 h2 { font-size: clamp(1.35rem, 2.7vw, 2rem); line-height: 1.28; }
 h3 { font-size: 1.15rem; line-height: 1.4; }
 .wrap { width: min(100% - 2rem, 72rem); margin-inline: auto; }
+.sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
 .skip { position: absolute; transform: translateY(-130%); background: var(--white); padding: .5rem; z-index: 2; }
 .skip:focus { transform: translateY(0); }
 .masthead { background: var(--white); border-bottom: 1px solid var(--line); }

@@ -22,3 +22,17 @@ jobs:
       - run: npm exec -- wrangler deploy --dry-run
         env:
           WRANGLER_SEND_METRICS: 'false'
+      - name: Check mobile and desktop layouts
+        run: |
+          mkdir -p var
+          npm run dev > var/dev.log 2>&1 &
+          dev_pid=$!
+          trap 'kill "$dev_pid" 2>/dev/null || true' EXIT
+          if ! curl --silent --fail --retry 12 --retry-connrefused --retry-delay 1 http://127.0.0.1:8787/en/ -o /dev/null; then
+            cat var/dev.log
+            exit 1
+          fi
+          node site/smoke.mjs
+          npm run test:browser
+        env:
+          WRANGLER_SEND_METRICS: 'false'

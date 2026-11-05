@@ -81,7 +81,9 @@ ${languages.map(locale => `<link rel="alternate" hreflang="${locale}" href="${or
 <body><a class="skip" href="#main">${t.skip}</a><header class="masthead"><div class="wrap header-inner">
 <a href="${url(lang)}" class="brand">${brand}</a>${switcher}
 <nav aria-label="${e(t.navigation)}">${links(primary)}</nav></div></header>
-<main id="main" class="wrap">${content}</main>
+<main id="main" class="wrap"${page === '' ? ' itemscope itemtype="https://schema.org/WebSite"' : ''}>
+${page === '' ? `<meta itemprop="name" content="Reward Radar"><meta itemprop="url" content="${origin.origin}${current}"><meta itemprop="inLanguage" content="${lang}">` : ''}
+${content}</main>
 <footer><div class="wrap foot-inner"><div><a href="${url(lang)}" class="brand">${brand}</a>
 <p class="muted">${t.legalContact} · ${address}</p></div>
 <nav aria-label="${e(t.footerNavigation)}">${links(secondary)}${switcher}</nav>
@@ -106,7 +108,7 @@ function filters(lang, available) {
   const countries = [...new Set(available.flatMap(row =>
     Array.isArray(row.eligible_countries) ? row.eligible_countries : []))];
   countries.sort((a,b) => name(lang,a).localeCompare(name(lang,b),lang));
-  const currencies = [...new Set(available.map(row => row.reward_currency).filter(Boolean))].sort();
+  const currencies = [...new Set(available.flatMap(row => [row.reward_currency, ...row.reward_currencies]).filter(Boolean))].sort();
   const options = (id, label, values) => `<label>${e(label)}<select name="${id}">
 <option value="">${t.all}</option>${Object.entries(values).map(([value, text]) =>
     `<option value="${e(value)}">${e(text)}</option>`).join('')}</select></label>`;
@@ -134,7 +136,7 @@ function directory(lang, available) {
   const filtered = available.length ? filters(lang,available) : '';
   return `${filtered}<p class="stamp" role="status"><span id="result-count">${available.length}</span>${t.count}</p>
 <p class="notice" data-empty ${available.length ? 'hidden' : ''}>${t.empty}</p>
-<section class="cards" aria-label="${e(t.pages.opportunities[0])}">${available.map(row => card(row,lang)).join('')}</section>`;
+<section class="cards" aria-label="${e(t.pages.opportunities[0])}"><h2 class="sr-only">${e(t.pages.opportunities[0])}</h2>${available.map(row => card(row,lang)).join('')}</section>`;
 }
 
 function details(lang, row) {
@@ -144,6 +146,7 @@ function details(lang, row) {
     [t.provider,e(row.provider)], [t.category,e(t.categories[row.category])],
     [t.listed,e(countryText(row,lang))], [t.sourceLanguage,e(t.languages[row.language])],
     [t.reward,e(t.rewards[row.reward_type])], [t.amount,e(amount(row,lang))],
+    [t.currency,e(row.reward_currency || row.reward_currencies.join(' / ') || t.unknown)],
     [t.expense,e(t.expenses[expense.kind]) + (expense.amount > 0 ? ' · ' + e(format(expense.amount,expense.currency,lang)) : '')],
     [t.method,e(t.methods[row.participation_method])], [t.certainty,e(t.certainties[row.certainty])],
     [t.effort,row.estimated_effort_minutes === null ? t.unknown : e(row.estimated_effort_minutes + t.minutes)],
@@ -169,7 +172,9 @@ ${flags ? `<h2>${t.flags}</h2><ul>${flags}</ul>` : ''}
 <p class="notice">${t.safer}</p>
 <div class="actions" data-expiring="${e(row.deadline || '')}">${external(row.official_url,t.official)}
 ${row.affiliate_url ? `<span data-affiliate-expires="${e(row.affiliate_expires_at || '')}">${external(row.affiliate_url,t.sponsored,true)}</span>` : ''}</div>
-<p><a href="${e(new URL(row.source_url).href)}" rel="noopener noreferrer">${t.source}</a></p></article>`;
+<p><a href="${e(new URL(row.source_url).href)}" rel="noopener noreferrer">${t.source}</a></p>
+${row.supporting_urls.map((link,index) => `<p><a href="${e(new URL(link).href)}" rel="noopener noreferrer">${t.moreSources} ${index + 1}</a></p>`).join('')}
+<template id="adsense-slot"></template></article>`;
 }
 
 async function page(lang, key, title, description, content, indexable = true) {

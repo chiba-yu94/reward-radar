@@ -60,6 +60,9 @@ test('country filtering keeps unknown out and explicitly accepts Japan', () => {
   assert.equal(matches({...jp,eligible_countries:'worldwide'},{explicitJapan:'yes'},'en',now),false);
   assert.equal(matches(jp,{q:'ＭＡＣＲＯＭＩＬＬ',country:'JP',language:'ja',expense:'free'},'en',now),true);
   assert.equal(matches(jp,{effort:5},'en',now),false);
+  const study = rows.find(row => row.id === 'prolific');
+  assert.equal(matches(study,{reward_currency:'GBP'},'en',now),true);
+  assert.equal(matches(study,{reward_currency:'unknown'},'en',now),false);
 });
 
 test('currency, null and timezone behavior', () => {
