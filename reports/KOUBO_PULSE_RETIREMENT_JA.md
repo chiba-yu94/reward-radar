@@ -9,11 +9,12 @@
 
 - 旧 GitHub リポジトリは非公開のままアーカイブしました。停止後の未ログイン確認では Render の2 URL が HTTP 503、対象 note が HTTP 404 を返しました。
 
-## 未確認・保留
+## 2026-11-05 追加調査
 
-- Supabase は運用 PostgreSQL と Auth、Resend はログインメールと通知に使用していたことをソースで確認しました。プロジェクト、API キー、送信ドメインの共有状況、バックアップ・保持要件、実際の請求を管理画面で照合できていません。リソースと利用者データは保持しました。
-- 管理画面で Supabase の対象 Project と Render の接続先を照合し、暗号化した DB/Auth の必要データと保持期間を確定します。Cron、Edge Functions、Webhooks、Auth 連携を確認します。Resend は対象キー、送信元と最近の履歴を確認し、専用キーと確定した場合だけ無効化します。各サービスの請求履歴を確認します。
-- Render の永久削除はバックアップ・保持範囲を確定してから判断します。今回の停止により両サービスが稼働対象から外れました。Render の Hobby ワークスペースで、確認時点の未請求額は 0.00 USD でした。Supabase と Resend の請求は未確認です。
+- Supabase の専用組織 `KouboPulse` に `koubo-pulse` プロジェクト1件が残っています。プロジェクトは稼働中で、組織の請求画面は Free Plan でした。GitHub の接続、Edge Functions、`pg_cron` と `pg_net` は確認されませんでした。表示された連携は Data API と Vault です。
+- Supabase には認証ユーザーとアプリ用テーブルが残っています。自動バックアップの表示は `No backups` でした。集計だけを実行し、個人データと秘密鍵は取得していません。保持期間と必要なバックアップの範囲を確定してから、停止または削除を判断します。
+- Resend は送信専用の既存キー1本を確認しました。最終利用ログは公募パルスの送信でした。カスタムドメイン、Webhook、一斉配信、予約メールはいずれも0件でした。請求画面は月額0 USDで、請求書と支払方法の登録はありませんでした。キーが他の送信経路と共有されていないか、最終利用ログだけでは確定できないため保持しています。
+- Render の Hobby ワークスペースで確認した未請求額は 0.00 USD でした。停止済みの2サービスは復元可能な状態で保持しています。
 
 ```sh
 gh workflow list -R chiba-yu94/koubo-pulse --all
@@ -23,8 +24,7 @@ curl -sS -o /dev/null -w '%{http_code}\n' https://koubo-pulse-info.onrender.com/
 curl -sS -o /dev/null -w '%{http_code}\n' https://note.com/behind_specs/n/nb55ae90264c8
 ```
 
-## 管理画面の認証
+## 残作業
 
-- [Supabase ログイン](https://supabase.com/dashboard/sign-in) を開き、Koubo Pulse を運用していたアカウントでログインし、対象 Organization と Project を開いてください。Project Settings、Integrations、Cron、Edge Functions、Auth と組織の請求を確認します。接続文字列や秘密鍵の共有は不要です。
-- [Resend ログイン](https://resend.com/login) を開き、Koubo Pulse を運用していたアカウントでログインしてください。API Keys、Domains、送信履歴、Billing を確認し、共有キーかどうかを照合します。キー値は共有不要です。
-- 認証後に依存関係と保持期限を確認し、必要データを保護した上で専用リソースの扱いを判断します。今回の調査範囲では両サービスの料金と稼働状態は未確認です。
+- [Supabase](https://supabase.com/dashboard/sign-in) の対象 Organization と Project を確認し、保持対象の業務データを暗号化して保全します。復元可能性を確認してからプロジェクトの停止・削除を判断します。
+- [Resend](https://resend.com/login) のキーを使っているアプリと運用経路を照合し、公募パルス専用と確定した場合だけ無効化します。キー値を記録・共有する必要はありません。
