@@ -1,0 +1,14 @@
+{
+  "devDependencies": {
+    "wrangler": "4.157.0"
+  },
+  "name": "reward-radar",
+  "version": "1.0.0",
+  "scripts": {
+    "build": "node site/build.mjs",
+    "test": "python3 -m unittest discover -s tests && node --test tests/*.test.mjs",
+    "dev": "wrangler dev --ip 127.0.0.1",
+    "deploy": "wrangler deploy"
+  },
+  "private": true
+}

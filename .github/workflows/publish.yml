@@ -1,0 +1,90 @@
+name: Collect and publish
+on:
+  schedule:
+    - cron: '23 20 * * *'
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: reward-radar-publication
+  cancel-in-progress: false
+jobs:
+  collect:
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+        with:
+          persist-credentials: false
+      - run: python3 -m radar.pipeline collect --observation var/observation.json
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        if: always()
+        with:
+          name: source-observation
+          path: var/observation.json
+          if-no-files-found: error
+          retention-days: 7
+
+  publish:
+    needs: collect
+    runs-on: ubuntu-24.04
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38 # v6
+        with:
+          node-version: '22'
+      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4
+        with:
+          name: source-observation
+          path: var/observation
+      - run: npm test
+      - run: python3 -m radar.pipeline publish --observation var/observation/observation.json
+      - run: python3 -m radar.health
+      - run: npm run build
+        env:
+          SITE_ORIGIN: ${{ vars.SITE_ORIGIN }}
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: validated-static-site
+          path: dist/
+          if-no-files-found: error
+          retention-days: 14
+
+  deploy:
+    if: vars.DEPLOY_ENABLED == 'true' && github.ref == 'refs/heads/main'
+    needs: publish
+    runs-on: ubuntu-24.04
+    timeout-minutes: 8
+    environment: production
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38 # v6
+        with:
+          node-version: '22'
+      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4
+        with:
+          name: validated-static-site
+          path: dist
+      - run: npm ci --ignore-scripts
+      - run: npm audit --audit-level=high
+      - name: Check destination and deployment assets
+        run: |
+          test -n "$SITE_ORIGIN"
+          grep -F "href=\"$SITE_ORIGIN/ja/\"" dist/ja/index.html > /dev/null
+          grep -F "frame-ancestors 'none'" dist/_headers > /dev/null
+        env:
+          SITE_ORIGIN: ${{ vars.SITE_ORIGIN }}
+      - run: npm run deploy
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ vars.CLOUDFLARE_ACCOUNT_ID }}
+          WRANGLER_SEND_METRICS: 'false'
+      - run: node site/smoke.mjs
+        env:
+          SITE_ORIGIN: ${{ vars.SITE_ORIGIN }}

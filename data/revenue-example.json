@@ -1,0 +1,10 @@
+{
+  "month": "YYYY-MM",
+  "page_visits": null,
+  "outbound_clicks": null,
+  "affiliate_clicks": null,
+  "verified_conversions": null,
+  "commission_received_jpy": null,
+  "platform_fees_jpy": null,
+  "direct_cost_jpy": null
+}

@@ -1,0 +1,10 @@
+/dist/
+/var/
+/node_modules/
+__pycache__/
+*.pyc
+.env*
+.dev.vars*
+*.sqlite*
+.DS_Store
+/.wrangler/
