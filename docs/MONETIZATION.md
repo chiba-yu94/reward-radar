@@ -13,7 +13,7 @@ Analytics is limited to canonical Japanese and English pages. The language picke
 
 ## GA4 reports
 
-Register `site_language`, `traffic_group`, `page_group`, and `opportunity_id` as event-scoped custom dimensions before collecting production data. In Explore, use Event count with these dimensions and filters.
+Register `site_language`, `traffic_group`, `page_group`, and `opportunity_id` as event-scoped custom dimensions before collecting production data. In Explore, use Event count for activity and Total users for the language comparison. Apply these dimensions and event filters.
 
 | Report | Event | Grouping or filter |
 | --- | --- | --- |
@@ -24,7 +24,7 @@ Register `site_language`, `traffic_group`, `page_group`, and `opportunity_id` as
 | Official application links | `application_click` | `opportunity_id`, `site_language` |
 | Approved affiliate links | `affiliate_click` | `opportunity_id`, `site_language` |
 
-Traffic groups are based on the browser's available referrer information and are distinct from GA4's campaign or session acquisition reports. Counts represent activity by consenting visitors on eligible pages. Clicks are directional measurements and may be lost to browser restrictions. Partner dashboards supply verified conversions.
+Traffic groups are based on the browser's available referrer information and are distinct from GA4's campaign or session acquisition reports. Counts represent activity by consenting visitors on eligible pages. A visitor who uses both site languages may be counted in both language groups. Clicks are directional measurements and may be lost to browser restrictions. Partner dashboards supply verified conversions.
 
 ## Affiliate approval and private ledger
 
