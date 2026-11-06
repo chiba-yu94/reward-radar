@@ -74,7 +74,7 @@ try {
     await page.waitForFunction(() => window.analyticsTestTagLoaded === true);
     assert.equal(calls.filter(url => url.startsWith(tag)).length,1);
     const queued = () => page.evaluate(() => window.dataLayer.map(args => Array.from(args)));
-    const [set, safeDefaults] = await queued();
+    const [[set, safeDefaults]] = await queued();
     assert.equal(set, 'set');
     assert.equal(safeDefaults.page_location, pageUrl);
     assert.equal(safeDefaults.page_referrer, origin + '/');

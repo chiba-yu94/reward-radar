@@ -133,7 +133,8 @@ ${consent ? '<script type="module" src="/assets/analytics.mjs"></script>' : ''}<
 <nav aria-label="${e(t.navigation)}">${links(primary)}</nav></div></header>
 ${consent?.panel || ''}
 <main id="main" class="wrap"${page === '' ? ' itemscope itemtype="https://schema.org/WebSite"' : ''}>
-${page === '' ? `<meta itemprop="name" content="${name}"><meta itemprop="url" content="${origin.origin}${current}"><meta itemprop="inLanguage" content="${lang}">` : ''}
+${page === '' ? `<meta itemprop="name" content="${name}"><meta itemprop="url" content="${origin.origin}${current}"><meta itemprop="inLanguage" content="${lang}">
+<div itemprop="publisher" itemscope itemtype="https://schema.org/Organization"><meta itemprop="name" content="${name}"><meta itemprop="email" content="${email}"></div>` : ''}
 ${content}</main>
 <footer><div class="wrap foot-inner"><div><a href="${url(lang)}" class="brand">${brand(t.copyright)}</a>
 <p class="muted">${t.legalContact} · ${address}</p></div>

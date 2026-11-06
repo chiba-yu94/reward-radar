@@ -44,7 +44,7 @@ The canonical site for review is https://freebietrail.com/. The former workers.d
 
 If AdSense accepts the exact site, use a verification option it provides, such as the issued meta tag or `ads.txt`, and wait for the site to be marked Ready. The inert `adsense-slot` and lack of ad scripts are intentional. The analytics consent UI is separate from ad consent and is not a Google-certified CMP. Before serving ads, review cookie and personalized-ad consent and vendor disclosures. For personalized ads to users in the EEA, UK and Switzerland, use a Google-certified CMP that integrates with IAB TCF, such as Google's own Privacy & messaging where suitable. Verify regional and ad-mode rules, withdrawal controls, and CSP before enabling ad tags. Keep ads off if eligibility or compliant operation cannot be confirmed at zero cost. [AdSense verification](https://support.google.com/adsense/answer/12169212?hl=en) · [Publisher CMP requirements](https://support.google.com/adsense/answer/13554116?hl=en) · [Privacy & messaging](https://support.google.com/adsense/answer/7670013?hl=en)
 
-Support [rewardradar.support@gmail.com](mailto:rewardradar.support@gmail.com)
+Support [support@freebietrail.com](mailto:support@freebietrail.com)
 
 ## Hapitas placement
 

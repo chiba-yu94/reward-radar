@@ -25,6 +25,6 @@ Open `http://127.0.0.1:8787/ja/` or `http://127.0.0.1:8787/en/`. Run `node site/
 - [Monetization](docs/MONETIZATION.md), [運用手順](docs/OPERATIONS_JA.md) and [費用管理](docs/COST_CONTROL_JA.md)
 - [公開報告](reports/LAUNCH_REPORT_JA.md), [セキュリティ検証](reports/SECURITY_AUDIT_JA.md) and [公募パルス終了報告](reports/KOUBO_PULSE_RETIREMENT_JA.md)
 
-Support: [rewardradar.support@gmail.com](mailto:rewardradar.support@gmail.com)
+Support: [support@freebietrail.com](mailto:support@freebietrail.com)
 
 Browser regression checks (Chrome installed, Wrangler dev running): `npm run test:browser`. Set `TEST_ORIGIN` to exercise a deployed site.

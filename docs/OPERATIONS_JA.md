@@ -68,7 +68,7 @@ limactl stop reward-radar
 - [GitHub Actions のスケジュール](https://docs.github.com/en/actions/reference/workflows-and-actions/events-that-trigger-workflows#schedule)
 - [Cloudflare Workers Static Assets](https://developers.cloudflare.com/workers/static-assets/)
 - [Search Console の所有権確認](https://support.google.com/webmasters/answer/9008080)
-- 運用窓口 [rewardradar.support@gmail.com](mailto:rewardradar.support@gmail.com)
+- 運用窓口 [support@freebietrail.com](mailto:support@freebietrail.com)
 
 2026-11-06 の05:23 JST予定分は09:58:59 JSTに実行が作成され、collect、discover、publish、deploy はすべて成功しました。Cloudflare の新バージョンは09:59:49 JSTに記録され、本番 JSON の生成時刻は09:59:20 JSTでした。遅延の個別原因は実行ログに記録されていません。[実行ログ](https://github.com/chiba-yu94/reward-radar/actions/runs/42140680733)
 
@@ -77,3 +77,9 @@ limactl stop reward-radar
 `freebietrail.com` と `www.freebietrail.com` は Cloudflare の管理画面で既存の `reward-radar` Worker の Custom Domain として管理します。GitHub Actions には DNS 権限を追加していません。正規ホストは GitHub の `SITE_ORIGIN` と Worker の同名変数で揃えます。正規ホストの設定時に限り、旧 workers.dev と www を、パス・クエリを保って301転送します。
 
 ロールバック時は `SITE_ORIGIN` を `https://reward-radar.rewardradar42.workers.dev` に戻して同じワークフローを実行すると、転送が停止します。手動の Wrangler 配信でも `npm run deploy -- --var "SITE_ORIGIN:$SITE_ORIGIN"` で同じ値を渡します。Worker が静的アセットより先にリクエストを処理するため、Workers Free のリクエスト使用量は Cloudflare のダッシュボードで確認します。
+
+### 問い合わせの受信
+
+公開窓口は `support@freebietrail.com` です。Cloudflare Email Routing の個別ルールで `rewardradar42@gmail.com` に転送し、返信は Gmail から直接行います。Catch-all は無効です。Cloudflare が管理する MX・SPF・DKIM レコードは DNS の管理画面で確認できます。
+
+2026年11月6日、転送先と別の Gmail アカウントから送ったテストメール（件名末尾 `FT-2121`）が指定の受信トレイに届くことを確認しました。転送設定を変更した場合も、別アカウントから送って受信まで確認します。

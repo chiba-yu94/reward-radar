@@ -1,5 +1,5 @@
 export const languages = ['ja', 'en'];
-export const email = 'rewardradar.support@gmail.com';
+export const email = 'support@freebietrail.com';
 export const copy = {
   ja: {
     application: {noSns:'SNS不要', webOnly:'Web完結', easyApply:'簡単応募', sns:'SNSアカウント', web:'Web完結', registration:'無料会員登録', operations:'応募操作（最短の確認済み手順）', count:'応募手順数', difficulty:'応募の難易度', evidence:'応募条件の確認元', yes:'必要', no:'不要', webYes:'確認済み', webNo:'Web以外の手続きあり', easy:'簡単', standard:'標準', hard:'手間あり',
