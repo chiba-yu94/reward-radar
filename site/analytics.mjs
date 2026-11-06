@@ -79,6 +79,9 @@ function start() {
     const placement = link.closest('[data-analytics-affiliate]')?.dataset.analyticsAffiliate;
     if (name === 'affiliate_click' && placement) {
       gtag('event', name, {...common, page_group:'affiliate-placement', opportunity_id:placement, send_to:id});
+    } else if (name === 'application_click' && link.closest('[data-analytics-entry]')) {
+      const card = link.closest('[data-analytics-entry]');
+      gtag('event', name, {...common, page_group:card.dataset.analyticsCategory, opportunity_id:card.dataset.analyticsEntry, send_to:id});
     } else if (page && (name === 'application_click' || name === 'affiliate_click')) {
       gtag('event', name, {...common, send_to:id});
     }

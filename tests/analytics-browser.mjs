@@ -98,6 +98,50 @@ try {
     assert.equal(clicks[0][2].opportunity_id,'prolific');
     assert.doesNotMatch(JSON.stringify(clicks),/prolific\.com/);
 
+    await page.goto(origin + '/' + lang + '/opportunities/');
+    const cardLink = page.locator('[data-record="prolific"] [data-analytics-click="application_click"]');
+    await cardLink.click();
+    const cardEvent = (await queued()).find(args => args[0] === 'event' && args[1] === 'application_click');
+    assert.equal(cardEvent[2].opportunity_id,'prolific');
+    assert.doesNotMatch(JSON.stringify(cardEvent),/prolific\.com/);
+
+    const affiliatePage = origin + '/' + lang + '/opportunities/freecash/';
+    if ((await page.goto(affiliatePage)).status() === 200) {
+      const sponsored = page.locator('[data-analytics-click="affiliate_click"]');
+      const destination = await sponsored.getAttribute('href');
+      async function openSponsored() {
+        const [opened] = await Promise.all([context.waitForEvent('page'), sponsored.click()]);
+        await opened.waitForURL(destination);
+        await opened.close();
+      }
+      await openSponsored();
+      const affiliate = (await queued()).filter(args => args[0] === 'event' && args[1] === 'affiliate_click');
+      assert.equal(affiliate.length,1);
+      assert.deepEqual(Object.keys(affiliate[0][2]).sort(),
+        ['opportunity_id','page_group','page_location','page_referrer','send_to','site_language']);
+      assert.equal(affiliate[0][2].opportunity_id,'freecash');
+      assert.equal(affiliate[0][2].site_language,lang);
+      assert.doesNotMatch(JSON.stringify(affiliate),/pxf\.io|freecash\.com|user_id/);
+
+      calls.length = 0;
+      await settings.click();
+      await Promise.all([page.waitForEvent('domcontentloaded'),dialog.locator('[data-analytics-choice="reject"]').click()]);
+      await openSponsored();
+      assert.equal(await page.evaluate(() => typeof window.gtag),'undefined');
+      assert.deepEqual(calls,[]);
+      await page.evaluate(() => localStorage.removeItem('reward-radar-analytics-v1'));
+      await page.reload();
+      await banner.waitFor({state:'visible'});
+      await openSponsored();
+      assert.deepEqual(calls,[]);
+      await banner.locator('[data-analytics-choice="reject"]').click();
+      await openSponsored();
+      assert.deepEqual(calls,[]);
+      await settings.click();
+      await dialog.locator('[data-analytics-choice="accept"]').click();
+      console.log(lang + ': Freecash link navigates before consent, after rejection and after withdrawal; consented event has only approved fields');
+    }
+
     await page.goto(origin + '/' + lang + '/');
     const placement = page.locator('[data-analytics-affiliate="hapitas-referral"]');
     if (!await placement.count()) {

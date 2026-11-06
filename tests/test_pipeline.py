@@ -36,7 +36,7 @@ class TestPipeline(unittest.TestCase):
             self.assertEqual(db.execute("SELECT COUNT(*) FROM opportunities").fetchone()[0], len(self.rows))
         public = json.loads(self.output.read_text())["records"]
         self.assertTrue(all("source_id" not in item and "affiliate_review" not in item for item in public))
-        self.assertTrue(all(item["affiliate_url"] is None for item in public))
+        self.assertTrue(all(item["affiliate_url"] is None for item in public if item["id"] != "freecash"))
         self.assertEqual(next(item for item in public if item["id"] == "macromill")["reward_amount"], None)
 
     def test_failed_source_preserves_previous_output(self):
@@ -112,6 +112,35 @@ class TestPipeline(unittest.TestCase):
                 validate({**self.record,field:value}, self.source, self.now)
         with self.assertRaises(KeyError):
             validate({**self.record, "affiliate_approval_status":"approved"}, self.source, self.now)
+
+    def test_sponsored_rewards_requires_current_scoped_approval(self):
+        record = next(row for row in self.rows if row["id"] == "freecash")
+        source = self.sources[record["source_id"]]
+        source["active"] = True
+        url = "https://example.com/partner-link"
+        review = {
+            "approved_url": url,
+            "channel": "reward-radar-website",
+            "destination_reviewed": record["official_url"],
+            "territory_reviewed": True,
+            "disclosure_reviewed": True,
+            "commission_reviewed": True,
+            "review_id": "fixture-review",
+            "expires_at": utc(self.now + timedelta(days=1)),
+        }
+        record.update(affiliate_url=url, affiliate_approval_status="approved",
+                      affiliate_review=review, published_status="approved", verification_status="verified")
+        self.assertIn("freecash", self.run_publish())
+        for flag in ("territory_reviewed", "disclosure_reviewed", "commission_reviewed"):
+            with self.subTest(flag=flag), self.assertRaisesRegex(ValueError, "scoped review"):
+                validate({**record, "affiliate_review": {**review, flag: False}}, source, self.now)
+        with self.assertRaisesRegex(ValueError, "scoped review"):
+            validate({**record, "affiliate_url": "https://example.com/other"}, source, self.now)
+        self.now = stamp(review["expires_at"])
+        self.assertNotIn("freecash", self.run_publish())
+        record["affiliate_url"] = None
+        record["affiliate_approval_status"] = "pending"
+        self.assertNotIn("freecash", self.run_publish())
 
     def test_redirect_rejected_without_a_second_connection(self):
         with patch("radar.net.PinnedHTTPS") as tls:

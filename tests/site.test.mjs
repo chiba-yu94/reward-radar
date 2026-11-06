@@ -114,18 +114,39 @@ test('sponsored link attributes only after validated approval', () => {
   const original = readFileSync('var/published.json','utf8');
   try {
     const dataset = JSON.parse(original);
-    assert.ok(dataset.records.every(row => row.affiliate_url === null));
+    assert.ok(dataset.records.every(row => row.id === 'freecash' || row.affiliate_url === null));
     const sample = dataset.records[0];
     sample.affiliate_url = 'https://example.com/approved?key=1&context=2';
+    sample.affiliate_approval_status = 'approved';
+    sample.affiliate_expires_at = new Date(Date.now() + 86_400_000).toISOString();
     // Fixture for the renderer only. Python rejects links lacking an approval record.
     const fixture = JSON.stringify(dataset);
     execFileSync(process.execPath,['-e','require("node:fs").writeFileSync("var/published.json",process.argv[1])',fixture]);
     execFileSync(process.execPath,['site/build.mjs'], {env:{...process.env,SITE_ORIGIN:origin}});
     const html = read('en/opportunities/' + sample.id + '/index.html');
-    assert.match(html,/context=2" rel="sponsored nofollow noopener noreferrer"/);
+    assert.match(html,/context=2" target="_blank" rel="sponsored nofollow noopener noreferrer"/);
     assert.match(html,/Affiliate link/);
   } finally {
     build();
+  }
+});
+
+test('Freecash uses the scoped sponsored route in both languages while current', () => {
+  const freecash = rows.find(row => row.id === 'freecash');
+  for (const lang of ['ja','en']) {
+    const path = `${lang}/opportunities/freecash/index.html`;
+    const affiliates = read(`${lang}/affiliates/index.html`);
+    assert.doesNotMatch(read(`${lang}/opportunities/index.html`), /data-record="freecash"/);
+    assert.equal(existsSync('dist/' + path), Boolean(freecash));
+    if (!freecash) continue;
+    assert.match(affiliates, /class="card sponsored-card" data-record="freecash"/);
+    assert.ok(affiliates.includes(copy[lang].affiliateDisclosure));
+    const html = read(path);
+    assert.ok(html.includes(copy[lang].affiliateDisclosure));
+    assert.ok(html.includes(`href="${freecash.official_url}" rel="noopener noreferrer"`));
+    assert.ok(html.includes(`href="${freecash.affiliate_url}" target="_blank" rel="sponsored nofollow noopener noreferrer"`));
+    assert.match(html, /itemtype="https:\/\/schema.org\/BreadcrumbList"/);
+    assert.equal(freecash.eligible_countries.length,15);
   }
 });
 

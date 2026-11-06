@@ -179,7 +179,12 @@ def validate(row, source, now):
             "Invalid variable currencies")
     if row["category"] == "sweepstakes":
         require(row["certainty"] == "chance", "Sweepstakes certainty mismatch")
-    if row["category"] == "affiliate":
+    if row["category"] == "affiliate" and row["commission"] is None:
+        require(row["reward_type"] in {"cash", "points", "gift-card"}
+                and row["certainty"] == "conditional", "Sponsored rewards classification mismatch")
+        if row["published_status"] == "approved" and row["affiliate_approval_status"] == "approved":
+            require(isinstance(row["eligible_countries"], list), "Sponsored rewards require a verified territory list")
+    elif row["category"] == "affiliate":
         require(row["reward_type"] == "commission" and row["certainty"] == "conditional",
                 "Affiliate classification mismatch")
         commission = row["commission"]
@@ -324,6 +329,8 @@ def publish(rows, sources, observation, output, database, now):
                     public["affiliate_approval_status"] = "revoked"
                 else:
                     public["affiliate_expires_at"] = expiry
+            if row["category"] == "affiliate" and row["commission"] is None and not public["affiliate_url"]:
+                continue
             approved.append(public)
             active.append(row["id"])
         require(any(row["category"] != "affiliate" for row in approved),

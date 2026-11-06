@@ -1653,5 +1653,87 @@
     "description_en": "Answer the newsletter quiz correctly and complete the survey for a chance to win items from local businesses.",
     "eligibility_ja": "市外からも応募可能。海外からの応募可否は未確認です。酒類は未成年者の応募不可。",
     "eligibility_en": "People outside Obu may enter. Eligibility from overseas is unverified. Minors may not enter for alcoholic prizes."
+  },
+  {
+    "id": "freecash",
+    "source_id": "freecash",
+    "provider": "Almedia GmbH",
+    "category": "affiliate",
+    "eligible_countries": [
+      "US",
+      "DE",
+      "FR",
+      "CA",
+      "AU",
+      "AT",
+      "NL",
+      "BE",
+      "IT",
+      "GB",
+      "PL",
+      "CH",
+      "JP",
+      "KR",
+      "SE"
+    ],
+    "eligibility_verified": true,
+    "reward_type": "cash",
+    "reward_currency": null,
+    "reward_amount": null,
+    "reward_conditions": {
+      "ja": "報酬の対象条件や交換方法はタスクと居住地によって異なります。交換方法には現金での受け取りやギフトカードなどがあります。タスクを始める前に個別条件と費用の有無を、交換前に公式の交換条件を確認してください。初回の交換や出金に本人確認が必要になる場合があります。",
+      "en": "Task requirements and redemption options vary by offer and location. Options can include cash withdrawals and gift cards. Check each task for requirements and costs before starting. Check the current redemption terms. Freecash may require identity verification before your first redemption or payout."
+    },
+    "required_expense": {
+      "kind": "unknown",
+      "amount": null,
+      "currency": null
+    },
+    "estimated_effort_minutes": null,
+    "participation_method": "account",
+    "deadline": null,
+    "official_url": "https://freecash.com/",
+    "affiliate_url": "https://freecash.pxf.io/GbyNa2",
+    "affiliate_approval_status": "approved",
+    "affiliate_review": {
+      "approved_url": "https://freecash.pxf.io/GbyNa2",
+      "destination_reviewed": "https://freecash.com/",
+      "channel": "reward-radar-website",
+      "territory_reviewed": true,
+      "disclosure_reviewed": true,
+      "commission_reviewed": true,
+      "review_id": "fc-20261107-web",
+      "expires_at": "2026-12-07T00:00:00Z"
+    },
+    "source_url": "https://freecash.com/",
+    "source_permission_status": "editorial-summary",
+    "first_seen_at": "2026-11-06T23:49:48Z",
+    "last_checked_at": "2026-11-06T23:49:48Z",
+    "verification_status": "verified",
+    "risk_flags": [
+      "variable",
+      "third-party-id",
+      "account"
+    ],
+    "published_status": "approved",
+    "language": "multiple",
+    "certainty": "conditional",
+    "redemption_difficulty": null,
+    "commission": null,
+    "title_ja": "Freecashのタスク型報酬",
+    "title_en": "Freecash task rewards",
+    "description_ja": "Freecashは、ゲームやアンケート、アプリの利用など、対象タスクを完了することで報酬を獲得できるサービスです。",
+    "description_en": "Freecash is a rewards platform where users can earn rewards by completing eligible tasks, including games, surveys, and app offers.",
+    "eligibility_ja": "この広告の対象地域は下記のとおりです。Freecashの利用には、16歳以上で、かつ法的に契約を結べることが必要です。1人・1世帯につき1アカウントまでです。",
+    "eligibility_en": "This advertisement covers the markets listed below. To use Freecash, you must be at least 16 and of legal age to enter a binding contract. Freecash allows one account per person and per household.",
+    "entry": {
+      "registration": "organizer",
+      "application": null,
+      "winner": null,
+      "steps": {
+        "ja": "公式サイトで利用条件を読み、参加資格を満たす場合はアカウントを作成します。各タスクの報酬条件と費用の有無を確認し、参加するタスクを選んでください。",
+        "en": "Read the official terms and create an account if you are eligible. Review each task’s reward requirements and any costs before choosing a task."
+      }
+    }
   }
 ]

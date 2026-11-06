@@ -465,5 +465,26 @@
     "free_entry_reviewed": true,
     "privacy_reviewed": true,
     "supporting_urls": []
+  },
+  {
+    "id": "freecash",
+    "provider": "Almedia GmbH",
+    "official_url": "https://freecash.com/",
+    "approved_destination": "https://freecash.com/",
+    "country": "Multiple",
+    "language": "en",
+    "method": "manual",
+    "permission": "editorial-summary",
+    "terms_status": "Public Freecash terms and advertising guidelines reviewed. Impact website placement reviewed separately.",
+    "last_verification_date": "2026-11-06T23:49:48Z",
+    "last_successful_collection": null,
+    "error_status": null,
+    "collection_frequency": "manual; review before approval expiry",
+    "active": true,
+    "organizer_verified": true,
+    "supporting_urls": [
+      "https://freecash.com/en/policies/terms",
+      "https://freecash.com/en/policies/partner-advertiser-policy"
+    ]
   }
 ]

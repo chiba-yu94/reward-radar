@@ -52,3 +52,9 @@ The separate bilingual home-page placement remains disabled unless the owner sup
 
 
 The placement is separate from the giveaway listings. Its consent-gated `affiliate_click` carries `opportunity_id=hapitas-referral`, `page_group=affiliate-placement`, and the page language. It does not send the referral URL or code to GA4. Check referral credits separately in Hapitas. For the November referrer campaign, the account holder must also enter the campaign in Hapitas by the campaign deadline. [Official program](https://hapitas.jp/referral)
+
+## Freecash website placement
+
+Freecash appears in the advertising and affiliate directory as a task-based rewards service. The regular directory and ranking exclude it. The organizer URL remains separate from the Impact link. The placement lists the markets covered by the advertisement. Service eligibility and redemption details come from Freecash's public terms. [Freecash terms](https://freecash.com/en/policies/terms) · [Advertising guidelines](https://freecash.com/en/policies/partner-advertiser-policy)
+
+Store contract and review evidence privately. Recheck the active terms, market list, link destination, and copy before the internal expiry recorded in `affiliate_review`. If Impact changes or cancels the agreement, update the review or set `affiliate_approval_status=revoked` and `affiliate_url=null`, then run the existing publish workflow. A missing, revoked, or expired review suppresses the sponsored service at build time. Open pages suppress its links at expiry.

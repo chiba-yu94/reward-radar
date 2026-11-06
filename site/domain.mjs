@@ -42,6 +42,7 @@ export function ordered(rows, now) {
     const expense = row.required_expense;
     if (row.category === 'affiliate') {
       const terms = row.commission;
+      if (!terms) return [...prefix, 4, row.id];
       return [...prefix, 3, terms.structure, -(terms.percent ?? -1), -(terms.months ?? -1),
         Number(!row.eligibility_verified), row.id];
     }
