@@ -11,6 +11,7 @@ from contextlib import closing
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
 
+from .application import application_profile
 from .net import fetch_json, https_url
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -225,6 +226,11 @@ def validate(row, source, now):
         "waitlist", "third-party-id", "approval", "purchase", "variable", "capacity", "account",
     } for flag in row["risk_flags"]), "Invalid risk flags")
     validate_entry(row, source)
+    profile = application_profile(row.get("application"), expense["kind"] == "free")
+    if profile["source_url"]:
+        require(profile["source_url"] in [row["source_url"], *source.get("supporting_urls", [])]
+                and first <= stamp(profile["checked_at"]) <= now + CLOCK_SKEW,
+                "Application facts require a reviewed source and date")
     enum(row["affiliate_approval_status"], {"none", "pending", "approved", "revoked"})
     if row["affiliate_approval_status"] == "approved":
         approval = row["affiliate_review"]
@@ -303,6 +309,7 @@ def publish(rows, sources, observation, output, database, now):
                 continue  # The reviewed snapshot and SQLite retain these entries.
             public = {key: row[key] for key in PUBLIC}
             public["deadline_date_only"] = row.get("deadline_date_only", False)
+            public["application"] = application_profile(row.get("application"), row["required_expense"]["kind"] == "free")
             public["entry"] = row.get("entry", UNKNOWN_ENTRY)
             public["prize_category"] = row.get("prize_category")
             public["organizer_verified"] = source.get("organizer_verified") is True

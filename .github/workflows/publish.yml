@@ -65,6 +65,8 @@ jobs:
         env:
           SITE_ORIGIN: ${{ vars.SITE_ORIGIN }}
           GA4_MEASUREMENT_ID: ${{ vars.GA4_MEASUREMENT_ID }}
+          HAPITAS_REFERRAL_URL: ${{ vars.HAPITAS_REFERRAL_URL }}
+          HAPITAS_REFERRAL_APPROVED: ${{ vars.HAPITAS_REFERRAL_APPROVED }}
           GA4_PRIVACY_READY: ${{ vars.GA4_PRIVACY_READY }}
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
         with:

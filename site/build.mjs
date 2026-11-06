@@ -12,6 +12,12 @@ const measurementId = process.env.GA4_MEASUREMENT_ID || '';
 if (measurementId && !/^G-[A-Z0-9]{4,20}$/.test(measurementId)) throw new Error('Invalid GA4 measurement ID');
 const analytics = measurementId && process.env.GA4_PRIVACY_READY === 'true' ? measurementId : '';
 if (measurementId && !analytics) console.warn('GA4 is disabled pending the property privacy setup');
+const hapitasDeadline = '2026-11-30T15:00:00Z';
+const hapitasUrl = process.env.HAPITAS_REFERRAL_APPROVED === 'true' && process.env.HAPITAS_REFERRAL_URL
+  ? process.env.HAPITAS_REFERRAL_URL : '';
+if (hapitasUrl && !/^https:\/\/(?:sp\.)?hapitas\.jp\/register\?i=[A-Za-z0-9_-]{1,128}(?:&route=[A-Za-z0-9_-]{1,40})?$/.test(hapitasUrl)) {
+  throw new Error('Invalid Hapitas referral URL');
+}
 const dataset = JSON.parse(await readFile('var/published.json', 'utf8'));
 const now = Date.now();
 const rows = ordered(dataset.records.filter(row => !expired(row, now)), now);
@@ -162,6 +168,7 @@ ${options('effort',t.maxEffort,Object.fromEntries([5,15,30,60].map(n => [n,n + t
 </div><div class="filter-actions"><label class="checkbox"><input type="checkbox" name="explicitJapan" value="yes">${t.japan}</label>
 <label class="checkbox"><input type="checkbox" name="emailOnly" value="yes">${t.emailOnly}</label>
 <label class="checkbox"><input type="checkbox" name="organizer" value="yes">${t.organizerFilter}</label>
+${['noSns','webOnly','easyApply'].map(key => `<label class="checkbox"><input type="checkbox" name="${key}" value="yes">${t.application[key]}</label>`).join('')}
 <button type="reset">${t.reset}</button></div></form>
 <noscript><p class="notice">${t.javascript}</p></noscript>
 <p class="notice" data-filter-error hidden>${t.failure}</p>`;
@@ -194,6 +201,21 @@ function details(lang, row) {
     [t.effort,row.estimated_effort_minutes === null ? t.unknown : e(row.estimated_effort_minutes + t.minutes)],
     [t.deadline,row.deadline ? time(row.deadline,lang,!row.deadline_date_only) : t.noDeadline],
   ];
+  const app = row.application;
+  if (app?.source_url) {
+    const a = t.application;
+    const yesNo = value => value === null ? t.unknown : value ? a.yes : a.no;
+    const socialNames = {x:'X', instagram:'Instagram', line:'LINE', facebook:'Facebook', tiktok:'TikTok', youtube:'YouTube'};
+    base.push(
+      [a.web, e(app.web_only === null ? t.unknown : app.web_only ? a.webYes : a.webNo)],
+      [a.sns, e([yesNo(app.sns_required), ...app.platforms.map(item => socialNames[item])].join(' · '))],
+      [a.registration, e(yesNo(app.free_registration))],
+      [a.operations, e(app.operations.map(item => a.names[item]).join(' → ') || t.unknown)],
+      [a.count, e(app.step_count ?? t.unknown)],
+      [a.difficulty, e(a[app.difficulty] || t.unknown)],
+      [a.evidence, `<a href="${e(app.source_url)}" rel="noopener noreferrer">${t.source}</a> · ${time(app.checked_at,lang)}`],
+    );
+  }
   const flags = row.risk_flags.map(flag => `<li>${e(t.risks[flag])}</li>`).join('');
   const c = row.commission;
   const terms = c ? `<h2>${t.commission}</h2>${fields([
@@ -229,6 +251,11 @@ async function page(lang, key, title, description, content, indexable = true) {
 const consumer = rows.filter(row => row.category !== 'affiliate');
 for (const lang of languages) {
   const t = copy[lang];
+  const hapitasAd = hapitasUrl && now < Date.parse(hapitasDeadline)
+    ? `<aside class="notice" data-affiliate-expires="${hapitasDeadline}">
+<h2>${t.hapitas.title}</h2><p>${t.hapitas.body}</p>
+${external(hapitasUrl,t.sponsored,'affiliate_click')}
+<p><a href="https://sp.hapitas.jp/special/referral202611?apn=search_keyword" rel="noopener noreferrer">${t.hapitas.terms}</a> · ${time('2026-11-30T14:59:00Z',lang,true)}</p></aside>` : '';
   const featured = consumer.filter(row => row.category === 'sweepstakes').slice(0,3);
   const comparison = ['macromill','research-panel','prolific'].map(id => consumer.find(row => row.id === id)).filter(Boolean);
   const table = `<section class="section"><h2>${t.compare}</h2><p>${t.compareLead}</p>
@@ -242,7 +269,7 @@ for (const lang of languages) {
 <p class="notice">${t.regionNotice}</p><section class="section"><h2>${t.explore}</h2>
 <div class="tiles">${primary.slice(1).map(key => `<a href="${url(lang,key)}"><strong>${e(t.pages[key][0])}</strong><span aria-hidden="true">↗</span></a>`).join('')}</div></section>
 <section class="section"><h2>${t.featured}</h2><p>${t.featuredLead}</p>
-<div class="cards">${featured.length ? featured.map(row => card(row,lang)).join('') : `<p>${t.empty}</p>`}</div></section>${table}`);
+<div class="cards">${featured.length ? featured.map(row => card(row,lang)).join('') : `<p>${t.empty}</p>`}</div></section>${hapitasAd}${table}`);
   const pages = {
     opportunities: consumer,
     sweepstakes: consumer.filter(row => row.category === 'sweepstakes'),

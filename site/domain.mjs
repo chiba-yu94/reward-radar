@@ -17,6 +17,9 @@ export function matches(row, query, lang, now) {
   }
   const currencies = row.reward_currencies?.length ? row.reward_currencies : [row.reward_currency ?? 'unknown'];
   if (query.reward_currency && !currencies.includes(query.reward_currency)) return false;
+  if (query.noSns && row.application?.sns_required !== false) return false;
+  if (query.webOnly && row.application?.web_only !== true) return false;
+  if (query.easyApply && row.application?.difficulty !== 'easy') return false;
   if (query.organizer && !row.organizer_verified) return false;
   if (query.registration && row.entry?.registration !== query.registration) return false;
   if (query.emailOnly && (row.entry?.registration !== 'none' ||
@@ -50,7 +53,13 @@ export function ordered(rows, now) {
         number(row.estimated_effort_minutes), number(friction[row.redemption_difficulty]),
         Number(!row.eligibility_verified), deadline, row.id];
     }
-    if (row.category === 'sweepstakes') return [...prefix, 1, deadline, cost[expense.kind], row.id];
+    if (row.category === 'sweepstakes') {
+      const app = row.application;
+      const web = app?.web_only === true && app.sns_required === false && expense.kind === 'free';
+      const level = {easy: 0, standard: 1, unknown: 2, hard: 3};
+      return [...prefix, 1, Number(!web), Number(app?.sns_required !== false),
+        level[app?.difficulty] ?? level.unknown, number(app?.step_count), deadline, row.id];
+    }
     return [...prefix, 2, cost[expense.kind], deadline, Number(!row.eligibility_verified), row.id];
   };
   return rows.map(row => [row, key(row)]).sort(([, a], [, b]) => {

@@ -21,6 +21,22 @@ import assert from 'node:assert/strict';
       await page.locator('[data-record="prolific"] h3 a').click();
       await page.locator('header .language').click();
       assert.match(page.url(),lang==='ja'?/\/en\/opportunities\/prolific\/$/:/\/ja\/opportunities\/prolific\/$/);
+      await page.goto(`${base}/${lang}/sweepstakes/`);
+      const snsFree = page.locator('[name=noSns]');
+      if (await snsFree.count()) {
+        const data = await (await page.request.get(base + '/opportunities.json')).json();
+        const records = data.records.filter(row => row.category === 'sweepstakes' &&
+          (!row.deadline || Date.parse(row.deadline) > Date.now()) && row.application?.sns_required === false);
+        const visibleIds = () => page.locator('[data-record]:visible')
+          .evaluateAll(items => items.map(item => item.dataset.record).sort());
+        await snsFree.check();
+        assert.deepEqual(await visibleIds(),records.map(row => row.id).sort());
+        await page.locator('[name=webOnly]').check();
+        await page.locator('[name=easyApply]').check();
+        assert.deepEqual(await visibleIds(),records.filter(row => row.application.web_only === true &&
+          row.application.difficulty === 'easy').map(row => row.id).sort());
+      }
+      assert.ok(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth));
       assert.deepEqual(errors,[]);
       console.log(`${lang} at ${width}px: home, directory, details, affiliates, contact, filter and language switch passed`);
       await page.close();

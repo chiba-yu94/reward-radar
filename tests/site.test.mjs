@@ -95,6 +95,18 @@ test('consumer filters do not turn unverified requirements into promises', () =>
   assert.ok(!rows.some(row => row.id === 'github-student'));
 });
 
+test('application filters require verified facts and prioritize low effort', () => {
+  const basic = {...jp, category:'sweepstakes'};
+  const web = {...basic,id:'web',application:{web_only:true,sns_required:false,step_count:3,difficulty:'easy'}};
+  const social = {...basic,id:'social',application:{sns_required:true,step_count:2,difficulty:'easy'}};
+  const hard = {...basic,id:'hard',reward_amount:100000,application:{sns_required:true,step_count:2,difficulty:'hard'}};
+  assert.equal(matches(web,{noSns:'yes',webOnly:'yes',easyApply:'yes'},'en',now),true);
+  assert.equal(matches(basic,{noSns:'yes'},'en',now),false);
+  assert.equal(matches(social,{webOnly:'yes'},'en',now),false);
+  assert.deepEqual(ordered([hard,social,web],now).map(row => row.id),['web','social','hard']);
+  assert.doesNotMatch(read('ja/index.html'), /hapitas\.jp\/register/);
+});
+
 test('sponsored link attributes only after validated approval', () => {
   const original = readFileSync('var/published.json','utf8');
   try {

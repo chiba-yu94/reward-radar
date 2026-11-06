@@ -25,3 +25,7 @@ Eight manual campaigns came from official organizer pages. The registry has 23 m
 - [Saitama Prefecture RSS instructions](https://www.pref.saitama.lg.jp/kense/koho/homepage/rss.html)
 - [Asahi Group RSS terms](https://www.asahigroup-holdings.com/newsroom/rss.html)
 - [GitHub REST Contents API](https://docs.github.com/en/rest/repos/contents#get-repository-content)
+
+## Application effort
+
+Record `application` only after checking official organizer rules. Its source URL must be the approved primary or supporting source. Record the review timestamp, whether entry is web-only, whether an SNS account or free organizer membership is required, supported platforms, and the actions on the shortest verified path. Use null for unresolved flags. The publication pipeline calculates the action count and difficulty from these facts. It prioritizes free, SNS-free web entry, then confirmed SNS-free routes and low-effort social routes. Writing a new or quote post and linking accounts count as more involved. Feed discoveries begin with unknown values and remain in the review queue until the organizer evidence is checked.

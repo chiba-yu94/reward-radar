@@ -2,6 +2,9 @@ export const languages = ['ja', 'en'];
 export const email = 'rewardradar.support@gmail.com';
 export const copy = {
   ja: {
+    application: {noSns:'SNS不要', webOnly:'Web完結', easyApply:'簡単応募', sns:'SNSアカウント', web:'Web完結', registration:'無料会員登録', operations:'応募操作（最短の確認済み手順）', count:'応募手順数', difficulty:'応募の難易度', evidence:'応募条件の確認元', yes:'必要', no:'不要', webYes:'確認済み', webNo:'Web以外の手続きあり', easy:'簡単', standard:'標準', hard:'手間あり',
+      names:{form:'フォーム入力', email:'メール送信', 'email-verify':'メール認証', register:'登録', follow:'フォロー', repost:'リポスト', like:'いいね', comment:'コメント', 'create-post':'新規投稿', 'quote-post':'引用投稿', 'link-accounts':'アカウント連携'}},
+    hapitas:{title:'ハピタス紹介プログラム', body:'紹介経由の新規登録・メール認証と3日連続ログインなど、特典には条件があります。運営者が紹介報酬を受け取る場合があります。', terms:'公式キャンペーン条件'},
     language: '日本語', otherLanguage: 'English', skip: '本文へ移動', home: 'ホーム',
     analytics: {
       title:'任意のアクセス解析', settings:'アクセス解析の設定', accept:'許可する', reject:'拒否する', close:'閉じる',
@@ -86,6 +89,9 @@ export const copy = {
     },
   },
   en: {
+    application: {noSns:'No social account needed', webOnly:'Web only', easyApply:'Easy entry', sns:'Social account', web:'Web-only entry', registration:'Free membership registration', operations:'Entry actions (shortest verified route)', count:'Number of steps', difficulty:'Entry difficulty', evidence:'Entry requirements source', yes:'Required', no:'Not required', webYes:'Verified', webNo:'Requires a step outside the website', easy:'Easy', standard:'Standard', hard:'More involved',
+      names:{form:'Fill out a form', email:'Send an email', 'email-verify':'Verify your email', register:'Register', follow:'Follow', repost:'Repost', like:'Like', comment:'Comment', 'create-post':'Create a post', 'quote-post':'Quote-post', 'link-accounts':'Link accounts'}},
+    hapitas:{title:'Hapitas referral program', body:'Rewards have conditions, including signing up through a referral, verifying your email and logging in on three consecutive days. The site operator may receive a referral reward.', terms:'Official campaign terms'},
     language: 'English', otherLanguage: '日本語', skip: 'Skip to content', home: 'Home',
     analytics: {
       title:'Optional analytics', settings:'Analytics settings', accept:'Accept', reject:'Reject', close:'Close',

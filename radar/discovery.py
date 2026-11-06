@@ -5,6 +5,7 @@ from datetime import datetime, timezone
 from pathlib import Path
 from xml.etree import ElementTree
 
+from .application import application_profile
 from .net import fetch_document, https_url
 from .pipeline import ROOT, dump, inputs, read, require, utc
 
@@ -59,7 +60,8 @@ def discover(feeds, reviewed, fetch=fetch_document):
     return {
         "checked_at": utc(datetime.now(timezone.utc)),
         "feeds": results,
-        "candidates": [{"url": url, "feeds": ids, "status": "candidate", "pending_checks": REVIEW_CHECKS}
+        "candidates": [{"url": url, "feeds": ids, "status": "candidate", "pending_checks": (*REVIEW_CHECKS, "application-ease-from-official-rules"),
+                        "application": application_profile(None, False)}
                        for url, ids in sorted(pending.items())],
     }
 

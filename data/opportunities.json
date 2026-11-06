@@ -975,7 +975,21 @@
         "en": "Follow @calbee_PR on a public X account and create a regular post with the campaign hashtag shown in the rules."
       }
     },
-    "prize_category": "food"
+    "prize_category": "food",
+    "application": {
+      "web_only": null,
+      "sns_required": true,
+      "platforms": [
+        "x"
+      ],
+      "operations": [
+        "follow",
+        "create-post"
+      ],
+      "free_registration": null,
+      "source_url": "https://www.calbee.co.jp/jagabee/hokkoricampaign/",
+      "checked_at": "2026-11-05T07:10:00Z"
+    }
   },
   {
     "id": "ja-wakayama-rice-2026-11",
@@ -1038,7 +1052,19 @@
       }
     },
     "prize_category": "food",
-    "deadline_date_only": true
+    "deadline_date_only": true,
+    "application": {
+      "web_only": false,
+      "sns_required": false,
+      "platforms": [],
+      "operations": [
+        "register",
+        "email"
+      ],
+      "free_registration": true,
+      "source_url": "https://www.ja-town.com/shop/pages/5610/presentforyou.aspx",
+      "checked_at": "2026-11-05T07:10:00Z"
+    }
   },
   {
     "id": "yamazaki-nikuman-2026",
@@ -1099,7 +1125,21 @@
         "en": "Follow @yamazakipan_cp and repost the entry post for the current round. Quote posts do not qualify."
       }
     },
-    "prize_category": "cash-gift"
+    "prize_category": "cash-gift",
+    "application": {
+      "web_only": null,
+      "sns_required": true,
+      "platforms": [
+        "x"
+      ],
+      "operations": [
+        "follow",
+        "repost"
+      ],
+      "free_registration": null,
+      "source_url": "https://www.yamazakipan.co.jp/feature/nikuman_xcp/",
+      "checked_at": "2026-11-05T07:10:00Z"
+    }
   },
   {
     "id": "saitama-seasonal-produce-2026",
@@ -1159,7 +1199,22 @@
       }
     },
     "prize_category": "food",
-    "deadline_date_only": true
+    "deadline_date_only": true,
+    "application": {
+      "web_only": null,
+      "sns_required": true,
+      "platforms": [
+        "instagram"
+      ],
+      "operations": [
+        "follow",
+        "like",
+        "comment"
+      ],
+      "free_registration": null,
+      "source_url": "https://www.pref.saitama.lg.jp/saitama-wassyoi/enjoy/news081027.html",
+      "checked_at": "2026-11-05T07:10:00Z"
+    }
   },
   {
     "id": "doutor-latte-2026",
@@ -1218,7 +1273,21 @@
         "en": "Follow @doutor_coffee_wholesale and comment on the campaign post with the flavour you would like to try."
       }
     },
-    "prize_category": "food"
+    "prize_category": "food",
+    "application": {
+      "web_only": null,
+      "sns_required": true,
+      "platforms": [
+        "instagram"
+      ],
+      "operations": [
+        "follow",
+        "comment"
+      ],
+      "free_registration": null,
+      "source_url": "https://www.doutor.co.jp/business/wholesale/campaign/05.html",
+      "checked_at": "2026-11-05T07:10:00Z"
+    }
   },
   {
     "id": "takaratomy-conan-card-2026",
@@ -1279,7 +1348,21 @@
         "en": "Follow @CONAN_tcg and quote-post the campaign post with the specified hashtag."
       }
     },
-    "prize_category": "other"
+    "prize_category": "other",
+    "application": {
+      "web_only": null,
+      "sns_required": true,
+      "platforms": [
+        "x"
+      ],
+      "operations": [
+        "follow",
+        "quote-post"
+      ],
+      "free_registration": null,
+      "source_url": "https://www.takaratomy.co.jp/products/conan-cardgame/news_detail/hashtag_202611_furuya",
+      "checked_at": "2026-11-05T07:10:00Z"
+    }
   },
   {
     "id": "kotobukiya-noa-2026",
@@ -1340,7 +1423,21 @@
         "en": "Follow @kotobukiyas on X and repost the campaign post."
       }
     },
-    "prize_category": "other"
+    "prize_category": "other",
+    "application": {
+      "web_only": null,
+      "sns_required": true,
+      "platforms": [
+        "x"
+      ],
+      "operations": [
+        "follow",
+        "repost"
+      ],
+      "free_registration": null,
+      "source_url": "https://www.kotobukiya.co.jp/campaign/detail/1366/",
+      "checked_at": "2026-11-05T07:10:00Z"
+    }
   },
   {
     "id": "tombow-mono-2026",
@@ -1401,6 +1498,21 @@
         "en": "On X, follow @tombowpencil and repost the campaign post. On Instagram, follow the same handle and leave a heart emoji on the campaign post."
       }
     },
-    "prize_category": "household"
+    "prize_category": "household",
+    "application": {
+      "web_only": null,
+      "sns_required": true,
+      "platforms": [
+        "x",
+        "instagram"
+      ],
+      "operations": [
+        "follow",
+        "repost"
+      ],
+      "free_registration": null,
+      "source_url": "https://www.tombow.com/sp/monoday2026/",
+      "checked_at": "2026-11-05T07:10:00Z"
+    }
   }
 ]
