@@ -50,7 +50,7 @@ const url = (lang, page = '') => '/' + lang + '/' + (page ? page + '/' : '');
 const detail = (lang, row) => url(lang, 'opportunities/' + row.id);
 const time = (value, lang, full = false) => `<time datetime="${e(value)}">${e(date(value, lang, full))}</time>`;
 const address = `<a href="mailto:${email}">${email}</a>`;
-const brand = name => '<img src="/assets/mark.svg" alt="" width="32" height="32"><span>${e(name)}</span>';
+const brand = name => `<img src="/assets/mark.svg" alt="" width="32" height="32"><span>${e(name)}</span>`;
 const primary = ['opportunities', 'sweepstakes', 'guaranteed', 'international'];
 const secondary = ['affiliates', 'ranking', 'about', 'contact', 'privacy', 'disclosure'];
 const maps = [];

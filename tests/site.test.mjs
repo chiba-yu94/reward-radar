@@ -19,6 +19,9 @@ const now = Date.parse('2026-11-06T00:00:00Z');
 
 test('locale structure, missing translation and actual HTML', () => {
   verifyLocales();
+  assert.match(read('ja/index.html'), /<span>懸賞さんぽ<\/span>/);
+  assert.match(read('en/index.html'), /<span>Freebie Trail<\/span>/);
+  assert.match(read('index.html'), /<span>Freebie Trail \/ 懸賞さんぽ<\/span>/);
   assert.throws(() => verifyLocales(copy.ja,{...copy.en,search:''}), /localization/);
   assert.match(read('ja/index.html'), /html lang="ja".*買わずに応募/s);
   assert.match(read('en/index.html'), /html lang="en".*Find free giveaways/s);
