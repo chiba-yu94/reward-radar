@@ -11,6 +11,10 @@ Production builds are off by default. A missing `GA4_MEASUREMENT_ID` or an unset
 
 Analytics is limited to canonical Japanese and English pages. The language picker, error pages and URLs carrying a query string or arbitrary fragment are excluded. The site sends its canonical route, locale, listing ID where applicable and a broad referrer category. Raw referrers, URL queries, entered search terms, outbound URLs, names and emails are excluded. GA4 cookie identifiers and device/connection information are handled by Google after consent. The CSP opens only Google Tag's `/gtag/` script path and the analytics transport endpoints on configured builds. Ad consent values remain denied. [Google privacy information](https://policies.google.com/technologies/partner-sites) · [GA4 PII guidance](https://support.google.com/analytics/answer/6366371?hl=en) · [Page views](https://developers.google.com/analytics/devguides/collection/ga4/views?technology=websites) · [CSP guidance](https://developers.google.com/tag-platform/security/guides/csp)
 
+For Tag Assistant, start with a canonical localized page such as `https://freebietrail.com/en/`. Clear **Include debug signal in the URL**, then allow analytics on the site. The language picker has no analytics and query strings, including Tag Assistant's debug parameter, suppress tag loading. Keep the consent and query guards in place. If the debug window cannot connect, check the actual collect requests and GA4 Realtime separately. [Google troubleshooting](https://support.google.com/tagmanager/answer/10039345?hl=en)
+
+When changing tag startup, verify the first real collect request for a visit from an external referrer. The sanitized page location and referrer and the automatic page-view setting must be set before Google tag initialization. The test stub checks command order but cannot detect changes in Google's live tag.
+
 ## GA4 reports
 
 Register `site_language`, `traffic_group`, `page_group`, and `opportunity_id` as event-scoped custom dimensions before collecting production data. In Explore, use Event count for activity and Total users for the language comparison. Apply these dimensions and event filters.
@@ -27,6 +31,8 @@ Register `site_language`, `traffic_group`, `page_group`, and `opportunity_id` as
 Traffic groups are based on the browser's available referrer information and are distinct from GA4's campaign or session acquisition reports. Counts represent activity by consenting visitors on eligible pages. A visitor who uses both site languages may be counted in both language groups. Clicks are directional measurements and may be lost to browser restrictions. Partner dashboards supply verified conversions.
 
 ## Affiliate approval and private ledger
+
+Impact website ownership can be verified with the static homepage meta tag generated from the public `IMPACT_VERIFICATION_ID` repository variable.
 
 The same approval gate covers Japanese and international partners. Preserve `official_url` and keep `affiliate_url` null during application. Before enabling a link, verify approval, the permitted website and audience territory, the official destination, program restrictions, commission and disclosure rules. Store the approval evidence privately. In the repository record only the opaque review ID, exact approved public affiliate URL and official destination, channel `reward-radar-website`, review flags and expiry in `affiliate_review`. Set `affiliate_approval_status=approved` after review. An approved link appears separately from the organizer URL, with a Japanese or English commission disclosure and `rel="sponsored nofollow noopener noreferrer"`. Expired and revoked approvals are suppressed. Revoke or review approvals if terms or destinations change.
 

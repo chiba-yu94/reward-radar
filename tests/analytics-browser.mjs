@@ -63,15 +63,22 @@ try {
     assert.deepEqual(calls,[]);
 
     // Even after opt-in, a page URL with private query or fragment data is not measured.
-    await page.goto(pageUrl + '?q=private@example.invalid#name');
+    await page.goto(pageUrl + '?gtm_debug=1');
     await settings.click();
     await dialog.locator('[data-analytics-choice="accept"]').click();
+    assert.deepEqual(calls,[]);
+    await page.goto(pageUrl + '?q=private@example.invalid#name');
     assert.deepEqual(calls,[]);
 
     await page.goto(pageUrl, {referer:'https://www.google.com/search?q=private@example.invalid'});
     await page.waitForFunction(() => window.analyticsTestTagLoaded === true);
     assert.equal(calls.filter(url => url.startsWith(tag)).length,1);
     const queued = () => page.evaluate(() => window.dataLayer.map(args => Array.from(args)));
+    const [set, safeDefaults] = await queued();
+    assert.equal(set, 'set');
+    assert.equal(safeDefaults.page_location, pageUrl);
+    assert.equal(safeDefaults.page_referrer, origin + '/');
+    assert.equal(safeDefaults.send_page_view, false);
     const config = (await queued()).find(args => args[0] === 'config')[2];
     assert.equal(config.send_page_view,false);
     assert.equal(config.allow_google_signals,false);

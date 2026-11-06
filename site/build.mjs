@@ -13,6 +13,12 @@ const publisher = process.env.ADSENSE_VERIFICATION_ID || '';
 if (publisher && !/^ca-pub-\d{16}$/.test(publisher)) throw new Error('Invalid AdSense verification ID');
 const adsenseMeta = publisher && configured === productionOrigin
   ? `<meta name="google-adsense-account" content="${publisher}">` : '';
+const impactVerification = process.env.IMPACT_VERIFICATION_ID || '';
+if (impactVerification && !/^[0-9a-f]{8}-(?:[0-9a-f]{4}-){3}[0-9a-f]{12}$/.test(impactVerification)) {
+  throw new Error('Invalid Impact verification ID');
+}
+const impactMeta = impactVerification && configured === productionOrigin
+  ? `<meta name="impact-site-verification" value="${impactVerification}">` : '';
 const measurementId = process.env.GA4_MEASUREMENT_ID || '';
 if (measurementId && !/^G-[A-Z0-9]{4,20}$/.test(measurementId)) throw new Error('Invalid GA4 measurement ID');
 const analytics = measurementId && process.env.GA4_PRIVACY_READY === 'true' ? measurementId : '';
@@ -302,7 +308,7 @@ ${key === 'privacy' && analytics ? `<p><button type="button" data-analytics-sett
   }
 }
 await write('index.html', `<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width">
-<title>Freebie Trail / 懸賞さんぽ</title>${adsenseMeta}
+<title>Freebie Trail / 懸賞さんぽ</title>${adsenseMeta}${impactMeta}
 <meta name="description" content="Find giveaways you can enter without a purchase.">
 <meta property="og:title" content="Freebie Trail / 懸賞さんぽ"><meta property="og:url" content="${origin.origin}/"><link rel="canonical" href="${origin.origin}/">
 ${languages.map(lang => `<link rel="alternate" hreflang="${lang}" href="${origin.origin}${url(lang)}">`).join('')}

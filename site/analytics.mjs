@@ -52,10 +52,11 @@ function start() {
   function gtag() { window.dataLayer.push(arguments); }
   window.gtag = gtag;
   const consent = {ad_storage:'denied', ad_user_data:'denied', ad_personalization:'denied'};
+  // The tag can emit a default page view during startup. Set safe URLs first.
+  gtag('set', {...common, send_page_view:false});
   gtag('consent', 'default', {...consent, analytics_storage:'denied'});
   gtag('consent', 'update', {...consent, analytics_storage:'granted'});
   gtag('js', new Date());
-  gtag('set', common);
   gtag('config', id, {
     send_page_view:false,
     allow_google_signals:false,
