@@ -259,10 +259,10 @@ const consumer = rows.filter(row => row.category !== 'affiliate');
 for (const lang of languages) {
   const t = copy[lang];
   const hapitasAd = hapitasUrl && now < Date.parse(hapitasDeadline)
-    ? `<aside class="notice" data-affiliate-expires="${hapitasDeadline}">
-<h2>${t.hapitas.title}</h2><p>${t.hapitas.body}</p>
-${external(hapitasUrl,t.sponsored,'affiliate_click')}
-<p><a href="https://sp.hapitas.jp/special/referral202611?apn=search_keyword" rel="noopener noreferrer">${t.hapitas.terms}</a> · ${time('2026-11-30T14:59:00Z',lang,true)}</p></aside>` : '';
+    ? `<aside class="notice" data-affiliate-expires="${hapitasDeadline}" data-analytics-affiliate="hapitas-referral">
+<p class="tag">${t.hapitas.label}</p><h2>${t.hapitas.title}</h2><p>${t.hapitas.body}</p>
+${external(hapitasUrl,t.hapitas.cta,'affiliate_click')}
+<p><a href="https://hapitas.jp/special/referral202611" rel="noopener noreferrer">${t.hapitas.terms}</a> · ${t.hapitas.deadline} ${time('2026-11-30T14:59:00Z',lang,true)}</p></aside>` : '';
   const featured = consumer.filter(row => row.category === 'sweepstakes').slice(0,3);
   const comparison = ['macromill','research-panel','prolific'].map(id => consumer.find(row => row.id === id)).filter(Boolean);
   const table = `<section class="section"><h2>${t.compare}</h2><p>${t.compareLead}</p>

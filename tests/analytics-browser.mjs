@@ -92,6 +92,26 @@ try {
     assert.equal(clicks[0][2].opportunity_id,'prolific');
     assert.doesNotMatch(JSON.stringify(clicks),/prolific\.com/);
 
+    await page.goto(origin + '/' + lang + '/');
+    const placement = page.locator('[data-analytics-affiliate="hapitas-referral"]');
+    if (!await placement.count()) {
+      // Exercise a standalone placement even when the referral is disabled.
+      await page.evaluate(() => {
+        const fixture = document.createElement('aside');
+        fixture.dataset.analyticsAffiliate = 'hapitas-referral';
+        fixture.innerHTML = '<a href="https://example.invalid/" data-analytics-click="affiliate_click">Test placement</a>';
+        document.querySelector('main').prepend(fixture);
+      });
+    }
+    const referral = placement.locator('a[data-analytics-click="affiliate_click"]');
+    await referral.evaluate(link => link.target = '_blank');
+    await referral.click();
+    const referralClicks = (await queued()).filter(args => args[0] === 'event' && args[1] === 'affiliate_click');
+    assert.equal(referralClicks.length,1);
+    assert.equal(referralClicks[0][2].opportunity_id,'hapitas-referral');
+    assert.equal(referralClicks[0][2].site_language,lang);
+    assert.doesNotMatch(JSON.stringify(referralClicks),/hapitas\.jp|example\.invalid/);
+
     calls.length = 0;
     await settings.click();
     await Promise.all([
@@ -102,7 +122,7 @@ try {
     await dialog.locator('[data-analytics-status="reject"]').waitFor({state:'visible'});
     assert.deepEqual(calls,[]);
     assert.equal(await page.evaluate(() => typeof window.gtag), 'undefined');
-    console.log(lang + ': no requests before consent, on rejection or after withdrawal; one application event');
+    console.log(lang + ': no requests before consent, on rejection or after withdrawal; one application event and one referral event');
     await context.close();
   }
 } finally {

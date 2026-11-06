@@ -70,12 +70,15 @@ function start() {
 
   // A primary or keyboard click fires click. A middle click fires auxclick.
   function outbound(event) {
-    if (!running || !event.isTrusted || event.defaultPrevented || !page ||
+    if (!running || !event.isTrusted || event.defaultPrevented ||
         (event.type === 'auxclick' ? event.button !== 1 : event.button !== 0)) return;
     const link = event.target.closest?.('a[data-analytics-click]');
     if (!link || link.closest('[hidden]')) return;
     const name = link.dataset.analyticsClick;
-    if (name === 'application_click' || name === 'affiliate_click') {
+    const placement = link.closest('[data-analytics-affiliate]')?.dataset.analyticsAffiliate;
+    if (name === 'affiliate_click' && placement) {
+      gtag('event', name, {...common, page_group:'affiliate-placement', opportunity_id:placement, send_to:id});
+    } else if (page && (name === 'application_click' || name === 'affiliate_click')) {
       gtag('event', name, {...common, send_to:id});
     }
   }

@@ -43,3 +43,6 @@ Support [rewardradar.support@gmail.com](mailto:rewardradar.support@gmail.com)
 ## Hapitas placement
 
 The separate bilingual home-page placement remains disabled unless the owner supplies the official account-issued referral URL as `HAPITAS_REFERRAL_URL` and the exact URL and website use have been reviewed before setting `HAPITAS_REFERRAL_APPROVED=true`. It is labeled as advertising. The November 2026 placement expires at midnight JST after November 30 and is removed from future builds. Open pages also hide the placement when the cutoff passes. Review the next official campaign before changing the copy or dates. [November terms](https://sp.hapitas.jp/special/referral202611?apn=search_keyword) · [Official program help](https://faq.hapitas.jp/hc/ja/articles/360035931734)
+
+
+The placement is separate from the giveaway listings. Its consent-gated `affiliate_click` carries `opportunity_id=hapitas-referral`, `page_group=affiliate-placement`, and the page language. It does not send the referral URL or code to GA4. Check referral credits separately in Hapitas. For the November referrer campaign, the account holder must also enter the campaign in Hapitas by the campaign deadline. [Official program](https://hapitas.jp/referral)
