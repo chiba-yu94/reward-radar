@@ -5,7 +5,7 @@ import {execFileSync} from 'node:child_process';
 import {copy, email, verifyLocales} from '../site/locales.mjs';
 import {eligible, matches, ordered, date, money, stale, expired} from '../site/domain.mjs';
 
-const origin = 'https://reward-radar.qa.workers.dev';
+const origin = 'https://freebietrail.com';
 const build = () => {
   execFileSync('python3',['-m','radar.pipeline','publish']);
   execFileSync(process.execPath,['site/build.mjs'], {env:{...process.env,SITE_ORIGIN:origin}});
@@ -20,7 +20,7 @@ const now = Date.parse('2026-11-06T00:00:00Z');
 test('locale structure, missing translation and actual HTML', () => {
   verifyLocales();
   assert.throws(() => verifyLocales(copy.ja,{...copy.en,search:''}), /localization/);
-  assert.match(read('ja/index.html'), /html lang="ja".*無料でもらえる/s);
+  assert.match(read('ja/index.html'), /html lang="ja".*買わずに応募/s);
   assert.match(read('en/index.html'), /html lang="en".*Find free giveaways/s);
   assert.match(read('ja/opportunities/index.html'), /検索・絞り込み/);
   assert.match(read('en/opportunities/index.html'), /Search and filters/);
@@ -126,11 +126,12 @@ test('sponsored link attributes only after validated approval', () => {
   }
 });
 
-test('static-only configuration, security headers and no secrets in assets', () => {
+test('asset configuration, security headers and no secrets in assets', () => {
   const config = JSON.parse(readFileSync('wrangler.jsonc','utf8'));
   assert.equal(config.assets.directory,'./dist');
   assert.equal(config.assets.not_found_handling,'404-page');
-  assert.equal(config.main,undefined);
+  assert.equal(config.main,'./site/worker.mjs');
+  assert.equal(config.assets.run_worker_first,true);
   assert.equal(config.preview_urls,false);
   assert.match(read('_headers'), /script-src 'self'/);
   assert.match(read('_headers'), /frame-ancestors 'none'/);
@@ -139,4 +140,22 @@ test('static-only configuration, security headers and no secrets in assets', () 
     assert.doesNotMatch(data, /-----BEGIN [A-Z ]*PRIVATE KEY-----|gh[pousr]_[0-9a-z]{25,}|sb_secret_[\w-]{12,}|ca-pub-\d{8,}|adsbygoogle/i);
     assert.doesNotMatch(data, /\bhref\s*=\s*"\s*(?:javascript|data):/i);
   }
+});
+
+test('host migration preserves paths and queries and waits for cutover', async () => {
+  const {default: worker} = await import('../site/worker.mjs');
+  const legacy = 'https://reward-radar.rewardradar42.workers.dev';
+  const path = '/ja/opportunities/prolific/?ref=example';
+  const assets = {fetch: () => new Response('asset')};
+  for (const alias of [legacy, 'https://www.freebietrail.com']) {
+    const request = new Request(alias + path);
+    assert.equal(await worker.fetch(request, {ASSETS:assets, SITE_ORIGIN:legacy}).text(), 'asset');
+    const redirect = worker.fetch(request, {ASSETS:assets, SITE_ORIGIN:origin});
+    assert.equal(redirect.status, 301);
+    assert.equal(redirect.headers.get('location'), origin + path);
+    assert.equal(new URL(worker.fetch(new Request(alias + '//example.org/'), {
+      ASSETS:assets, SITE_ORIGIN:origin,
+    }).headers.get('location')).origin, origin);
+  }
+  assert.equal(await worker.fetch(new Request(origin + path), {ASSETS:assets, SITE_ORIGIN:origin}).text(), 'asset');
 });

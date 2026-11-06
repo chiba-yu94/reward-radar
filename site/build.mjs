@@ -6,8 +6,13 @@ import {date, expired, money, ordered, stale} from './domain.mjs';
 verifyLocales();
 const configured = process.env.SITE_ORIGIN;
 const origin = new URL(configured || 'http://localhost:8787');
-if (configured && (origin.protocol !== 'https:' || !origin.hostname.endsWith('.workers.dev') ||
-    configured !== origin.origin)) throw new Error('SITE_ORIGIN must be the HTTPS workers.dev origin');
+const productionOrigin = 'https://freebietrail.com';
+const legacyOrigin = 'https://reward-radar.rewardradar42.workers.dev';
+if (configured && ![productionOrigin, legacyOrigin].includes(configured)) throw new Error('Unrecognized SITE_ORIGIN');
+const publisher = process.env.ADSENSE_VERIFICATION_ID || '';
+if (publisher && !/^ca-pub-\d{16}$/.test(publisher)) throw new Error('Invalid AdSense verification ID');
+const adsenseMeta = publisher && configured === productionOrigin
+  ? `<meta name="google-adsense-account" content="${publisher}">` : '';
 const measurementId = process.env.GA4_MEASUREMENT_ID || '';
 if (measurementId && !/^G-[A-Z0-9]{4,20}$/.test(measurementId)) throw new Error('Invalid GA4 measurement ID');
 const analytics = measurementId && process.env.GA4_PRIVACY_READY === 'true' ? measurementId : '';
@@ -45,7 +50,7 @@ const url = (lang, page = '') => '/' + lang + '/' + (page ? page + '/' : '');
 const detail = (lang, row) => url(lang, 'opportunities/' + row.id);
 const time = (value, lang, full = false) => `<time datetime="${e(value)}">${e(date(value, lang, full))}</time>`;
 const address = `<a href="mailto:${email}">${email}</a>`;
-const brand = '<img src="/assets/mark.svg" alt="" width="32" height="32"><span>Reward Radar</span>';
+const brand = name => '<img src="/assets/mark.svg" alt="" width="32" height="32"><span>${e(name)}</span>';
 const primary = ['opportunities', 'sweepstakes', 'guaranteed', 'international'];
 const secondary = ['affiliates', 'ranking', 'about', 'contact', 'privacy', 'disclosure'];
 const maps = [];
@@ -98,17 +103,19 @@ function layout(lang, page, title, description, content, indexable = true) {
   const consent = analytics ? consentControls(t,lang) : null;
   const switcher = `<a class="language" href="${url(other, page)}" lang="${other}" hreflang="${other}">${t.otherLanguage}</a>`;
   const links = keys => keys.map(key => `<a href="${url(lang, key)}"${key === page ? ' aria-current="page"' : ''}>${e(t.pages[key][0])}</a>`).join('');
-  const fullTitle = e(page ? title + ' | Reward Radar' : 'Reward Radar · ' + title);
+  const name = e(t.copyright);
+  const fullTitle = e(page ? title + ' | ' + t.copyright : t.copyright + ' · ' + title);
   if (indexable) maps.push({path:current, page});
   return `<!doctype html><html lang="${lang}"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>${fullTitle}</title><meta name="description" content="${e(description)}">
-<meta name="author" content="Reward Radar"><meta name="contact" content="${email}">
+${adsenseMeta}
+<meta name="author" content="${name}"><meta name="contact" content="${email}">
 <meta name="robots" content="${configured && indexable ? 'index, follow' : 'noindex, follow'}">
 <link rel="canonical" href="${origin.origin}${current}">
 ${languages.map(locale => `<link rel="alternate" hreflang="${locale}" href="${origin.origin}${url(locale, page)}">`).join('\n')}
 <link rel="alternate" hreflang="x-default" href="${origin.origin}${page ? url('en', page) : '/'}">
-<meta property="og:type" content="website"><meta property="og:site_name" content="Reward Radar">
+<meta property="og:type" content="website"><meta property="og:site_name" content="${name}">
 <meta property="og:title" content="${fullTitle}"><meta property="og:description" content="${e(description)}">
 <meta property="og:locale" content="${lang === 'ja' ? 'ja_JP' : 'en_US'}"><meta property="og:locale:alternate" content="${other === 'ja' ? 'ja_JP' : 'en_US'}">
 <meta property="og:url" content="${origin.origin}${current}">
@@ -116,13 +123,13 @@ ${languages.map(locale => `<link rel="alternate" hreflang="${locale}" href="${or
 <script type="module" src="/assets/client.mjs"></script>
 ${consent ? '<script type="module" src="/assets/analytics.mjs"></script>' : ''}</head>
 <body><a class="skip" href="#main">${t.skip}</a><header class="masthead"><div class="wrap header-inner">
-<a href="${url(lang)}" class="brand">${brand}</a>${switcher}
+<a href="${url(lang)}" class="brand">${brand(t.copyright)}</a>${switcher}
 <nav aria-label="${e(t.navigation)}">${links(primary)}</nav></div></header>
 ${consent?.panel || ''}
 <main id="main" class="wrap"${page === '' ? ' itemscope itemtype="https://schema.org/WebSite"' : ''}>
-${page === '' ? `<meta itemprop="name" content="Reward Radar"><meta itemprop="url" content="${origin.origin}${current}"><meta itemprop="inLanguage" content="${lang}">` : ''}
+${page === '' ? `<meta itemprop="name" content="${name}"><meta itemprop="url" content="${origin.origin}${current}"><meta itemprop="inLanguage" content="${lang}">` : ''}
 ${content}</main>
-<footer><div class="wrap foot-inner"><div><a href="${url(lang)}" class="brand">${brand}</a>
+<footer><div class="wrap foot-inner"><div><a href="${url(lang)}" class="brand">${brand(t.copyright)}</a>
 <p class="muted">${t.legalContact} · ${address}</p></div>
 <nav aria-label="${e(t.footerNavigation)}">${links(secondary)}${switcher}</nav>
 ${consent?.settings || ''}<p class="muted">© ${t.copyright}</p></div></footer></body></html>`;
@@ -295,22 +302,24 @@ ${key === 'privacy' && analytics ? `<p><button type="button" data-analytics-sett
   }
 }
 await write('index.html', `<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width">
-<title>Reward Radar</title><link rel="canonical" href="${origin.origin}/">
+<title>Freebie Trail / 懸賞さんぽ</title>${adsenseMeta}
+<meta name="description" content="Find giveaways you can enter without a purchase.">
+<meta property="og:title" content="Freebie Trail / 懸賞さんぽ"><meta property="og:url" content="${origin.origin}/"><link rel="canonical" href="${origin.origin}/">
 ${languages.map(lang => `<link rel="alternate" hreflang="${lang}" href="${origin.origin}${url(lang)}">`).join('')}
 <link rel="alternate" hreflang="x-default" href="${origin.origin}/">
 ${configured ? '' : '<meta name="robots" content="noindex">'}
 <link rel="stylesheet" href="/assets/style.css"></head><body><main class="wrap intro">
-<div class="brand">${brand}</div><h1>Choose a language</h1><p lang="ja">表示言語を選んでください。</p>
+<div class="brand">${brand("Freebie Trail / 懸賞さんぽ")}</div><h1>Choose a language</h1><p lang="ja">表示言語を選んでください。</p>
 <div class="actions"><a class="button" href="/ja/" lang="ja" hreflang="ja">日本語</a>
 <a class="button secondary" href="/en/" hreflang="en">English</a></div></main></body></html>`);
 await write('404.html', `<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width">
-<meta name="robots" content="noindex"><link rel="stylesheet" href="/assets/style.css"><title>404 | Reward Radar</title></head>
+<meta name="robots" content="noindex"><link rel="stylesheet" href="/assets/style.css"><title>404 | Freebie Trail / 懸賞さんぽ</title></head>
 <body><main class="wrap intro"><h1>Page unavailable</h1><p lang="ja">ページを表示できません。</p>
 <div class="actions"><a href="/ja/" lang="ja">日本語ホーム</a><a href="/en/">English home</a></div></main></body></html>`);
 await write('robots.txt', configured ? `User-agent: *\nAllow: /\nSitemap: ${origin.origin}/sitemap.xml\n` : 'User-agent: *\nDisallow: /\n');
 await write('sitemap.xml', `<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:xhtml="http://www.w3.org/1999/xhtml">
 ${maps.map(({path,page:key}) => `<url><loc>${origin.origin}${path}</loc>${languages.map(lang =>
-  `<xhtml:link rel="alternate" hreflang="${lang}" href="${origin.origin}${url(lang,key)}"/>`).join('')}</url>`).join('\n')}
+  `<xhtml:link rel="alternate" hreflang="${lang}" href="${origin.origin}${url(lang,key)}"/>`).join('')}<xhtml:link rel="alternate" hreflang="x-default" href="${origin.origin}${key ? url('en',key) : '/'}"/></url>`).join('\n')}
 </urlset>\n`);
 console.log(`Built ${maps.length} localized pages with ${rows.length} listings.`);

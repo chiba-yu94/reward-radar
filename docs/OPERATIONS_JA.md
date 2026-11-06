@@ -19,7 +19,7 @@ gh run download RUN_ID -n source-observation -D var/observations/RUN_ID
 
 ## 本番の自動更新
 
-本番は [Reward Radar](https://reward-radar.rewardradar42.workers.dev/) です。日次実行は収集とテストを通過した静的成果物を Workers Free に配信します。期限を過ぎた案件はブラウザーで非表示になり、次回の成功したデプロイで詳細ページとサイトマップから外れます。
+本番は [Freebie Trail](https://freebietrail.com/) です。日次実行は収集とテストを通過した静的成果物を Workers Free に配信します。期限を過ぎた案件はブラウザーで非表示になり、次回の成功したデプロイで詳細ページとサイトマップから外れます。
 
 GitHub の `production` Environment は `main` に制限しています。Cloudflare の対象アカウントに限定した Workers Scripts 編集用トークンを `CLOUDFLARE_API_TOKEN` として登録します。リポジトリ変数は `CLOUDFLARE_ACCOUNT_ID`、`SITE_ORIGIN`、`DEPLOY_ENABLED` です。トークンはデプロイ工程だけが参照します。秘密値はチャット、ログ、リポジトリに貼らないでください。
 
@@ -31,7 +31,7 @@ gh run list --workflow publish.yml --limit 5
 
 再開時は無効の状態でビルドが成功したことを確認し、`gh variable set DEPLOY_ENABLED --body true` を実行します。手動でワークフローを起動し、`deploy` とその後の本番スモークテストの成功を確認します。停止設定は次に起動する実行に適用されます。既に配信中のジョブは必要に応じて Actions からキャンセルします。
 
-Cloudflare の認証済みローカル環境から緊急で配信する場合は、公開用データの再生成・テスト後に本番 `SITE_ORIGIN` を指定して `npm run build` を行い、`WRANGLER_SEND_METRICS=false npm run deploy` を実行します。`SITE_ORIGIN=https://reward-radar.rewardradar42.workers.dev node site/smoke.mjs` で本番応答を確認します。
+Cloudflare の認証済みローカル環境から緊急で配信する場合は、公開用データの再生成・テスト後に本番 `SITE_ORIGIN` を指定して `npm run build` を行い、`WRANGLER_SEND_METRICS=false npm run deploy` を実行します。`SITE_ORIGIN=https://freebietrail.com node site/smoke.mjs` で本番応答を確認します。
 
 Search Console で本番 URL の URL プレフィックスプロパティを登録する場合は、HTML ファイル方式で発行された検証ファイルを静的ビルドに追加し、検証後に `sitemap.xml` を送信します。
 
@@ -71,3 +71,9 @@ limactl stop reward-radar
 - 運用窓口 [rewardradar.support@gmail.com](mailto:rewardradar.support@gmail.com)
 
 2026-11-06 の05:23 JST予定分は09:58:59 JSTに実行が作成され、collect、discover、publish、deploy はすべて成功しました。Cloudflare の新バージョンは09:59:49 JSTに記録され、本番 JSON の生成時刻は09:59:20 JSTでした。遅延の個別原因は実行ログに記録されていません。[実行ログ](https://github.com/chiba-yu94/reward-radar/actions/runs/42140680733)
+
+## 独自ドメインの運用
+
+`freebietrail.com` と `www.freebietrail.com` は Cloudflare の管理画面で既存の `reward-radar` Worker の Custom Domain として管理します。GitHub Actions には DNS 権限を追加していません。正規ホストは GitHub の `SITE_ORIGIN` と Worker の同名変数で揃えます。正規ホストの設定時に限り、旧 workers.dev と www を、パス・クエリを保って301転送します。
+
+ロールバック時は `SITE_ORIGIN` を `https://reward-radar.rewardradar42.workers.dev` に戻して同じワークフローを実行すると、転送が停止します。手動の Wrangler 配信でも `npm run deploy -- --var "SITE_ORIGIN:$SITE_ORIGIN"` で同じ値を渡します。Worker が静的アセットより先にリクエストを処理するため、Workers Free のリクエスト使用量は Cloudflare のダッシュボードで確認します。

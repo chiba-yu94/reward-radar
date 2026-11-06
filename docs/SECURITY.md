@@ -10,4 +10,4 @@ To disable a compromised source, set its `active` field to false, inspect relate
 
 Report suspected security issues to [rewardradar.support@gmail.com](mailto:rewardradar.support@gmail.com). Keep credentials and identity documents out of reports.
 
-Discovery rejects DTDs and entity declarations, limits fetched bytes, validates RSS media types and first-party URLs, and discards source text. Its artifact is isolated from publication. Do not click a claim link from a private message without checking the sender and the official rules. Reward Radar records only categories of requested information and never takes entries or stores visitor identities.
+Discovery rejects DTDs and entity declarations, limits fetched bytes, validates RSS media types and first-party URLs, and discards source text. Its artifact is isolated from publication. Do not click a claim link from a private message without checking the sender and the official rules. Freebie Trail records only categories of requested information and never takes entries or stores visitor identities.

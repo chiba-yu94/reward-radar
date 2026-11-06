@@ -1,8 +1,8 @@
-# Reward Radar
+# Freebie Trail
 
 A Japanese and English directory of free consumer giveaways and gifts. Surveys and rewards are secondary; affiliate programs have a separate page. Official terms, residence eligibility, spending and verification dates are visible on each listing. Any operating proceeds support independent game development, including PATCH_03.
 
-Production: [Japanese](https://reward-radar.rewardradar42.workers.dev/ja/) · [English](https://reward-radar.rewardradar42.workers.dev/en/)
+Production: [Japanese](https://freebietrail.com/ja/) · [English](https://freebietrail.com/en/)
 
 ## Run locally
 

@@ -67,6 +67,7 @@ jobs:
           GA4_MEASUREMENT_ID: ${{ vars.GA4_MEASUREMENT_ID }}
           HAPITAS_REFERRAL_URL: ${{ vars.HAPITAS_REFERRAL_URL }}
           HAPITAS_REFERRAL_APPROVED: ${{ vars.HAPITAS_REFERRAL_APPROVED }}
+          ADSENSE_VERIFICATION_ID: ${{ vars.ADSENSE_VERIFICATION_ID }}
           GA4_PRIVACY_READY: ${{ vars.GA4_PRIVACY_READY }}
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
         with:
@@ -101,10 +102,11 @@ jobs:
           grep -F "frame-ancestors 'none'" dist/_headers > /dev/null
         env:
           SITE_ORIGIN: ${{ vars.SITE_ORIGIN }}
-      - run: npm run deploy
+      - run: npm run deploy -- --var "SITE_ORIGIN:$SITE_ORIGIN"
         env:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           CLOUDFLARE_ACCOUNT_ID: ${{ vars.CLOUDFLARE_ACCOUNT_ID }}
+          SITE_ORIGIN: ${{ vars.SITE_ORIGIN }}
           WRANGLER_SEND_METRICS: 'false'
       - run: node site/smoke.mjs
         env:
