@@ -28,7 +28,7 @@ Register `site_language`, `traffic_group`, `page_group`, and `opportunity_id` as
 | Official application links | `application_click` | `opportunity_id`, `site_language` |
 | Approved affiliate links | `affiliate_click` | `opportunity_id`, `site_language` |
 
-Traffic groups are based on the browser's available referrer information and are distinct from GA4's campaign or session acquisition reports. Counts represent activity by consenting visitors on eligible pages. A visitor who uses both site languages may be counted in both language groups. Clicks are directional measurements and may be lost to browser restrictions. Partner dashboards supply verified conversions.
+Traffic groups are based on the browser's available referrer information and are distinct from GA4's campaign or session acquisition reports. Counts represent activity by consenting visitors on eligible pages. A visitor who uses both site languages may be counted in both language groups. Official application links open a new tab so the listing stays loaded while GA4 dispatches the click. Clicks are directional measurements and may be lost to browser restrictions. Partner dashboards supply verified conversions.
 
 ## Affiliate approval and private ledger
 

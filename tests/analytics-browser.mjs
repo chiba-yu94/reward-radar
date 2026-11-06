@@ -58,7 +58,6 @@ try {
     await dialog.locator('[data-analytics-close]').click();
     await dialog.waitFor({state:'hidden'});
     const rejectedLink = page.locator('[data-analytics-click="application_click"]');
-    await rejectedLink.evaluate(link => link.target = '_blank');
     await rejectedLink.click();
     assert.deepEqual(calls,[]);
 
@@ -90,9 +89,9 @@ try {
     assert.doesNotMatch(JSON.stringify(await queued()),/private@example|search\?q/);
 
     const application = page.locator('[data-analytics-click="application_click"]');
-    // Open the link in a test tab so the page's event queue remains available.
-    await application.evaluate(link => link.target = '_blank');
-    await application.click();
+    const officialUrl = await application.getAttribute('href');
+    const [officialPage] = await Promise.all([context.waitForEvent('page'), application.click()]);
+    await officialPage.waitForURL(officialUrl);
     await page.waitForFunction(() => window.dataLayer.some(event => event[1] === 'application_click'));
     const clicks = (await queued()).filter(args => args[0] === 'event' && args[1] === 'application_click');
     assert.equal(clicks.length,1);

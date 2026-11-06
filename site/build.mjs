@@ -79,9 +79,11 @@ const fields = pairs => '<dl class="facts">' + pairs.map(([label, value]) =>
 
 function external(destination, label, event = null) {
   const sponsored = event === 'affiliate_click';
+  // Keep the listing open while GA4 dispatches the consented application click.
+  const target = event === 'application_click' ? ' target="_blank"' : '';
   const parsed = new URL(destination);
   if (parsed.protocol !== 'https:' || parsed.username || parsed.password) throw new Error('Unsafe destination');
-  return `<a class="button ${sponsored ? 'secondary' : ''}" href="${e(destination)}" rel="${sponsored ? 'sponsored nofollow ' : ''}noopener noreferrer"${event && analytics ? ` data-analytics-click="${event}"` : ''}>${e(label)}</a>`;
+  return `<a class="button ${sponsored ? 'secondary' : ''}" href="${e(destination)}"${target} rel="${sponsored ? 'sponsored nofollow ' : ''}noopener noreferrer"${event && analytics ? ` data-analytics-click="${event}"` : ''}>${e(label)}</a>`;
 }
 
 function consentControls(t, lang) {
@@ -249,7 +251,7 @@ ${row.entry.steps ? `<h2>${t.steps}</h2><p>${e(row.entry.steps[lang])}</p>` : ''
 ${row.category === 'sweepstakes' ? `<p class="notice">${t.odds}</p>` : ''}${terms}
 ${flags ? `<h2>${t.flags}</h2><ul>${flags}</ul>` : ''}
 <p class="notice">${t.safer}</p>
-<div class="actions" data-expiring="${e(row.deadline || '')}">${external(row.official_url,t.official,c ? null : 'application_click')}
+<div class="actions" data-expiring="${e(row.deadline || '')}">${external(row.official_url,c ? t.official : t.officialNewTab,c ? null : 'application_click')}
 ${row.affiliate_url ? `<span data-affiliate-expires="${e(row.affiliate_expires_at || '')}">${external(row.affiliate_url,t.sponsored,'affiliate_click')}</span>` : ''}</div>
 <p><a href="${e(new URL(row.source_url).href)}" rel="noopener noreferrer">${t.source}</a></p>
 ${row.supporting_urls.map((link,index) => `<p><a href="${e(new URL(link).href)}" rel="noopener noreferrer">${t.moreSources} ${index + 1}</a></p>`).join('')}
