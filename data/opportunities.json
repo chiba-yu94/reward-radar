@@ -1514,5 +1514,144 @@
       "source_url": "https://www.tombow.com/sp/monoday2026/",
       "checked_at": "2026-11-05T07:10:00Z"
     }
+  },
+  {
+    "id": "club-sunstar-november-2026",
+    "source_id": "club-sunstar-november-2026",
+    "provider": "Sunstar",
+    "category": "sweepstakes",
+    "eligible_countries": [
+      "JP"
+    ],
+    "eligibility_verified": true,
+    "reward_type": "prize",
+    "reward_currency": null,
+    "reward_amount": null,
+    "reward_conditions": {
+      "ja": "応募は1人1回。賞品は応募時の住所へ発送されます。公式案内に締切時刻の記載はありません。",
+      "en": "One entry per person. Prizes ship to the address provided. The organizer lists a closing date without a time."
+    },
+    "required_expense": {
+      "kind": "free",
+      "amount": 0,
+      "currency": null
+    },
+    "estimated_effort_minutes": null,
+    "participation_method": "form",
+    "deadline": "2026-11-30T14:59:59Z",
+    "official_url": "https://www.club-sunstar.jp/campaign/osusowake2611/",
+    "affiliate_url": null,
+    "affiliate_approval_status": "none",
+    "source_url": "https://www.club-sunstar.jp/campaign/osusowake2611/",
+    "source_permission_status": "editorial-summary",
+    "first_seen_at": "2026-11-06T07:19:11Z",
+    "last_checked_at": "2026-11-06T07:19:11Z",
+    "verification_status": "verified",
+    "risk_flags": [
+      "account"
+    ],
+    "published_status": "approved",
+    "language": "ja",
+    "certainty": "chance",
+    "redemption_difficulty": null,
+    "commission": null,
+    "prize_category": "household",
+    "deadline_date_only": true,
+    "entry": {
+      "registration": "organizer",
+      "application": null,
+      "winner": null,
+      "steps": {
+        "ja": "未登録なら無料会員登録を行い、応募フォームのクイズに答えます。",
+        "en": "Create a free account if needed, then answer the quiz in the entry form."
+      }
+    },
+    "application": {
+      "web_only": true,
+      "sns_required": false,
+      "platforms": [],
+      "operations": [
+        "register",
+        "quiz",
+        "form"
+      ],
+      "free_registration": true,
+      "source_url": "https://www.club-sunstar.jp/campaign/osusowake2611/",
+      "checked_at": "2026-11-06T07:19:11Z"
+    },
+    "title_ja": "クラブサンスター 11月のオーラルケア用品抽選",
+    "title_en": "Club Sunstar November oral-care giveaway",
+    "description_ja": "歯間ブラシと歯ブラシのセットが抽選で50名に当たります。",
+    "description_en": "Fifty entrants will win a toothbrush and interdental brush set.",
+    "eligibility_ja": "日本国内に住むクラブサンスター会員。会員登録は無料です。",
+    "eligibility_en": "Club Sunstar members residing in Japan. Membership is free."
+  },
+  {
+    "id": "obu-city-quiz-november-2026",
+    "source_id": "obu-city-quiz-november-2026",
+    "provider": "Obu City",
+    "category": "sweepstakes",
+    "eligible_countries": null,
+    "eligibility_verified": false,
+    "reward_type": "prize",
+    "reward_currency": null,
+    "reward_amount": null,
+    "reward_conditions": {
+      "ja": "1人1回。賞品は郵送された引換券を持参し、市内の店舗で受け取ります。公式案内にWeb応募の締切時刻の記載はありません。",
+      "en": "One entry per person. Winners receive a voucher by mail and redeem it in person at the local shop. No online closing time is stated."
+    },
+    "required_expense": {
+      "kind": "free",
+      "amount": 0,
+      "currency": null
+    },
+    "estimated_effort_minutes": null,
+    "participation_method": "form",
+    "deadline": "2026-11-15T14:59:59Z",
+    "official_url": "https://www.city.obu.aichi.jp/shisei/koho/koho_obu/1016526.html",
+    "affiliate_url": null,
+    "affiliate_approval_status": "none",
+    "source_url": "https://www.city.obu.aichi.jp/shisei/koho/koho_obu/1016526.html",
+    "source_permission_status": "editorial-summary",
+    "first_seen_at": "2026-11-06T07:19:11Z",
+    "last_checked_at": "2026-11-06T07:19:11Z",
+    "verification_status": "verified",
+    "risk_flags": [],
+    "published_status": "approved",
+    "language": "ja",
+    "certainty": "chance",
+    "redemption_difficulty": null,
+    "commission": null,
+    "prize_category": "other",
+    "deadline_date_only": true,
+    "entry": {
+      "registration": "unknown",
+      "application": null,
+      "winner": null,
+      "steps": {
+        "ja": "11月号でクイズの答えを調べ、公式ページの応募フォームからクイズとアンケートを送信します。",
+        "en": "Find the quiz answer in the November issue and submit it with the survey through the official entry form."
+      }
+    },
+    "application": {
+      "web_only": true,
+      "sns_required": false,
+      "platforms": [],
+      "operations": [
+        "read-issue",
+        "quiz",
+        "survey",
+        "form"
+      ],
+      "free_registration": null,
+      "source_url": "https://www.city.obu.aichi.jp/shisei/koho/koho_obu/1016526.html",
+      "checked_at": "2026-11-06T07:19:11Z"
+    },
+    "title_ja": "広報おおぶ 11月号のクイズとアンケート抽選",
+    "title_en": "Obu City newsletter November quiz giveaway",
+    "description_ja": "広報クイズに正解し、アンケートに回答した人の中から、抽選で市内店舗の商品などが当たります。",
+    "description_en": "Answer the newsletter quiz correctly and complete the survey for a chance to win items from local businesses.",
+    "eligibility_ja": "市外からも応募可能。海外からの応募可否は未確認です。酒類は未成年者の応募不可。",
+    "eligibility_en": "People outside Obu may enter. Eligibility from overseas is unverified. Minors may not enter for alcoholic prizes."
   }
 ]

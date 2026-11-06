@@ -423,5 +423,47 @@
     "organizer_verified": true,
     "free_entry_reviewed": true,
     "privacy_reviewed": true
+  },
+  {
+    "id": "club-sunstar-november-2026",
+    "provider": "Sunstar",
+    "official_url": "https://www.club-sunstar.jp/campaign/osusowake2611/",
+    "approved_destination": "https://www.club-sunstar.jp/campaign/osusowake2611/",
+    "country": "JP",
+    "language": "ja",
+    "method": "manual",
+    "permission": "editorial-summary",
+    "terms_status": "Public organizer rules reviewed for an original factual summary and link. No automated collection or reproduction.",
+    "last_verification_date": "2026-11-06T07:19:11Z",
+    "last_successful_collection": null,
+    "error_status": null,
+    "collection_frequency": "manual; check before upload",
+    "active": true,
+    "organizer_verified": true,
+    "free_entry_reviewed": true,
+    "privacy_reviewed": true,
+    "supporting_urls": [
+      "https://www.club-sunstar.jp/about-site/"
+    ]
+  },
+  {
+    "id": "obu-city-quiz-november-2026",
+    "provider": "Obu City",
+    "official_url": "https://www.city.obu.aichi.jp/shisei/koho/koho_obu/1016526.html",
+    "approved_destination": "https://www.city.obu.aichi.jp/shisei/koho/koho_obu/1016526.html",
+    "country": "JP",
+    "language": "ja",
+    "method": "manual",
+    "permission": "editorial-summary",
+    "terms_status": "Public organizer rules reviewed for an original factual summary and link. No automated collection or reproduction.",
+    "last_verification_date": "2026-11-06T07:19:11Z",
+    "last_successful_collection": null,
+    "error_status": null,
+    "collection_frequency": "manual; check before upload",
+    "active": true,
+    "organizer_verified": true,
+    "free_entry_reviewed": true,
+    "privacy_reviewed": true,
+    "supporting_urls": []
   }
 ]

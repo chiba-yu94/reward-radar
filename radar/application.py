@@ -1,7 +1,7 @@
 """Normalize organizer-reviewed application facts and calculate difficulty."""
 from .net import https_url
 
-OPERATIONS = {"form", "email", "email-verify", "register", "follow", "repost",
+OPERATIONS = {"form", "read-issue", "quiz", "survey", "email", "email-verify", "register", "follow", "repost",
               "like", "comment", "create-post", "quote-post", "link-accounts"}
 SOCIAL = {"x", "instagram", "line", "facebook", "tiktok", "youtube"}
 UNKNOWN_APPLICATION = dict(web_only=None, sns_required=None, platforms=[], operations=[],
