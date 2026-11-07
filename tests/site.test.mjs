@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import {existsSync, readFileSync, readdirSync} from 'node:fs';
 import {execFileSync} from 'node:child_process';
 import {copy, email, verifyLocales} from '../site/locales.mjs';
-import {eligible, matches, ordered, date, money, stale, expired} from '../site/domain.mjs';
+import {eligible, matches, ordered, date, money, stale, expired, allowedFilters} from '../site/domain.mjs';
 
 const origin = 'https://freebietrail.com';
 const build = () => {
@@ -23,7 +23,7 @@ test('locale structure, missing translation and actual HTML', () => {
   assert.match(read('en/index.html'), /<span>Freebie Trail<\/span>/);
   assert.match(read('index.html'), /<span>Freebie Trail \/ 懸賞さんぽ<\/span>/);
   assert.throws(() => verifyLocales(copy.ja,{...copy.en,search:''}), /localization/);
-  assert.match(read('ja/index.html'), /html lang="ja".*買わずに応募/s);
+  assert.match(read('ja/index.html'), /html lang="ja".*無料で応募/s);
   assert.match(read('en/index.html'), /html lang="en".*Find free giveaways/s);
   assert.match(read('ja/opportunities/index.html'), /検索・絞り込み/);
   assert.match(read('en/opportunities/index.html'), /Search and filters/);
@@ -44,10 +44,11 @@ test('canonical, hreflang, language switching and internal links', () => {
       const alternate = file.startsWith('ja') ? 'en' : 'ja';
       const counterpart = '/' + alternate + path.slice(3);
       assert.ok(html.includes(`hreflang="${alternate}" href="${origin}${counterpart}"`));
-      assert.equal(html.split(`class="language" href="${counterpart}"`).length,3);
+      assert.equal((html.match(new RegExp(`class="language"[^>]*href="${counterpart}"`,"g")) || []).length,2);
     }
     for (const [,href] of html.matchAll(/href="(\/[^"]*)"/g)) {
-      assert.ok(existsSync('dist' + href + (href.endsWith('/') ? 'index.html' : '')), href);
+      const path = new URL(href,origin).pathname;
+      assert.ok(existsSync('dist' + path + (path.endsWith('/') ? 'index.html' : '')),href);
     }
   }
   assert.match(read('sitemap.xml'), /xhtml:link rel="alternate" hreflang="ja"/);
@@ -82,7 +83,7 @@ test('expiration, stale ranking, and unknown winning odds', () => {
   const old = {...jp,id:'older',stale_at:'2026-11-05T18:00:00Z'};
   assert.equal(ordered([old,jp],now)[0].id,jp.id);
   for (const live of rows.filter(row => row.category === 'sweepstakes')) {
-    assert.match(read(`en/opportunities/${live.id}/index.html`), /no verified winning odds/);
+    assert.doesNotMatch(read(`en/opportunities/${live.id}/index.html`), /winning odds: [0-9]+%/i);
     assert.ok(!Object.hasOwn(live,'winning_probability'));
   }
 });
@@ -136,14 +137,14 @@ test('Freecash uses the scoped sponsored route in both languages while current',
   for (const lang of ['ja','en']) {
     const path = `${lang}/opportunities/freecash/index.html`;
     const affiliates = read(`${lang}/affiliates/index.html`);
-    assert.doesNotMatch(read(`${lang}/opportunities/index.html`), /data-record="freecash"/);
+    assert.match(read(`${lang}/opportunities/index.html`), /data-record="freecash"/);
     assert.equal(existsSync('dist/' + path), Boolean(freecash));
     if (!freecash) continue;
-    assert.match(affiliates, /class="card sponsored-card" data-record="freecash"/);
-    assert.ok(affiliates.includes(copy[lang].affiliateDisclosure));
+    assert.doesNotMatch(affiliates, /data-record="freecash"/);
+    assert.match(read(`${lang}/rewards/index.html`), /class="card sponsored-card" data-record="freecash"/);
     const html = read(path);
     assert.ok(html.includes(copy[lang].affiliateDisclosure));
-    assert.ok(html.includes(`href="${freecash.official_url}" rel="noopener noreferrer"`));
+    assert.ok(html.includes(`href="${freecash.official_url}" target="_blank" rel="noopener noreferrer"`));
     assert.ok(html.includes(`href="${freecash.affiliate_url}" target="_blank" rel="sponsored nofollow noopener noreferrer"`));
     assert.match(html, /itemtype="https:\/\/schema.org\/BreadcrumbList"/);
     assert.equal(freecash.eligible_countries.length,15);
@@ -182,4 +183,50 @@ test('host migration preserves paths and queries and waits for cutover', async (
     }).headers.get('location')).origin, origin);
   }
   assert.equal(await worker.fetch(new Request(origin + path), {ASSETS:assets, SITE_ORIGIN:origin}).text(), 'asset');
+});
+
+
+test('search indexes verified concepts without inventing eligibility or free entry', () => {
+  const live = Date.now();
+  for (const [q,id] of [['懸賞','club-sunstar-november-2026'],['お米','ja-wakayama-rice-2026-11'],['rice','ja-wakayama-rice-2026-11'],['Freecash','freecash'],['タスク報酬','freecash'],['United States','stanley-review-november-2026'],['sweepstakes','penguin-white-company-calendar-2026']]) {
+    assert.ok(matches(rows.find(row => row.id === id),{q},'ja',live),q);
+  }
+  assert.equal(matches(jp,{q:'United States'},'en',live),false);
+  assert.equal(matches({...draw,title_en:'Example',title_ja:'例',description_en:'Survey panel',description_ja:'調査',reward_conditions:{ja:'回答',en:'Answer'}},{q:'Japan'},'en',live),false);
+  assert.equal(matches(jp,{q:'SNS不要'},'ja',live),false);
+  const fc = rows.find(row => row.id === 'freecash');
+  assert.equal(matches(fc,{freeEntry:'yes'},'ja',live),false);
+  assert.equal(matches(fc,{q:'no social media'},'en',live),false);
+  const input = new URLSearchParams('q=rice&country=US&noSns=yes&sort=deadline&unknown=secret&category=invalid');
+  assert.deepEqual(allowedFilters(input,{q:[],country:['JP','US'],noSns:['yes'],sort:['','deadline'],category:['sweepstakes']}),
+    {q:'rice',country:'US',noSns:'yes',sort:'deadline'});
+});
+
+test('primary action precedes secondary information and prizes omit monetary placeholders', () => {
+  for (const lang of ['ja','en']) {
+    const html = read(`${lang}/opportunities/club-sunstar-november-2026/index.html`);
+    assert.ok(html.indexOf('entry-action') < html.indexOf('detail-body'));
+    assert.ok(!html.includes(copy[lang].varies));
+    assert.ok(!html.includes(copy[lang].organizerVerified));
+    const fc = read(`${lang}/opportunities/freecash/index.html`);
+    assert.ok(fc.indexOf('sponsored-button') < fc.indexOf('detail-body'));
+    assert.ok(fc.includes('class="country-details"'));
+    assert.match(read(`${lang}/index.html`),/form class="home-search".*method="get"/);
+    assert.match(read(`${lang}/index.html`),/og:image/);
+  }
+  assert.ok(existsSync('dist/favicon.ico'));
+  assert.ok(existsSync('dist/assets/social.png'));
+});
+
+test('permanent canonical redirects and query pages are noindex', async () => {
+  const {default:worker} = await import('../site/worker.mjs');
+  const env = {SITE_ORIGIN:origin,ASSETS:{fetch:() => new Response('asset')}};
+  const http = worker.fetch(new Request('http://freebietrail.com/ja/'),env);
+  assert.equal(http.status,301);
+  assert.equal(http.headers.get('location'),origin + '/ja/');
+  const slash = worker.fetch(new Request(origin + '/ja?q=rice'),env);
+  assert.equal(slash.status,308);
+  assert.equal(slash.headers.get('location'),origin + '/ja/?q=rice');
+  const query = worker.fetch(new Request(origin + '/en/opportunities/?q=rice'),env);
+  assert.equal(query.headers.get('x-robots-tag'),'noindex, follow');
 });

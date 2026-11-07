@@ -1348,7 +1348,7 @@
         "en": "Follow @CONAN_tcg and quote-post the campaign post with the specified hashtag."
       }
     },
-    "prize_category": "other",
+    "prize_category": "collectibles",
     "application": {
       "web_only": null,
       "sns_required": true,
@@ -1423,7 +1423,7 @@
         "en": "Follow @kotobukiyas on X and repost the campaign post."
       }
     },
-    "prize_category": "other",
+    "prize_category": "collectibles",
     "application": {
       "web_only": null,
       "sns_required": true,
@@ -1681,8 +1681,8 @@
     "reward_currency": null,
     "reward_amount": null,
     "reward_conditions": {
-      "ja": "報酬の対象条件や交換方法はタスクと居住地によって異なります。交換方法には現金での受け取りやギフトカードなどがあります。タスクを始める前に個別条件と費用の有無を、交換前に公式の交換条件を確認してください。初回の交換や出金に本人確認が必要になる場合があります。",
-      "en": "Task requirements and redemption options vary by offer and location. Options can include cash withdrawals and gift cards. Check each task for requirements and costs before starting. Check the current redemption terms. Freecash may require identity verification before your first redemption or payout."
+      "ja": "報酬は居住地・タスク・達成条件によって異なります。購入・課金を伴うタスクもあるため、開始前に費用と達成条件を確認してください。報酬の獲得は保証されません。",
+      "en": "Rewards depend on location, task availability and qualifying completion. Some tasks require purchases or in-app spending. Check costs and completion rules first. Earnings are not guaranteed."
     },
     "required_expense": {
       "kind": "unknown",
@@ -1708,7 +1708,7 @@
     "source_url": "https://freecash.com/",
     "source_permission_status": "editorial-summary",
     "first_seen_at": "2026-11-06T23:49:48Z",
-    "last_checked_at": "2026-11-06T23:49:48Z",
+    "last_checked_at": "2026-11-07T03:15:31Z",
     "verification_status": "verified",
     "risk_flags": [
       "variable",
@@ -1720,20 +1720,158 @@
     "certainty": "conditional",
     "redemption_difficulty": null,
     "commission": null,
-    "title_ja": "Freecashのタスク型報酬",
-    "title_en": "Freecash task rewards",
-    "description_ja": "Freecashは、ゲームやアンケート、アプリの利用など、対象タスクを完了することで報酬を獲得できるサービスです。",
-    "description_en": "Freecash is a rewards platform where users can earn rewards by completing eligible tasks, including games, surveys, and app offers.",
-    "eligibility_ja": "この広告の対象地域は下記のとおりです。Freecashの利用には、16歳以上で、かつ法的に契約を結べることが必要です。1人・1世帯につき1アカウントまでです。",
-    "eligibility_en": "This advertisement covers the markets listed below. To use Freecash, you must be at least 16 and of legal age to enter a binding contract. Freecash allows one account per person and per household.",
+    "title_ja": "Freecash｜ゲーム・アンケートのタスク報酬",
+    "title_en": "Freecash games and survey rewards",
+    "description_ja": "ゲームの指定条件やアンケートなどのタスクを完了し、条件を満たすと報酬を受け取れるサービス。登録は無料です。",
+    "description_en": "Complete game milestones, surveys or other eligible tasks for rewards. Registration is free.",
+    "eligibility_ja": "16歳以上かつ法的に契約できる方。1人・1世帯1アカウント。広告対象は日本・米国など15地域です。",
+    "eligibility_en": "Age 16+ and legally able to enter a contract. One account per person and household. Advertised in 15 markets, including Japan and the US.",
     "entry": {
       "registration": "organizer",
       "application": null,
       "winner": null,
       "steps": {
-        "ja": "公式サイトで利用条件を読み、参加資格を満たす場合はアカウントを作成します。各タスクの報酬条件と費用の有無を確認し、参加するタスクを選んでください。",
-        "en": "Read the official terms and create an account if you are eligible. Review each task’s reward requirements and any costs before choosing a task."
+        "ja": "無料アカウントを作成し、タスクごとの条件・期限・費用を確認して選びます。条件を達成した後、記録・承認された報酬を交換します。",
+        "en": "Create a free account, choose a task after checking its rules, deadline and costs, then complete it. Redeem rewards after completion is tracked and approved."
       }
+    }
+  },
+  {
+    "id": "penguin-white-company-calendar-2026",
+    "source_id": "penguin-white-company-calendar-2026",
+    "provider": "Penguin Random House",
+    "category": "sweepstakes",
+    "eligible_countries": [
+      "GB"
+    ],
+    "eligibility_verified": true,
+    "reward_type": "prize",
+    "reward_currency": null,
+    "reward_amount": null,
+    "reward_conditions": {
+      "ja": "1人1回。11月30日に抽選し、当選連絡から7営業日以内の受け取り手続きが必要です。",
+      "en": "One entry per person. Draw on November 30; claim within seven working days of notification."
+    },
+    "required_expense": {
+      "kind": "free",
+      "amount": 0,
+      "currency": null
+    },
+    "estimated_effort_minutes": null,
+    "participation_method": "form",
+    "deadline": "2026-11-28T23:59:00Z",
+    "deadline_timezone": "Europe/London",
+    "official_url": "https://www.penguin.co.uk/discover/articles/win-karen-swan-whiteco-calendar",
+    "affiliate_url": null,
+    "affiliate_approval_status": "none",
+    "source_url": "https://www.penguin.co.uk/discover/articles/win-karen-swan-whiteco-calendar",
+    "source_permission_status": "editorial-summary",
+    "first_seen_at": "2026-11-07T03:15:31Z",
+    "last_checked_at": "2026-11-07T03:15:31Z",
+    "verification_status": "verified",
+    "risk_flags": [],
+    "published_status": "approved",
+    "language": "en",
+    "certainty": "chance",
+    "redemption_difficulty": null,
+    "commission": null,
+    "prize_category": "household",
+    "entry": {
+      "registration": "none",
+      "application": null,
+      "winner": null,
+      "steps": {
+        "ja": "公式ページのフォームに必要事項を入力して送信します。購入不要。応募には規約の18歳以上という条件が適用されます。",
+        "en": "Submit the form on the official page. No purchase needed. The rules require age 18+, despite the generic 16+ text near the form."
+      }
+    },
+    "application": {
+      "web_only": true,
+      "sns_required": false,
+      "platforms": [],
+      "operations": [
+        "form"
+      ],
+      "free_registration": null,
+      "source_url": "https://www.penguin.co.uk/discover/articles/win-karen-swan-whiteco-calendar",
+      "checked_at": "2026-11-07T03:15:31Z"
+    },
+    "title_ja": "英国向け｜The White Companyアドベントカレンダー抽選",
+    "title_en": "The White Company advent calendar draw (UK)",
+    "description_ja": "アドベントカレンダー（参考価格195ポンド）が1名に当たります。",
+    "description_en": "One winner receives a White Company advent calendar, listed at £195.",
+    "eligibility_ja": "英国在住の18歳以上。主催者の従業員・家族・関係者は対象外。",
+    "eligibility_en": "UK residents aged 18+. Employees, their families, agents and others connected with the promotion are excluded."
+  },
+  {
+    "id": "stanley-review-november-2026",
+    "source_id": "stanley-review-november-2026",
+    "provider": "STANLEY Tools",
+    "category": "sweepstakes",
+    "eligible_countries": [
+      "US"
+    ],
+    "eligibility_verified": true,
+    "reward_type": "prize",
+    "reward_currency": null,
+    "reward_amount": null,
+    "reward_conditions": {
+      "ja": "1人5回まで、同じ商品への重複レビュー不可。新規購入は不要ですが工具の所有が条件です。当選後は宣誓書・免責同意書の返送と米国内の実住所が必要です。",
+      "en": "Up to five entries; no repeat review of the same product. No new purchase needed, but product ownership is required. Winner must return an affidavit/release and provide a US street address."
+    },
+    "required_expense": {
+      "kind": "free",
+      "amount": 0,
+      "currency": null
+    },
+    "estimated_effort_minutes": null,
+    "participation_method": "form",
+    "deadline": "2026-12-01T04:59:59Z",
+    "deadline_timezone": "America/New_York",
+    "official_url": "https://www.stanleytools.com/en-us/stanley-november-product-review-giveaway-2026",
+    "affiliate_url": null,
+    "affiliate_approval_status": "none",
+    "source_url": "https://www.stanleytools.com/en-us/stanley-november-product-review-giveaway-2026",
+    "source_permission_status": "editorial-summary",
+    "first_seen_at": "2026-11-07T03:15:31Z",
+    "last_checked_at": "2026-11-07T03:15:31Z",
+    "verification_status": "verified",
+    "risk_flags": [],
+    "published_status": "approved",
+    "language": "en",
+    "certainty": "chance",
+    "redemption_difficulty": null,
+    "commission": null,
+    "prize_category": "household",
+    "entry": {
+      "registration": "unknown",
+      "application": [
+        "email"
+      ],
+      "winner": [
+        "address"
+      ],
+      "steps": {
+        "ja": "所有している工具の商品ページで、実体験に基づく英語のレビューを投稿し、抽選への応募欄を選びます。",
+        "en": "Review a tool you own, in English, on its product page and select the giveaway entry checkbox."
+      }
+    },
+    "title_ja": "米国向け｜STANLEY工具レビュー抽選",
+    "title_en": "STANLEY tool review giveaway (US)",
+    "description_ja": "巻尺、かんな、のみセット、ステープルガンの対象4品から1品を、当選者1名が選べます。 所有しているSTANLEY工具のレビューが条件です。",
+    "description_en": "One winner chooses a tape measure, pocket plane, chisel set or staple gun from the four listed prizes. For existing STANLEY tool owners.",
+    "eligibility_ja": "米国50州・ワシントンDC在住の18歳以上で、レビューするSTANLEY工具を所有する方。従業員・家族・同居人は対象外。",
+    "eligibility_en": "Age 18+, resident in the 50 US states or DC, and own the STANLEY product reviewed. Sponsor-related employees, their families and households are excluded.",
+    "application": {
+      "web_only": true,
+      "sns_required": false,
+      "platforms": [],
+      "operations": [
+        "review"
+      ],
+      "free_registration": null,
+      "source_url": "https://www.stanleytools.com/en-us/stanley-november-product-review-giveaway-2026",
+      "checked_at": "2026-11-07T03:15:31Z"
     }
   }
 ]

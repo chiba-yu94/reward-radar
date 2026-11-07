@@ -2,7 +2,7 @@
 from .net import https_url
 
 OPERATIONS = {"form", "read-issue", "quiz", "survey", "email", "email-verify", "register", "follow", "repost",
-              "like", "comment", "create-post", "quote-post", "link-accounts"}
+              "like", "comment", "create-post", "quote-post", "link-accounts", "review"}
 SOCIAL = {"x", "instagram", "line", "facebook", "tiktok", "youtube"}
 UNKNOWN_APPLICATION = dict(web_only=None, sns_required=None, platforms=[], operations=[],
                            free_registration=None, step_count=None, difficulty="unknown",
@@ -25,7 +25,7 @@ def application_profile(raw, free):
     operations = set(raw["operations"])
     count = len(raw["operations"]) or None
     difficulty = "unknown"
-    if operations & {"create-post", "quote-post", "link-accounts"}:
+    if operations & {"create-post", "quote-post", "link-accounts", "review"}:
         difficulty = "hard"
     elif free and raw["sns_required"] is False and raw["web_only"] is True and count and count <= 3:
         difficulty = "easy"

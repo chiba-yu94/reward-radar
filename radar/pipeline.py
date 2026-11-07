@@ -10,6 +10,7 @@ import tempfile
 from contextlib import closing
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
+from zoneinfo import ZoneInfo, ZoneInfoNotFoundError
 
 from .application import application_profile
 from .net import fetch_json, https_url
@@ -24,7 +25,7 @@ GEO = re.compile(r"[A-Z]{2}")
 ID = re.compile(r"[a-z0-9]+(?:-[a-z0-9]+)*")
 UTC = re.compile(r"\d{4}-\d\d-\d\dT\d\d:\d\d:\d\dZ")
 SHA = re.compile(r"[a-f0-9]{40}")
-PRIZES = {"food", "cash-gift", "electronics", "household", "digital", "other"}
+PRIZES = {"collectibles", "food", "cash-gift", "electronics", "household", "digital", "other"}
 PERSONAL = {"email", "name", "address", "phone", "social-account", "identity"}
 UNKNOWN_ENTRY = {"registration": "unknown", "application": None, "winner": None, "steps": None}
 STALE = timedelta(days=30)
@@ -227,6 +228,12 @@ def validate(row, source, now):
             and (not row.get("deadline_date_only") or row["deadline"] is not None), "Invalid deadline precision")
     if row["deadline"] is not None:
         stamp(row["deadline"])
+    if row.get("deadline_timezone"):
+        require(row["deadline"] is not None, "Timezone requires a deadline")
+        try:
+            ZoneInfo(row["deadline_timezone"])
+        except (ZoneInfoNotFoundError, ValueError, TypeError):
+            raise ValueError("Invalid deadline timezone")
     require(isinstance(row["risk_flags"], list) and all(flag in {
         "waitlist", "third-party-id", "approval", "purchase", "variable", "capacity", "account",
     } for flag in row["risk_flags"]), "Invalid risk flags")
@@ -313,6 +320,7 @@ def publish(rows, sources, observation, output, database, now):
             if expired or (row["category"] != "affiliate" and not consumer_public(row)):
                 continue  # The reviewed snapshot and SQLite retain these entries.
             public = {key: row[key] for key in PUBLIC}
+            public["deadline_timezone"] = row.get("deadline_timezone")
             public["deadline_date_only"] = row.get("deadline_date_only", False)
             public["application"] = application_profile(row.get("application"), row["required_expense"]["kind"] == "free")
             public["entry"] = row.get("entry", UNKNOWN_ENTRY)

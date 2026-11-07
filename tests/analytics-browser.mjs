@@ -99,11 +99,13 @@ try {
     assert.doesNotMatch(JSON.stringify(clicks),/prolific\.com/);
 
     await page.goto(origin + '/' + lang + '/opportunities/');
+    await page.locator('[name=q]').fill('Prolific');
+    await page.evaluate(() => history.replaceState(null,'','?q=private@example.invalid'));
     const cardLink = page.locator('[data-record="prolific"] [data-analytics-click="application_click"]');
     await cardLink.click();
     const cardEvent = (await queued()).find(args => args[0] === 'event' && args[1] === 'application_click');
     assert.equal(cardEvent[2].opportunity_id,'prolific');
-    assert.doesNotMatch(JSON.stringify(cardEvent),/prolific\.com/);
+    assert.doesNotMatch(JSON.stringify(cardEvent),/prolific\.com|private@example|Prolific/);
 
     const affiliatePage = origin + '/' + lang + '/opportunities/freecash/';
     if ((await page.goto(affiliatePage)).status() === 200) {

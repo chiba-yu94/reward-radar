@@ -11,7 +11,9 @@
     "dev": "wrangler dev --ip 127.0.0.1",
     "deploy": "wrangler deploy",
     "test:browser": "node tests/browser.mjs",
-    "test:analytics": "node tests/analytics-browser.mjs"
+    "test:analytics": "node tests/analytics-browser.mjs",
+    "test:ux": "node tests/ux-browser.mjs",
+    "test:seo": "node tests/seo-browser.mjs"
   },
   "private": true
 }

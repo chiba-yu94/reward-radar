@@ -1,0 +1,610 @@
+[
+  {
+    "lang": "ja",
+    "width": 375,
+    "name": "home",
+    "height": 4435,
+    "overflow": false,
+    "header": 138.359375,
+    "firstCard": 728.1875,
+    "nav": false
+  },
+  {
+    "lang": "ja",
+    "width": 375,
+    "name": "directory",
+    "height": 10811,
+    "overflow": false,
+    "header": 138.359375,
+    "firstCard": 635.453125,
+    "nav": false
+  },
+  {
+    "lang": "ja",
+    "width": 375,
+    "name": "sweepstakes",
+    "height": 5680,
+    "overflow": false,
+    "header": 138.359375,
+    "firstCard": 363.59375,
+    "nav": false
+  },
+  {
+    "lang": "ja",
+    "width": 375,
+    "name": "detail",
+    "height": 3146,
+    "overflow": false,
+    "header": 138.359375,
+    "nav": false
+  },
+  {
+    "lang": "ja",
+    "width": 375,
+    "name": "freecash",
+    "height": 3226,
+    "overflow": false,
+    "header": 138.359375,
+    "nav": false
+  },
+  {
+    "lang": "ja",
+    "width": 375,
+    "name": "rewards",
+    "height": 2510,
+    "overflow": false,
+    "header": 138.359375,
+    "firstCard": 363.59375,
+    "nav": false
+  },
+  {
+    "lang": "ja",
+    "width": 375,
+    "name": "contact",
+    "height": 966,
+    "overflow": false,
+    "header": 138.359375,
+    "nav": false
+  },
+  {
+    "lang": "ja",
+    "width": 375,
+    "name": "about",
+    "height": 1069,
+    "overflow": false,
+    "header": 138.359375,
+    "nav": false
+  },
+  {
+    "lang": "en",
+    "width": 375,
+    "name": "home",
+    "height": 4687,
+    "overflow": false,
+    "header": 181.453125,
+    "firstCard": 790.375,
+    "nav": false
+  },
+  {
+    "lang": "en",
+    "width": 375,
+    "name": "directory",
+    "height": 11503,
+    "overflow": false,
+    "header": 181.453125,
+    "firstCard": 698.34375,
+    "nav": false
+  },
+  {
+    "lang": "en",
+    "width": 375,
+    "name": "sweepstakes",
+    "height": 6143,
+    "overflow": false,
+    "header": 181.453125,
+    "firstCard": 486.015625,
+    "nav": false
+  },
+  {
+    "lang": "en",
+    "width": 375,
+    "name": "detail",
+    "height": 3253,
+    "overflow": false,
+    "header": 181.453125,
+    "nav": false
+  },
+  {
+    "lang": "en",
+    "width": 375,
+    "name": "freecash",
+    "height": 3410,
+    "overflow": false,
+    "header": 181.453125,
+    "nav": false
+  },
+  {
+    "lang": "en",
+    "width": 375,
+    "name": "rewards",
+    "height": 2970,
+    "overflow": false,
+    "header": 181.453125,
+    "firstCard": 757.875,
+    "nav": false
+  },
+  {
+    "lang": "en",
+    "width": 375,
+    "name": "contact",
+    "height": 1031,
+    "overflow": false,
+    "header": 181.453125,
+    "nav": false
+  },
+  {
+    "lang": "en",
+    "width": 375,
+    "name": "about",
+    "height": 1160,
+    "overflow": false,
+    "header": 181.453125,
+    "nav": false
+  },
+  {
+    "lang": "ja",
+    "width": 390,
+    "name": "home",
+    "height": 4410,
+    "overflow": false,
+    "header": 138.359375,
+    "firstCard": 728.1875,
+    "nav": false
+  },
+  {
+    "lang": "ja",
+    "width": 390,
+    "name": "directory",
+    "height": 10784,
+    "overflow": false,
+    "header": 138.359375,
+    "firstCard": 635.453125,
+    "nav": false
+  },
+  {
+    "lang": "ja",
+    "width": 390,
+    "name": "sweepstakes",
+    "height": 5653,
+    "overflow": false,
+    "header": 138.359375,
+    "firstCard": 363.59375,
+    "nav": false
+  },
+  {
+    "lang": "ja",
+    "width": 390,
+    "name": "detail",
+    "height": 3120,
+    "overflow": false,
+    "header": 138.359375,
+    "nav": false
+  },
+  {
+    "lang": "ja",
+    "width": 390,
+    "name": "freecash",
+    "height": 3226,
+    "overflow": false,
+    "header": 138.359375,
+    "nav": false
+  },
+  {
+    "lang": "ja",
+    "width": 390,
+    "name": "rewards",
+    "height": 2488,
+    "overflow": false,
+    "header": 138.359375,
+    "firstCard": 363.59375,
+    "nav": false
+  },
+  {
+    "lang": "ja",
+    "width": 390,
+    "name": "contact",
+    "height": 966,
+    "overflow": false,
+    "header": 138.359375,
+    "nav": false
+  },
+  {
+    "lang": "ja",
+    "width": 390,
+    "name": "about",
+    "height": 1069,
+    "overflow": false,
+    "header": 138.359375,
+    "nav": false
+  },
+  {
+    "lang": "en",
+    "width": 390,
+    "name": "home",
+    "height": 4567,
+    "overflow": false,
+    "header": 138.359375,
+    "firstCard": 747.28125,
+    "nav": false
+  },
+  {
+    "lang": "en",
+    "width": 390,
+    "name": "directory",
+    "height": 11315,
+    "overflow": false,
+    "header": 138.359375,
+    "firstCard": 632.203125,
+    "nav": false
+  },
+  {
+    "lang": "en",
+    "width": 390,
+    "name": "sweepstakes",
+    "height": 6047,
+    "overflow": false,
+    "header": 138.359375,
+    "firstCard": 419.875,
+    "nav": false
+  },
+  {
+    "lang": "en",
+    "width": 390,
+    "name": "detail",
+    "height": 3139,
+    "overflow": false,
+    "header": 138.359375,
+    "nav": false
+  },
+  {
+    "lang": "en",
+    "width": 390,
+    "name": "freecash",
+    "height": 3345,
+    "overflow": false,
+    "header": 138.359375,
+    "nav": false
+  },
+  {
+    "lang": "en",
+    "width": 390,
+    "name": "rewards",
+    "height": 2587,
+    "overflow": false,
+    "header": 138.359375,
+    "firstCard": 419.875,
+    "nav": false
+  },
+  {
+    "lang": "en",
+    "width": 390,
+    "name": "contact",
+    "height": 988,
+    "overflow": false,
+    "header": 138.359375,
+    "nav": false
+  },
+  {
+    "lang": "en",
+    "width": 390,
+    "name": "about",
+    "height": 1117,
+    "overflow": false,
+    "header": 138.359375,
+    "nav": false
+  },
+  {
+    "lang": "ja",
+    "width": 768,
+    "name": "home",
+    "height": 3194,
+    "overflow": false,
+    "header": 95.265625,
+    "firstCard": 553.4375,
+    "nav": false
+  },
+  {
+    "lang": "ja",
+    "width": 768,
+    "name": "directory",
+    "height": 5938,
+    "overflow": false,
+    "header": 95.265625,
+    "firstCard": 553.078125,
+    "nav": false
+  },
+  {
+    "lang": "ja",
+    "width": 768,
+    "name": "sweepstakes",
+    "height": 3113,
+    "overflow": false,
+    "header": 95.265625,
+    "firstCard": 277.6875,
+    "nav": false
+  },
+  {
+    "lang": "ja",
+    "width": 768,
+    "name": "detail",
+    "height": 2203,
+    "overflow": false,
+    "header": 95.265625,
+    "nav": false
+  },
+  {
+    "lang": "ja",
+    "width": 768,
+    "name": "freecash",
+    "height": 2404,
+    "overflow": false,
+    "header": 95.265625,
+    "nav": false
+  },
+  {
+    "lang": "ja",
+    "width": 768,
+    "name": "rewards",
+    "height": 1829,
+    "overflow": false,
+    "header": 95.265625,
+    "firstCard": 277.6875,
+    "nav": false
+  },
+  {
+    "lang": "ja",
+    "width": 768,
+    "name": "contact",
+    "height": 850,
+    "overflow": false,
+    "header": 95.265625,
+    "nav": false
+  },
+  {
+    "lang": "ja",
+    "width": 768,
+    "name": "about",
+    "height": 850,
+    "overflow": false,
+    "header": 95.265625,
+    "nav": false
+  },
+  {
+    "lang": "en",
+    "width": 768,
+    "name": "home",
+    "height": 3255,
+    "overflow": false,
+    "header": 95.265625,
+    "firstCard": 573.1875,
+    "nav": false
+  },
+  {
+    "lang": "en",
+    "width": 768,
+    "name": "directory",
+    "height": 6209,
+    "overflow": false,
+    "header": 95.265625,
+    "firstCard": 549.53125,
+    "nav": false
+  },
+  {
+    "lang": "en",
+    "width": 768,
+    "name": "sweepstakes",
+    "height": 3244,
+    "overflow": false,
+    "header": 95.265625,
+    "firstCard": 274.140625,
+    "nav": false
+  },
+  {
+    "lang": "en",
+    "width": 768,
+    "name": "detail",
+    "height": 2246,
+    "overflow": false,
+    "header": 95.265625,
+    "nav": false
+  },
+  {
+    "lang": "en",
+    "width": 768,
+    "name": "freecash",
+    "height": 2401,
+    "overflow": false,
+    "header": 95.265625,
+    "nav": false
+  },
+  {
+    "lang": "en",
+    "width": 768,
+    "name": "rewards",
+    "height": 1872,
+    "overflow": false,
+    "header": 95.265625,
+    "firstCard": 300.234375,
+    "nav": false
+  },
+  {
+    "lang": "en",
+    "width": 768,
+    "name": "contact",
+    "height": 850,
+    "overflow": false,
+    "header": 95.265625,
+    "nav": false
+  },
+  {
+    "lang": "en",
+    "width": 768,
+    "name": "about",
+    "height": 850,
+    "overflow": false,
+    "header": 95.265625,
+    "nav": false
+  },
+  {
+    "lang": "ja",
+    "width": 1440,
+    "name": "home",
+    "height": 2539,
+    "overflow": false,
+    "header": 63.375,
+    "firstCard": 661.328125,
+    "nav": false
+  },
+  {
+    "lang": "ja",
+    "width": 1440,
+    "name": "directory",
+    "height": 4487,
+    "overflow": false,
+    "header": 63.375,
+    "firstCard": 594.609375,
+    "nav": false
+  },
+  {
+    "lang": "ja",
+    "width": 1440,
+    "name": "sweepstakes",
+    "height": 2571,
+    "overflow": false,
+    "header": 63.375,
+    "firstCard": 293.421875,
+    "nav": false
+  },
+  {
+    "lang": "ja",
+    "width": 1440,
+    "name": "detail",
+    "height": 2215,
+    "overflow": false,
+    "header": 63.375,
+    "nav": false
+  },
+  {
+    "lang": "ja",
+    "width": 1440,
+    "name": "freecash",
+    "height": 2328,
+    "overflow": false,
+    "header": 63.375,
+    "nav": false
+  },
+  {
+    "lang": "ja",
+    "width": 1440,
+    "name": "rewards",
+    "height": 1341,
+    "overflow": false,
+    "header": 63.375,
+    "firstCard": 293.421875,
+    "nav": false
+  },
+  {
+    "lang": "ja",
+    "width": 1440,
+    "name": "contact",
+    "height": 850,
+    "overflow": false,
+    "header": 63.375,
+    "nav": false
+  },
+  {
+    "lang": "ja",
+    "width": 1440,
+    "name": "about",
+    "height": 850,
+    "overflow": false,
+    "header": 63.375,
+    "nav": false
+  },
+  {
+    "lang": "en",
+    "width": 1440,
+    "name": "home",
+    "height": 2575,
+    "overflow": false,
+    "header": 63.375,
+    "firstCard": 649.359375,
+    "nav": false
+  },
+  {
+    "lang": "en",
+    "width": 1440,
+    "name": "directory",
+    "height": 4661,
+    "overflow": false,
+    "header": 63.375,
+    "firstCard": 588.625,
+    "nav": false
+  },
+  {
+    "lang": "en",
+    "width": 1440,
+    "name": "sweepstakes",
+    "height": 2702,
+    "overflow": false,
+    "header": 63.375,
+    "firstCard": 287.4375,
+    "nav": false
+  },
+  {
+    "lang": "en",
+    "width": 1440,
+    "name": "detail",
+    "height": 2250,
+    "overflow": false,
+    "header": 63.375,
+    "nav": false
+  },
+  {
+    "lang": "en",
+    "width": 1440,
+    "name": "freecash",
+    "height": 2296,
+    "overflow": false,
+    "header": 63.375,
+    "nav": false
+  },
+  {
+    "lang": "en",
+    "width": 1440,
+    "name": "rewards",
+    "height": 1339,
+    "overflow": false,
+    "header": 63.375,
+    "firstCard": 313.53125,
+    "nav": false
+  },
+  {
+    "lang": "en",
+    "width": 1440,
+    "name": "contact",
+    "height": 850,
+    "overflow": false,
+    "header": 63.375,
+    "nav": false
+  },
+  {
+    "lang": "en",
+    "width": 1440,
+    "name": "about",
+    "height": 850,
+    "overflow": false,
+    "header": 63.375,
+    "nav": false
+  }
+]

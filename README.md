@@ -1,6 +1,6 @@
 # Freebie Trail
 
-A Japanese and English directory of free consumer giveaways and gifts. Surveys and rewards are secondary; affiliate programs have a separate page. Official terms, residence eligibility, spending and verification dates are visible on each listing. Any operating proceeds support independent game development, including PATCH_03.
+A Japanese and English directory of free consumer giveaways and gifts. Consumer surveys and task rewards have a Rewards section; publisher affiliate programs have a separate page. Official terms, residence eligibility, spending and verification dates are visible on each listing. Any operating proceeds support independent game development, including PATCH_03.
 
 Production: [Japanese](https://freebietrail.com/ja/) · [English](https://freebietrail.com/en/)
 
@@ -18,7 +18,7 @@ npm run build
 WRANGLER_SEND_METRICS=false npm run dev
 ```
 
-Open `http://127.0.0.1:8787/ja/` or `http://127.0.0.1:8787/en/`. Run `node site/smoke.mjs` in a second terminal. To build with no network, omit collection and run `python3 -m radar.pipeline publish` from the reviewed inputs.
+Open `http://127.0.0.1:8787/ja/` or `http://127.0.0.1:8787/en/`. Run `node site/smoke.mjs` in a second terminal. Use `npm run test:ux` for the bilingual four-width screenshot and interaction matrix, and `npm run test:seo` for canonical, sitemap and internal-link checks. To build with no network, omit collection and run `python3 -m radar.pipeline publish` from the reviewed inputs.
 
 - [Architecture](docs/ARCHITECTURE.md) and [Security](docs/SECURITY.md)
 - [Sources](docs/DATA_SOURCES.md), [Localization](docs/LOCALIZATION.md) and [Ranking](docs/RANKING_METHOD.md)

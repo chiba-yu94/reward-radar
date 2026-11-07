@@ -39,6 +39,19 @@ class TestPipeline(unittest.TestCase):
         self.assertTrue(all(item["affiliate_url"] is None for item in public if item["id"] != "freecash"))
         self.assertEqual(next(item for item in public if item["id"] == "macromill")["reward_amount"], None)
 
+    def test_deadline_timezone_is_validated_and_preserved(self):
+        record = next(row for row in self.rows if row["id"] == "penguin-white-company-calendar-2026")
+        source = self.sources[record["source_id"]]
+        validate(record, source, self.now)
+        with self.assertRaises(ValueError):
+            validate({**record, "deadline_timezone": "Invalid/Timezone"}, source, self.now)
+        self.run_publish()
+        public = json.loads(self.output.read_text())["records"]
+        self.assertEqual(next(row for row in public if row["id"] == record["id"])["deadline_timezone"], "Europe/London")
+        stanley = next(row for row in public if row["id"] == "stanley-review-november-2026")
+        self.assertEqual(stanley["application"]["difficulty"], "hard")
+        self.assertFalse(stanley["application"]["sns_required"])
+
     def test_failed_source_preserves_previous_output(self):
         self.run_publish()
         previous = self.output.read_bytes()

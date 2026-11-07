@@ -476,7 +476,7 @@
     "method": "manual",
     "permission": "editorial-summary",
     "terms_status": "Public Freecash terms and advertising guidelines reviewed. Impact website placement reviewed separately.",
-    "last_verification_date": "2026-11-06T23:49:48Z",
+    "last_verification_date": "2026-11-07T03:15:31Z",
     "last_successful_collection": null,
     "error_status": null,
     "collection_frequency": "manual; review before approval expiry",
@@ -484,7 +484,52 @@
     "organizer_verified": true,
     "supporting_urls": [
       "https://freecash.com/en/policies/terms",
-      "https://freecash.com/en/policies/partner-advertiser-policy"
+      "https://freecash.com/en/policies/partner-advertiser-policy",
+      "https://freecash.com/academy/en/support/withdrawal/issues/withdrawal-limits"
+    ]
+  },
+  {
+    "id": "penguin-white-company-calendar-2026",
+    "provider": "Penguin Random House",
+    "official_url": "https://www.penguin.co.uk/discover/articles/win-karen-swan-whiteco-calendar",
+    "approved_destination": "https://www.penguin.co.uk/discover/articles/win-karen-swan-whiteco-calendar",
+    "country": "GB",
+    "language": "en",
+    "method": "manual",
+    "permission": "editorial-summary",
+    "terms_status": "Official organizer rules, free entry route, residence, age, deadline and privacy link reviewed; original factual summary only.",
+    "last_verification_date": "2026-11-07T03:15:31Z",
+    "last_successful_collection": null,
+    "error_status": null,
+    "collection_frequency": "manual; recheck before deadline",
+    "active": true,
+    "organizer_verified": true,
+    "free_entry_reviewed": true,
+    "privacy_reviewed": true,
+    "supporting_urls": [
+      "https://www.penguin.co.uk/company/about-us/notices/privacy-policy"
+    ]
+  },
+  {
+    "id": "stanley-review-november-2026",
+    "provider": "STANLEY Tools",
+    "official_url": "https://www.stanleytools.com/en-us/stanley-november-product-review-giveaway-2026",
+    "approved_destination": "https://www.stanleytools.com/en-us/stanley-november-product-review-giveaway-2026",
+    "country": "US",
+    "language": "en",
+    "method": "manual",
+    "permission": "editorial-summary",
+    "terms_status": "Official organizer rules, free entry route, residence, age, deadline and privacy link reviewed; original factual summary only.",
+    "last_verification_date": "2026-11-07T03:15:31Z",
+    "last_successful_collection": null,
+    "error_status": null,
+    "collection_frequency": "manual; recheck before deadline",
+    "active": true,
+    "organizer_verified": true,
+    "free_entry_reviewed": true,
+    "privacy_reviewed": true,
+    "supporting_urls": [
+      "https://www.stanleyblackanddecker.com/privacy-policy"
     ]
   }
 ]

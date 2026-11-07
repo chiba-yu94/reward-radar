@@ -1,0 +1,150 @@
+[
+  {
+    "phase": "before",
+    "lang": "ja",
+    "path": "",
+    "header": 138.359375,
+    "firstCard": 728.1875,
+    "official": [
+      402
+    ],
+    "affiliate": [],
+    "consent": 248.234375,
+    "height": 4410
+  },
+  {
+    "phase": "before",
+    "lang": "ja",
+    "path": "opportunities/club-sunstar-november-2026/",
+    "header": 138.359375,
+    "official": [
+      2480
+    ],
+    "affiliate": [],
+    "consent": 248.234375,
+    "height": 3120
+  },
+  {
+    "phase": "before",
+    "lang": "ja",
+    "path": "opportunities/freecash/",
+    "header": 138.359375,
+    "official": [
+      2253
+    ],
+    "affiliate": [
+      2545
+    ],
+    "consent": 248.234375,
+    "height": 3226
+  },
+  {
+    "phase": "before",
+    "lang": "en",
+    "path": "",
+    "header": 138.359375,
+    "firstCard": 747.28125,
+    "official": [
+      396
+    ],
+    "affiliate": [],
+    "consent": 248.234375,
+    "height": 4567
+  },
+  {
+    "phase": "before",
+    "lang": "en",
+    "path": "opportunities/club-sunstar-november-2026/",
+    "header": 138.359375,
+    "official": [
+      2499
+    ],
+    "affiliate": [],
+    "consent": 248.234375,
+    "height": 3139
+  },
+  {
+    "phase": "before",
+    "lang": "en",
+    "path": "opportunities/freecash/",
+    "header": 138.359375,
+    "official": [
+      2375
+    ],
+    "affiliate": [
+      2664
+    ],
+    "consent": 248.234375,
+    "height": 3345
+  },
+  {
+    "phase": "after",
+    "lang": "ja",
+    "path": "",
+    "header": 65,
+    "firstCard": 412.765625,
+    "official": [],
+    "affiliate": [],
+    "consent": 113.1875,
+    "height": 3825
+  },
+  {
+    "phase": "after",
+    "lang": "ja",
+    "path": "opportunities/club-sunstar-november-2026/",
+    "header": 65,
+    "official": [
+      524
+    ],
+    "affiliate": [],
+    "consent": 113.1875,
+    "height": 1739
+  },
+  {
+    "phase": "after",
+    "lang": "ja",
+    "path": "opportunities/freecash/",
+    "header": 65,
+    "official": [],
+    "affiliate": [
+      619
+    ],
+    "consent": 113.1875,
+    "height": 2006
+  },
+  {
+    "phase": "after",
+    "lang": "en",
+    "path": "",
+    "header": 65,
+    "firstCard": 474.125,
+    "official": [],
+    "affiliate": [],
+    "consent": 113.1875,
+    "height": 3963
+  },
+  {
+    "phase": "after",
+    "lang": "en",
+    "path": "opportunities/club-sunstar-november-2026/",
+    "header": 65,
+    "official": [
+      542
+    ],
+    "affiliate": [],
+    "consent": 113.1875,
+    "height": 1890
+  },
+  {
+    "phase": "after",
+    "lang": "en",
+    "path": "opportunities/freecash/",
+    "header": 65,
+    "official": [],
+    "affiliate": [
+      673
+    ],
+    "consent": 113.1875,
+    "height": 2198
+  }
+]

@@ -27,8 +27,50 @@ export function matches(row, query, lang, now) {
   if (query.expense && row.required_expense.kind !== query.expense) return false;
   if (query.effort && (row.estimated_effort_minutes === null || row.estimated_effort_minutes > Number(query.effort))) return false;
   if (query.deadline && (!row.deadline || (query.deadline !== 'any' && expiration(row) > now + Number(query.deadline) * DAY))) return false;
-  const text = [row.provider, row[`title_${lang}`], row[`description_${lang}`]].join(' ').normalize('NFKC').toLocaleLowerCase(lang);
-  return (query.q || '').trim().normalize('NFKC').toLocaleLowerCase(lang).split(/\s+/).every(word => text.includes(word));
+  if (query.freeEntry && row.required_expense.kind !== 'free') return false;
+  if (query.closingSoon && (!row.deadline || expiration(row) > now + 7 * DAY)) return false;
+  const text = searchText(row);
+  return normalize(query.q || '').split(/\s+/).every(word => text.includes(word));
+}
+
+const normalize = text => text.normalize('NFKC').toLowerCase().trim();
+const concepts = {
+  sweepstakes:'懸賞 抽選 プレゼント sweepstakes giveaway prize draw',
+  survey:'アンケート 調査 survey surveys', research:'調査 research study studies',
+  points:'ポイ活 ポイント rewards points', gift:'特典 ギフト rewards gifts',
+  guaranteed:'条件達成 特典 rewards', cashback:'還元 cashback', registration:'登録特典 signup rewards',
+  affiliate:'affiliate アフィリエイト',
+};
+export function searchText(row) {
+  const parts = [row.provider, row.title_ja, row.title_en, row.description_ja, row.description_en,
+    row.reward_conditions.ja, row.reward_conditions.en, concepts[row.category], row.reward_type,
+    ({collectibles:'カード フィギュア cards collectibles', food:'食品 飲料 food drinks', 'cash-gift':'現金 ギフトカード cash gift card', household:'日用品 household', electronics:'家電 ゲーム electronics games', digital:'デジタル digital'})[row.prize_category]];
+  if (row.category === 'affiliate' && !row.commission) parts.push('ポイ活 タスク報酬 タスク型報酬 rewards tasks');
+  if (row.application?.sns_required === false) parts.push('SNS不要 no social media no social account required');
+  if (row.required_expense.kind === 'free') parts.push('無料応募 free entry no purchase');
+  if (row.eligibility_verified && Array.isArray(row.eligible_countries)) {
+    for (const locale of ['ja','en']) {
+      const names = new Intl.DisplayNames(locale, {type:'region'});
+      parts.push(...row.eligible_countries.map(code => names.of(code)), ...row.eligible_countries);
+      const aliases = {JP:'日本 Japan',US:'米国 アメリカ United States USA',GB:'英国 イギリス United Kingdom UK'};
+      parts.push(...row.eligible_countries.map(code => aliases[code]));
+    }
+  }
+  let text = normalize(parts.filter(Boolean).join(' '));
+  if (/rice|きぬむすめ|お米/.test(text)) text += ' 米 お米 rice';
+  if (/gift.card|ギフトカード|ギフト券/.test(text)) text += ' ギフト券 ギフトカード gift card';
+  return text;
+}
+
+// Only public controls can be restored/shared; never reflect arbitrary URL keys into HTML.
+export function allowedFilters(params, formValues) {
+  const query = {};
+  for (const [key, values] of Object.entries(formValues)) {
+    const value = params.get(key);
+    if (key === 'q' && value) query.q = value.slice(0,150);
+    else if (value && values.includes(value)) query[key] = value;
+  }
+  return query;
 }
 
 export function ordered(rows, now) {
@@ -80,9 +122,9 @@ export function money(amount, currency, lang, unknown) {
   }).format(amount);
 }
 
-export function date(value, lang, includeTime = false) {
+export function date(value, lang, includeTime = false, zone = lang === 'ja' ? 'Asia/Tokyo' : 'UTC') {
   return new Intl.DateTimeFormat(lang === 'ja' ? 'ja-JP' : 'en-GB', {
-    timeZone: lang === 'ja' ? 'Asia/Tokyo' : 'UTC',
+    timeZone: zone,
     year: 'numeric', month: 'short', day: 'numeric',
     ...(includeTime ? {hour: '2-digit', minute: '2-digit', hourCycle: 'h23', timeZoneName: 'short'} : {}),
   }).format(new Date(value));
