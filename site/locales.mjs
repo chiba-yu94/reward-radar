@@ -2,7 +2,7 @@ export const languages = ['ja', 'en'];
 export const email = 'support@freebietrail.com';
 export const copy = {
   ja: {
-    menu:'メニュー', freeEntry:'無料応募', closingSoon:'7日以内に締切', sort:'並び順', recommended:'条件順', deadlineSort:'締切が近い順', newest:'新着順', showResults:'結果に戻る', searchSubmit:'検索',
+    visitOfficial:'公式ページ', menu:'メニュー', freeEntry:'無料応募', closingSoon:'7日以内に締切', sort:'並び順', recommended:'条件順', deadlineSort:'締切が近い順', newest:'新着順', showResults:'結果に戻る', searchSubmit:'検索',
     regionShort:'対象地域を確認して応募できます。', markets:'広告対象の全15地域', countries:'対象の国・地域', entryUnknown:'一部の応募情報は未確認。公式条件をご確認ください。', relatedRewards:'アンケート・タスク報酬も見る',
     sourceTerms:'応募条件・利用規約', sourcePrivacy:'プライバシー方針', sourceGuide:'参加方法', sourcePayout:'出金条件・手数料', sourcePolicy:'広告ガイドライン',
     freecashCost:'登録は無料。購入・課金が条件のタスクもあります。',
@@ -105,7 +105,7 @@ export const copy = {
     },
   },
   en: {
-    menu:'Menu', freeEntry:'Free entry', closingSoon:'Closes within 7 days', sort:'Sort by', recommended:'Default', deadlineSort:'Deadline', newest:'Newest', showResults:'Back to results', searchSubmit:'Search',
+    visitOfficial:'Official page', menu:'Menu', freeEntry:'Free entry', closingSoon:'Closes within 7 days', sort:'Sort by', recommended:'Default', deadlineSort:'Deadline', newest:'Newest', showResults:'Back to results', searchSubmit:'Search',
     regionShort:'Eligibility is listed for each opportunity.', markets:'All 15 advertised markets', countries:'Countries and regions', entryUnknown:'Some entry information is unverified. Check the official rules.', relatedRewards:'Browse surveys and task rewards',
     sourceTerms:'Entry rules / terms of service', sourcePrivacy:'Privacy policy', sourceGuide:'How to participate', sourcePayout:'Withdrawal limits and fees', sourcePolicy:'Advertising guidelines',
     freecashCost:'Free registration. Some tasks require a purchase or in-app spending.',

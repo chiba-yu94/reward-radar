@@ -188,7 +188,7 @@ ${isDraw && row.application?.sns_required === false ? `<p class="small">${t.appl
 <p class="notice" data-stale="${e(row.stale_at)}"${stale(row,now) ? '' : ' hidden'}>${t.stale}</p>
 ${sponsored ? `<p class="small">${t.affiliateDisclosure}</p>` : ''}
 <div class="card-footer"><p class="stamp">${t.checked} · ${time(row.last_checked_at,lang)}</p>
-${sponsored ? `<a class="text-link" href="${detail(lang,row)}">${t.details} →</a>` : external(row.official_url,t.officialNewTab,row.commission ? null : 'application_click',title)}</div></article>`;
+${sponsored ? `<a class="text-link" href="${detail(lang,row)}">${t.details} →</a>` : external(row.official_url,isDraw ? t.officialNewTab : t.visitOfficial,row.commission ? null : 'application_click',title)}</div></article>`;
 }
 
 function filters(lang, available) {
@@ -256,7 +256,7 @@ ${breadcrumbs(lang,section,title)}
     ...(row.reward_amount !== null ? [[t.amount,e(amount(row,lang))]] : []),
 ])}</section>
 <div class="entry-action${sponsored ? ' ad-action' : ''}" data-expiring="${e(row.deadline || '')}"${sponsored ? ` data-affiliate-expires="${e(row.affiliate_expires_at)}"` : ''}>
-${sponsoredLink(row) ? `<p class="ad-disclosure"><strong>${t.sponsoredLabel}</strong> · ${t.affiliateDisclosure}</p><div class="actions">${external(row.affiliate_url,sponsored ? t.sponsoredVisit : t.sponsored,'affiliate_click')}</div><p class="secondary-official"><a href="${e(row.official_url)}" target="_blank" rel="noopener noreferrer">${t.official}</a></p>` : `<div class="actions">${external(row.official_url,t.officialNewTab,row.commission ? null : 'application_click')}</div>`}
+${sponsoredLink(row) ? `<p class="ad-disclosure"><strong>${t.sponsoredLabel}</strong> · ${t.affiliateDisclosure}</p><div class="actions">${external(row.affiliate_url,sponsored ? t.sponsoredVisit : t.sponsored,'affiliate_click')}</div><p class="secondary-official"><a href="${e(row.official_url)}" target="_blank" rel="noopener noreferrer">${t.official}</a></p>` : `<div class="actions">${external(row.official_url,row.category === 'sweepstakes' ? t.officialNewTab : t.visitOfficial,row.commission ? null : 'application_click')}</div>`}
 </div>
 <div class="detail-body"><section><h2>${t.entryRequirements}</h2>
 ${row.entry.steps ? `<p>${e(row.entry.steps[lang])}</p>` : ''}${fields(requirements)}
