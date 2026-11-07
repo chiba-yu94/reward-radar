@@ -141,7 +141,7 @@ test('Freecash uses the scoped sponsored route in both languages while current',
     assert.equal(existsSync('dist/' + path), Boolean(freecash));
     if (!freecash) continue;
     assert.doesNotMatch(affiliates, /data-record="freecash"/);
-    assert.match(read(`${lang}/rewards/index.html`), /class="card sponsored-card" data-record="freecash"/);
+    assert.match(read(`${lang}/rewards/index.html`), /class="card sponsored-card task-card" data-record="freecash"/);
     const html = read(path);
     assert.ok(html.includes(copy[lang].affiliateDisclosure));
     assert.ok(html.includes(`href="${freecash.official_url}" target="_blank" rel="noopener noreferrer"`));
@@ -238,4 +238,24 @@ test('permanent canonical redirects and query pages are noindex', async () => {
   assert.equal(slash.headers.get('location'),origin + '/ja/?q=rice');
   const query = worker.fetch(new Request(origin + '/en/opportunities/?q=rice'),env);
   assert.equal(query.headers.get('x-robots-tag'),'noindex, follow');
+});
+
+
+test('Freecash comparison cards lead with tasks, disclose costs and link through the approved partner', () => {
+  const row = rows.find(row => row.id === 'freecash');
+  if (!row) return;
+  for (const lang of ['ja','en']) for (const path of ['index.html','rewards/index.html','opportunities/index.html']) {
+    const html = read(`${lang}/${path}`);
+    const card = html.match(/<article class="card sponsored-card task-card"[^>]*>[\s\S]*?<\/article>/)?.[0];
+    assert.ok(card,path);
+    for (const key of ['freecashCardSummary','freecashCardCost','freecashCardConditions','freecashCardDetails','freecashCardDisclosure','sponsoredLabel']) assert.ok(card.includes(copy[lang][key]),key);
+    assert.ok(card.indexOf(copy[lang].freecashCardSummary) < card.indexOf(copy[lang].freecashCardDisclosure));
+    assert.equal((card.match(/class="button /g) || []).length,1);
+    assert.ok(card.includes(`href="${row.affiliate_url}"`));
+    assert.match(card,/rel="sponsored nofollow noopener noreferrer"/);
+    assert.doesNotMatch(card,/<dl|15 countries|Ad markets|広告の対象地域/);
+    const detail = read(`${lang}/opportunities/freecash/index.html`);
+    assert.ok(detail.includes(copy[lang].freecashPayout));
+    assert.ok(detail.includes(copy[lang].freecashRestrictions));
+  }
 });

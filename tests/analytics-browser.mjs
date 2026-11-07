@@ -142,6 +142,46 @@ try {
       await settings.click();
       await dialog.locator('[data-analytics-choice="accept"]').click();
       console.log(lang + ': Freecash link navigates before consent, after rejection and after withdrawal; consented event has only approved fields');
+      // The same approved link appears on consumer cards without requiring a detail-page visit.
+      for (const path of ['', 'rewards/', 'opportunities/']) {
+        await page.goto(origin + '/' + lang + '/' + path);
+        const card = page.locator('[data-record="freecash"]');
+        const cardLink = card.locator('[data-analytics-click="affiliate_click"]');
+        async function openCard() {
+          const [opened] = await Promise.all([context.waitForEvent('page'),cardLink.click()]);
+          await opened.waitForURL(destination);
+          await opened.close();
+        }
+        const running = await page.evaluate(() => typeof window.gtag === 'function');
+        await settings.click();
+        if (running) await Promise.all([page.waitForEvent('domcontentloaded'),dialog.locator('[data-analytics-choice="reject"]').click()]);
+        else await dialog.locator('[data-analytics-choice="reject"]').click();
+        calls.length = 0;
+        await openCard();
+        assert.deepEqual(calls,[]);
+        await page.evaluate(() => localStorage.removeItem('reward-radar-analytics-v1'));
+        await page.reload();
+        await banner.waitFor({state:'visible'});
+        await openCard();
+        assert.deepEqual(calls,[]);
+        await banner.locator('[data-analytics-choice="accept"]').click();
+        await openCard();
+        const event = (await queued()).filter(args => args[0] === 'event' && args[1] === 'affiliate_click');
+        assert.equal(event.length,1);
+        assert.equal(event[0][2].opportunity_id,'freecash');
+        assert.equal(event[0][2].page_group,'affiliate');
+        assert.equal(event[0][2].site_language,lang);
+        assert.doesNotMatch(JSON.stringify(event),/pxf\.io|freecash\.com|private@example/);
+        await settings.click();
+        await Promise.all([page.waitForEvent('domcontentloaded'),dialog.locator('[data-analytics-choice="reject"]').click()]);
+        calls.length = 0;
+        await openCard();
+        assert.deepEqual(calls,[]);
+        console.log(lang + ': ' + (path || 'home') + ' card: correct attribution after consent; no measurement before consent, after rejection or withdrawal');
+      }
+      await settings.click();
+      await dialog.locator('[data-analytics-choice="accept"]').click();
+
     }
 
     await page.goto(origin + '/' + lang + '/');

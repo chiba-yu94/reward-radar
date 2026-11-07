@@ -182,3 +182,11 @@ footer { background:var(--surface); border-top:1px solid var(--line); margin-top
 .filter fieldset { border:0; padding:0; margin:0; min-width:0; }
 
 select { -webkit-appearance:none; appearance:none; padding-right:1.8rem; background:white url("/assets/chevron.svg") no-repeat right .65rem center; }
+
+/* Service cards share neutral surfaces; the advertising label identifies sponsorship. */
+.card.task-card { background:var(--page); border-color:var(--line); }
+.task-card .card-conditions { margin-bottom:1rem; }
+.task-card .card-footer .button { background:var(--accent); color:white; border-color:var(--accent); }
+.task-card .card-footer .button:hover { background:var(--accent-hover); }
+.task-card .card-details { display:inline-flex; align-items:center; min-height:44px; font-size:.8rem; }
+.task-card .card-disclosure { margin:.5rem 0 0; font-size:.8rem; }

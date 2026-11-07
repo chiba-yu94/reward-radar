@@ -169,7 +169,19 @@ const compactCountries = (row, lang) => row.eligibility_verified && Array.isArra
 const sourceLabel = (link, row, t) => /withdrawal|cash.?out/.test(link) ? t.sourcePayout : /privacy/.test(link) ? t.sourcePrivacy : /partner-advertiser/.test(link) ? t.sourcePolicy : /terms|rules|kiyaku|about-site|iframeView/.test(link) ? t.sourceTerms : link === row.source_url ? row.provider + (row.category === 'sweepstakes' ? ' · ' + t.sourceTerms : '') : t.sourceGuide + ' · ' + new URL(link).hostname;
 
 
+function freecashCard(row, lang) {
+  const t = copy[lang];
+  return `<article class="card sponsored-card task-card" data-record="${e(row.id)}" data-deadline="${e(row.deadline || '')}" data-affiliate-expires="${e(row.affiliate_expires_at)}"${analytics ? ` data-analytics-entry="${e(row.id)}" data-analytics-category="${e(row.category)}"` : ''}>
+<div class="labels"><span>${t.taskRewards}</span><span class="sponsored-label">${t.sponsoredLabel}</span></div>
+<h3>Freecash</h3><p class="card-summary">${t.freecashCardSummary}</p>
+<p class="small card-conditions">${t.freecashCardCost}<br>${t.freecashCardConditions}</p>
+<p class="notice" data-stale="${e(row.stale_at)}"${stale(row,now) ? '' : ' hidden'}>${t.stale}</p>
+<div class="card-footer"><div class="actions">${external(row.affiliate_url,t.sponsoredVisit,'affiliate_click','Freecash')}<a class="card-details" href="${detail(lang,row)}" aria-label="${e(t.freecashCardDetails + ' · Freecash')}">${t.freecashCardDetails}</a></div>
+<p class="small card-disclosure">${t.freecashCardDisclosure}</p></div></article>`;
+}
+
 function card(row, lang) {
+  if (row.id === 'freecash' && sponsoredLink(row)) return freecashCard(row,lang);
   const t = copy[lang];
   const title = row['title_' + lang];
   const sponsored = taskService(row);

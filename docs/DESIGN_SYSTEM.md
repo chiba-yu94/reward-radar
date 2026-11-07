@@ -7,7 +7,7 @@ The primary task is to compare eligibility, prize or reward conditions and deadl
 - Page `#ffffff`; secondary surface `#f6f7f9`; borders `#d9dee5`.
 - Main text `#202733`; secondary text `#586170`.
 - Interactive accent `#2456a6`; hover `#193e7b`; selected filter surface `#edf3fc`. Blue consistently denotes links, actions and keyboard focus.
-- Advertising text `#77501c`, border `#d5c19f`, surface `#fcf9f3`. These colors identify advertising without competing with the content. Advertising actions retain the same blue interaction token and have a nearby disclosure.
+- Advertising text `#77501c`, border `#d5c19f`, surface `#fcf9f3`. These colors identify advertising labels and detail-page disclosures. Consumer service cards use the same white surface and neutral border as other cards; sponsorship is identified by its textual badge and adjacent disclosure. Advertising actions retain the same blue interaction token and have a nearby disclosure.
 - The existing green route mark is retained for brand recognition; green has no other decorative role.
 - System sans-serif fonts; body 16px, secondary text approximately 13.4px. H1 scales from 25.6px to 40px; detail H1 from 24px to 36.8px.
 - Spacing tokens: 4, 8, 16, 24, 32px. Default radius 8px. Metadata uses horizontal rules instead of separate cards.
