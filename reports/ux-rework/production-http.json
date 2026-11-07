@@ -1,0 +1,77 @@
+{
+  "assets": [
+    {
+      "name": "domain.mjs",
+      "status": 200,
+      "matchesSource": true
+    },
+    {
+      "name": "client.mjs",
+      "status": 200,
+      "matchesSource": true
+    },
+    {
+      "name": "style.css",
+      "status": 200,
+      "matchesSource": true
+    }
+  ],
+  "headers": [
+    {
+      "url": "http://freebietrail.com/ja/",
+      "status": 301,
+      "location": "https://freebietrail.com/ja/",
+      "robots": null,
+      "cache": null
+    },
+    {
+      "url": "https://www.freebietrail.com/ja/",
+      "status": 301,
+      "location": "https://freebietrail.com/ja/",
+      "robots": null,
+      "cache": null
+    },
+    {
+      "url": "https://freebietrail.com/ja",
+      "status": 308,
+      "location": "https://freebietrail.com/ja/",
+      "robots": null,
+      "cache": null
+    },
+    {
+      "url": "https://freebietrail.com/en",
+      "status": 308,
+      "location": "https://freebietrail.com/en/",
+      "robots": null,
+      "cache": null
+    },
+    {
+      "url": "https://freebietrail.com/favicon.ico",
+      "status": 200,
+      "location": null,
+      "robots": null,
+      "cache": "public, max-age=0, must-revalidate, no-transform"
+    },
+    {
+      "url": "https://freebietrail.com/assets/social.png",
+      "status": 200,
+      "location": null,
+      "robots": null,
+      "cache": "public, max-age=0, must-revalidate, no-transform"
+    },
+    {
+      "url": "https://freebietrail.com/en/opportunities/?q=Freecash",
+      "status": 200,
+      "location": null,
+      "robots": "noindex, follow",
+      "cache": "public, max-age=0, must-revalidate, no-transform"
+    },
+    {
+      "url": "https://freebietrail.com/ja/",
+      "status": 200,
+      "location": null,
+      "robots": null,
+      "cache": "public, max-age=0, must-revalidate, no-transform"
+    }
+  ]
+}

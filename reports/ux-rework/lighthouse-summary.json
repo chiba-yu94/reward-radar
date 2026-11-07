@@ -44,6 +44,21 @@
     "fetchTime": "2026-11-07T03:18:43.228Z",
     "url": "http://127.0.0.1:8787/ja/"
   },
+  "lighthouse-production-ja-mobile": {
+    "scores": {
+      "performance": 100,
+      "accessibility": 100,
+      "best-practices": 100,
+      "seo": 100
+    },
+    "metrics": {
+      "largest-contentful-paint": "1.5\u00a0s",
+      "cumulative-layout-shift": "0",
+      "total-blocking-time": "0\u00a0ms"
+    },
+    "fetchTime": "2026-11-07T03:37:22.933Z",
+    "url": "https://freebietrail.com/ja/"
+  },
   "lighthouse-en-mobile": {
     "scores": {
       "performance": 100,
@@ -58,5 +73,20 @@
     },
     "fetchTime": "2026-11-07T03:20:16.487Z",
     "url": "http://127.0.0.1:8787/en/"
+  },
+  "lighthouse-production-en-mobile": {
+    "scores": {
+      "performance": 99,
+      "accessibility": 100,
+      "best-practices": 100,
+      "seo": 100
+    },
+    "metrics": {
+      "largest-contentful-paint": "1.9\u00a0s",
+      "cumulative-layout-shift": "0",
+      "total-blocking-time": "0\u00a0ms"
+    },
+    "fetchTime": "2026-11-07T03:37:33.181Z",
+    "url": "https://freebietrail.com/en/"
   }
 }

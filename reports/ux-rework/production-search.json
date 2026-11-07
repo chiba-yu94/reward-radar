@@ -1,0 +1,115 @@
+{
+  "search": [
+    {
+      "lang": "ja",
+      "q": "懸賞",
+      "count": 12,
+      "ids": [
+        "penguin-white-company-calendar-2026",
+        "club-sunstar-november-2026",
+        "obu-city-quiz-november-2026",
+        "stanley-review-november-2026",
+        "ja-wakayama-rice-2026-11",
+        "tombow-mono-2026",
+        "kotobukiya-noa-2026",
+        "yamazaki-nikuman-2026",
+        "doutor-latte-2026",
+        "saitama-seasonal-produce-2026",
+        "takaratomy-conan-card-2026",
+        "calbee-jagabee-2026"
+      ]
+    },
+    {
+      "lang": "ja",
+      "q": "米",
+      "count": 1,
+      "ids": [
+        "ja-wakayama-rice-2026-11"
+      ]
+    },
+    {
+      "lang": "ja",
+      "q": "お米",
+      "count": 1,
+      "ids": [
+        "ja-wakayama-rice-2026-11"
+      ]
+    },
+    {
+      "lang": "ja",
+      "q": "Freecash",
+      "count": 1,
+      "ids": [
+        "freecash"
+      ]
+    },
+    {
+      "lang": "ja",
+      "q": "米国",
+      "count": 5,
+      "ids": [
+        "microsoft-rewards",
+        "stanley-review-november-2026",
+        "google-opinion-android",
+        "prolific",
+        "freecash"
+      ]
+    },
+    {
+      "lang": "en",
+      "q": "sweepstakes",
+      "count": 12,
+      "ids": [
+        "penguin-white-company-calendar-2026",
+        "club-sunstar-november-2026",
+        "obu-city-quiz-november-2026",
+        "stanley-review-november-2026",
+        "ja-wakayama-rice-2026-11",
+        "tombow-mono-2026",
+        "kotobukiya-noa-2026",
+        "yamazaki-nikuman-2026",
+        "doutor-latte-2026",
+        "saitama-seasonal-produce-2026",
+        "takaratomy-conan-card-2026",
+        "calbee-jagabee-2026"
+      ]
+    },
+    {
+      "lang": "en",
+      "q": "rice",
+      "count": 1,
+      "ids": [
+        "ja-wakayama-rice-2026-11"
+      ]
+    },
+    {
+      "lang": "en",
+      "q": "United States",
+      "count": 5,
+      "ids": [
+        "microsoft-rewards",
+        "stanley-review-november-2026",
+        "google-opinion-android",
+        "prolific",
+        "freecash"
+      ]
+    },
+    {
+      "lang": "en",
+      "q": "no social media",
+      "count": 5,
+      "ids": [
+        "penguin-white-company-calendar-2026",
+        "club-sunstar-november-2026",
+        "obu-city-quiz-november-2026",
+        "stanley-review-november-2026",
+        "ja-wakayama-rice-2026-11"
+      ]
+    }
+  ],
+  "consoleErrors": [],
+  "scripts": [
+    "https://freebietrail.com/assets/client.mjs",
+    "https://freebietrail.com/assets/analytics.mjs"
+  ]
+}
