@@ -137,7 +137,7 @@ test('Freecash uses the scoped sponsored route in both languages while current',
   for (const lang of ['ja','en']) {
     const path = `${lang}/opportunities/freecash/index.html`;
     const affiliates = read(`${lang}/affiliates/index.html`);
-    assert.match(read(`${lang}/opportunities/index.html`), /data-record="freecash"/);
+    assert.equal(/data-record="freecash"/.test(read(`${lang}/opportunities/index.html`)),Boolean(freecash));
     assert.equal(existsSync('dist/' + path), Boolean(freecash));
     if (!freecash) continue;
     assert.doesNotMatch(affiliates, /data-record="freecash"/);
