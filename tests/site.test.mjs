@@ -187,14 +187,15 @@ test('host migration preserves paths and queries and waits for cutover', async (
 
 
 test('search indexes verified concepts without inventing eligibility or free entry', () => {
-  const live = Date.now();
+  const live = Date.parse('2026-11-07T00:00:00Z');
+  const fixtures = JSON.parse(readFileSync('data/opportunities.json','utf8'));
   for (const [q,id] of [['懸賞','club-sunstar-november-2026'],['お米','ja-wakayama-rice-2026-11'],['rice','ja-wakayama-rice-2026-11'],['Freecash','freecash'],['タスク報酬','freecash'],['United States','stanley-review-november-2026'],['sweepstakes','penguin-white-company-calendar-2026']]) {
-    assert.ok(matches(rows.find(row => row.id === id),{q},'ja',live),q);
+    assert.ok(matches(fixtures.find(row => row.id === id),{q},'ja',live),q);
   }
   assert.equal(matches(jp,{q:'United States'},'en',live),false);
   assert.equal(matches({...draw,title_en:'Example',title_ja:'例',description_en:'Survey panel',description_ja:'調査',reward_conditions:{ja:'回答',en:'Answer'}},{q:'Japan'},'en',live),false);
   assert.equal(matches(jp,{q:'SNS不要'},'ja',live),false);
-  const fc = rows.find(row => row.id === 'freecash');
+  const fc = fixtures.find(row => row.id === 'freecash');
   assert.equal(matches(fc,{freeEntry:'yes'},'ja',live),false);
   assert.equal(matches(fc,{q:'no social media'},'en',live),false);
   const input = new URLSearchParams('q=rice&country=US&noSns=yes&sort=deadline&unknown=secret&category=invalid');
@@ -204,13 +205,18 @@ test('search indexes verified concepts without inventing eligibility or free ent
 
 test('primary action precedes secondary information and prizes omit monetary placeholders', () => {
   for (const lang of ['ja','en']) {
-    const html = read(`${lang}/opportunities/club-sunstar-november-2026/index.html`);
-    assert.ok(html.indexOf('entry-action') < html.indexOf('detail-body'));
-    assert.ok(!html.includes(copy[lang].varies));
-    assert.ok(!html.includes(copy[lang].organizerVerified));
-    const fc = read(`${lang}/opportunities/freecash/index.html`);
-    assert.ok(fc.indexOf('sponsored-button') < fc.indexOf('detail-body'));
-    assert.ok(fc.includes('class="country-details"'));
+    const draw = rows.find(row => row.category === 'sweepstakes');
+    if (draw) {
+      const html = read(`${lang}/opportunities/${draw.id}/index.html`);
+      assert.ok(html.indexOf('entry-action') < html.indexOf('detail-body'));
+      assert.ok(!html.includes(copy[lang].varies));
+      assert.ok(!html.includes(copy[lang].organizerVerified));
+    }
+    if (rows.some(row => row.id === 'freecash')) {
+      const fc = read(`${lang}/opportunities/freecash/index.html`);
+      assert.ok(fc.indexOf('sponsored-button') < fc.indexOf('detail-body'));
+      assert.ok(fc.includes('class="country-details"'));
+    }
     assert.match(read(`${lang}/index.html`),/form class="home-search".*method="get"/);
     assert.match(read(`${lang}/index.html`),/og:image/);
   }

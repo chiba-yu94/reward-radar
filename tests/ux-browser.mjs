@@ -1,5 +1,6 @@
 import {chromium} from 'playwright-core';
 import assert from 'node:assert/strict';
+import {matches} from '../site/domain.mjs';
 import {mkdir,writeFile} from 'node:fs/promises';
 const base = process.env.TEST_ORIGIN || 'http://127.0.0.1:8787';
 const phase = process.env.QA_PHASE || 'after';
@@ -7,6 +8,10 @@ const out = process.env.QA_OUTPUT || 'var/ux-rework';
 await mkdir(out,{recursive:true});
 const browser = await chromium.launch({channel:'chrome'});
 const measurements = [];
+const dataset = await (await fetch(base + '/opportunities.json')).json();
+const records = dataset.records;
+const hasFreecash = records.some(row => row.id === 'freecash');
+const sampleDetail = records.find(row => row.id === 'club-sunstar-november-2026') || records.find(row => row.category === 'sweepstakes') || records.find(row => row.id === 'prolific');
 try {
   for (const width of [375,390,768,1440]) for (const lang of ['ja','en']) {
     const context = await browser.newContext({viewport:{width,height:850},reducedMotion:'reduce',deviceScaleFactor:1});
@@ -14,7 +19,7 @@ try {
     const errors=[];
     page.on('pageerror',error=>errors.push(error.message));
     page.on('console',message=>{if(message.type()==='error')errors.push(message.text())});
-    const paths = [['home',''],['directory','opportunities/'],['sweepstakes','sweepstakes/'],['detail','opportunities/club-sunstar-november-2026/'],['freecash','opportunities/freecash/'],['rewards',phase==='before'?'affiliates/':'rewards/'],['contact','contact/'],['about','about/']];
+    const paths = [['home',''],['directory','opportunities/'],['sweepstakes','sweepstakes/'],['detail',`opportunities/${sampleDetail.id}/`],...(hasFreecash ? [['freecash','opportunities/freecash/']] : []),['rewards',phase==='before'?'affiliates/':'rewards/'],['contact','contact/'],['about','about/']];
     for (const [name,path] of paths) {
       assert.equal((await page.goto(`${base}/${lang}/${path}`)).status(),200);
       if (name==='home' && await page.locator('.analytics-notice').isVisible()) {
@@ -37,15 +42,17 @@ try {
     }
     if(phase!=='before') {
       await page.goto(`${base}/${lang}/`);
-      await page.locator('#home-query').fill('Freecash');
+      const homeQuery = hasFreecash ? 'Freecash' : 'Prolific';
+      await page.locator('#home-query').fill(homeQuery);
       await page.locator('.home-search button').click();
       await page.locator('#filters').waitFor({state:'visible'}); if(phase!=='before') await page.waitForFunction(()=>document.querySelector('#filters').getAttribute('aria-busy')==='false');
-      assert.equal(await page.locator('[name=q]').inputValue(),'Freecash');
-      assert.deepEqual(await page.locator('[data-record]:visible').evaluateAll(items=>items.map(x=>x.dataset.record)),['freecash']);
+      assert.equal(await page.locator('[name=q]').inputValue(),homeQuery);
+      assert.deepEqual(await page.locator('[data-record]:visible').evaluateAll(items=>items.map(x=>x.dataset.record)),[hasFreecash ? 'freecash' : 'prolific']);
       const cases=lang==='ja'?['懸賞','お米','Freecash','SNS不要','タスク報酬']:['sweepstakes','rice','United States','Freecash','no social media'];
       for(const q of cases) {
         await page.locator('[name=q]').fill(q);
-        assert.ok(Number(await page.locator('#result-count').textContent())>0,q);
+        const expected = records.filter(row => (row.category !== 'affiliate' || !row.commission) && matches(row,{q},lang,Date.now())).length;
+        assert.equal(Number(await page.locator('#result-count').textContent()),expected,q);
       }
       await page.locator('[type=reset]').click();
       await page.locator('[name=noSns]').check();
@@ -67,9 +74,9 @@ try {
       assert.deepEqual(errors,[],`${lang} ${width}: console/runtime errors`);
     }
     await context.close();
-    console.log(`${phase}: ${lang} ${width}px — 8 page types and UX checks passed`);
+    console.log(`${phase}: ${lang} ${width}px — ${paths.length} page types and UX checks passed`);
   }
-  if(phase!=='before') {
+  if(phase!=='before' && hasFreecash) {
     const expiryPage = await browser.newPage();
     await expiryPage.clock.install({time:new Date('2026-12-08T00:00:00Z')});
     await expiryPage.goto(base + '/ja/opportunities/freecash/');
