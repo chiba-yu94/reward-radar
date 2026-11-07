@@ -1,0 +1,114 @@
+[
+  {
+    "lang": "ja",
+    "width": 375,
+    "page": "rewards",
+    "height": 307.609375,
+    "overflow": false
+  },
+  {
+    "lang": "en",
+    "width": 375,
+    "page": "rewards",
+    "height": 375.96875,
+    "overflow": false
+  },
+  {
+    "lang": "ja",
+    "width": 390,
+    "page": "rewards",
+    "height": 307.609375,
+    "overflow": false
+  },
+  {
+    "lang": "ja",
+    "width": 390,
+    "page": "home",
+    "height": 307.609375,
+    "overflow": false
+  },
+  {
+    "lang": "ja",
+    "width": 390,
+    "page": "detail",
+    "height": 1492.109375,
+    "overflow": false
+  },
+  {
+    "lang": "en",
+    "width": 390,
+    "page": "rewards",
+    "height": 351.953125,
+    "overflow": false
+  },
+  {
+    "lang": "en",
+    "width": 390,
+    "page": "home",
+    "height": 351.953125,
+    "overflow": false
+  },
+  {
+    "lang": "en",
+    "width": 390,
+    "page": "detail",
+    "height": 1643.078125,
+    "overflow": false
+  },
+  {
+    "lang": "ja",
+    "width": 768,
+    "page": "rewards",
+    "height": 312.390625,
+    "overflow": false
+  },
+  {
+    "lang": "en",
+    "width": 768,
+    "page": "rewards",
+    "height": 380.75,
+    "overflow": false
+  },
+  {
+    "lang": "ja",
+    "width": 1440,
+    "page": "rewards",
+    "height": 337.890625,
+    "overflow": false
+  },
+  {
+    "lang": "ja",
+    "width": 1440,
+    "page": "home",
+    "height": 337.890625,
+    "overflow": false
+  },
+  {
+    "lang": "ja",
+    "width": 1440,
+    "page": "detail",
+    "height": 1183.859375,
+    "overflow": false
+  },
+  {
+    "lang": "en",
+    "width": 1440,
+    "page": "rewards",
+    "height": 359.546875,
+    "overflow": false
+  },
+  {
+    "lang": "en",
+    "width": 1440,
+    "page": "home",
+    "height": 359.546875,
+    "overflow": false
+  },
+  {
+    "lang": "en",
+    "width": 1440,
+    "page": "detail",
+    "height": 1184.921875,
+    "overflow": false
+  }
+]

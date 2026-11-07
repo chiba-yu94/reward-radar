@@ -1,0 +1,65 @@
+{
+  "cases": [
+    {
+      "lang": "ja",
+      "path": "",
+      "primaryCTA": 1,
+      "approvedURL": true,
+      "neutral": true
+    },
+    {
+      "lang": "ja",
+      "path": "rewards/",
+      "primaryCTA": 1,
+      "approvedURL": true,
+      "neutral": true
+    },
+    {
+      "lang": "ja",
+      "path": "opportunities/",
+      "primaryCTA": 1,
+      "approvedURL": true,
+      "neutral": true
+    },
+    {
+      "lang": "en",
+      "path": "",
+      "primaryCTA": 1,
+      "approvedURL": true,
+      "neutral": true
+    },
+    {
+      "lang": "en",
+      "path": "rewards/",
+      "primaryCTA": 1,
+      "approvedURL": true,
+      "neutral": true
+    },
+    {
+      "lang": "en",
+      "path": "opportunities/",
+      "primaryCTA": 1,
+      "approvedURL": true,
+      "neutral": true
+    }
+  ],
+  "errors": [],
+  "assets": [
+    {
+      "name": "style.css",
+      "status": 200,
+      "matches": true
+    },
+    {
+      "name": "client.mjs",
+      "status": 200,
+      "matches": true
+    },
+    {
+      "name": "analytics.mjs",
+      "status": 200,
+      "matches": true
+    }
+  ],
+  "expiredCardHidden": true
+}
