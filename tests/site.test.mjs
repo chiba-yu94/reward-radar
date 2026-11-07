@@ -189,13 +189,16 @@ test('host migration preserves paths and queries and waits for cutover', async (
 test('search indexes verified concepts without inventing eligibility or free entry', () => {
   const live = Date.parse('2026-11-07T00:00:00Z');
   const fixtures = JSON.parse(readFileSync('data/opportunities.json','utf8'));
-  for (const [q,id] of [['懸賞','club-sunstar-november-2026'],['お米','ja-wakayama-rice-2026-11'],['rice','ja-wakayama-rice-2026-11'],['Freecash','freecash'],['タスク報酬','freecash'],['United States','stanley-review-november-2026'],['sweepstakes','penguin-white-company-calendar-2026']]) {
+  for (const [q,id] of [['懸賞','club-sunstar-november-2026'],['お米','ja-wakayama-rice-2026-11'],['米','ja-wakayama-rice-2026-11'],['rice','ja-wakayama-rice-2026-11'],['Freecash','freecash'],['タスク報酬','freecash'],['United States','stanley-review-november-2026'],['sweepstakes','penguin-white-company-calendar-2026']]) {
     assert.ok(matches(fixtures.find(row => row.id === id),{q},'ja',live),q);
   }
   assert.equal(matches(jp,{q:'United States'},'en',live),false);
   assert.equal(matches({...draw,title_en:'Example',title_ja:'例',description_en:'Survey panel',description_ja:'調査',reward_conditions:{ja:'回答',en:'Answer'}},{q:'Japan'},'en',live),false);
   assert.equal(matches(jp,{q:'SNS不要'},'ja',live),false);
   const fc = fixtures.find(row => row.id === 'freecash');
+  assert.equal(matches(fc,{q:'米'},'ja',live),false);
+  assert.equal(matches({...jp,title_en:'Example',title_ja:'例',description_en:'Low price',description_ja:'価格',reward_conditions:{en:'Terms',ja:'条件'}},{q:'rice'},'en',live),false);
+  assert.equal(matches({...jp,description_en:'No purchase; social media entry required',application:{sns_required:true}},{q:'no social media'},'en',live),false);
   assert.equal(matches(fc,{freeEntry:'yes'},'ja',live),false);
   assert.equal(matches(fc,{q:'no social media'},'en',live),false);
   const input = new URLSearchParams('q=rice&country=US&noSns=yes&sort=deadline&unknown=secret&category=invalid');

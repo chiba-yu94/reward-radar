@@ -29,8 +29,15 @@ export function matches(row, query, lang, now) {
   if (query.deadline && (!row.deadline || (query.deadline !== 'any' && expiration(row) > now + Number(query.deadline) * DAY))) return false;
   if (query.freeEntry && row.required_expense.kind !== 'free') return false;
   if (query.closingSoon && (!row.deadline || expiration(row) > now + 7 * DAY)) return false;
+  const q = normalize(query.q || '');
+  if (/sns不要|no social (?:media|account)/.test(q) && row.application?.sns_required !== false) return false;
   const text = searchText(row);
-  return normalize(query.q || '').split(/\s+/).every(word => text.includes(word));
+  return q.split(/\s+/).every(raw => {
+    // A standalone 米 means rice, not the 米 in 米国 or 米ドル.
+    const word = raw === '米' ? 'お米' : raw;
+    if (/^[a-z0-9]+$/.test(word)) return new RegExp('(^|[^a-z0-9])' + word + (word.length < 3 ? '($|[^a-z0-9])' : '')).test(text);
+    return text.includes(word);
+  });
 }
 
 const normalize = text => text.normalize('NFKC').toLowerCase().trim();
@@ -57,7 +64,7 @@ export function searchText(row) {
     }
   }
   let text = normalize(parts.filter(Boolean).join(' '));
-  if (/rice|きぬむすめ|お米/.test(text)) text += ' 米 お米 rice';
+  if (/\brice\b|きぬむすめ|お米/.test(text)) text += ' 米 お米 rice';
   if (/gift.card|ギフトカード|ギフト券/.test(text)) text += ' ギフト券 ギフトカード gift card';
   return text;
 }

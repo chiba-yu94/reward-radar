@@ -48,7 +48,7 @@ try {
       await page.locator('#filters').waitFor({state:'visible'}); if(phase!=='before') await page.waitForFunction(()=>document.querySelector('#filters').getAttribute('aria-busy')==='false');
       assert.equal(await page.locator('[name=q]').inputValue(),homeQuery);
       assert.deepEqual(await page.locator('[data-record]:visible').evaluateAll(items=>items.map(x=>x.dataset.record)),[hasFreecash ? 'freecash' : 'prolific']);
-      const cases=lang==='ja'?['懸賞','お米','Freecash','SNS不要','タスク報酬']:['sweepstakes','rice','United States','Freecash','no social media'];
+      const cases=lang==='ja'?['懸賞','お米','米','Freecash','SNS不要','タスク報酬']:['sweepstakes','rice','United States','Freecash','no social media'];
       for(const q of cases) {
         await page.locator('[name=q]').fill(q);
         const expected = records.filter(row => (row.category !== 'affiliate' || !row.commission) && matches(row,{q},lang,Date.now())).length;
