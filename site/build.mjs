@@ -1,7 +1,10 @@
-import {readFile, mkdir, writeFile, copyFile, rm} from 'node:fs/promises';
-import {resolve} from 'node:path';
+import {readFile, mkdir, writeFile, copyFile, rm, cp, readdir, mkdtemp} from 'node:fs/promises';
+import {resolve, relative} from 'node:path';
 import {copy, email, languages, verifyLocales} from './locales.mjs';
-import {date, expiration, expired, money, ordered, stale} from './domain.mjs';
+import {date, expiration, expired, money, ordered, stale, freshness} from './domain.mjs';
+
+import {dateCopy} from './status.mjs';
+import {validatePublic} from './quality.mjs';
 
 verifyLocales();
 const configured = process.env.SITE_ORIGIN;
@@ -30,16 +33,19 @@ if (hapitasUrl && !/^https:\/\/(?:sp\.)?hapitas\.jp\/register\?i=[A-Za-z0-9_-]{1
   throw new Error('Invalid Hapitas referral URL');
 }
 const dataset = JSON.parse(await readFile('var/published.json', 'utf8'));
-const now = Date.now();
+const now = process.env.QA_NOW ? Date.parse(process.env.QA_NOW) : Date.now();
+if (!Number.isFinite(now)) throw new Error('Invalid QA_NOW');
+validatePublic(dataset,JSON.parse(await readFile('data/taxonomy.json','utf8')),now);
 const taskService = row => row.category === 'affiliate' && !row.commission;
 const sponsoredLink = row => row.affiliate_approval_status === 'approved' && row.affiliate_url &&
   Date.parse(row.affiliate_expires_at) > now;
 const rows = ordered(dataset.records.filter(row => !expired(row, now) && (!taskService(row) || sponsoredLink(row))), now);
-const dist = resolve('dist');
-await rm(dist, {recursive:true, force:true});
+const destination = resolve('dist');
+await mkdir('var', {recursive:true});
+const dist = await mkdtemp(resolve('var/site-build-'));
 await mkdir(dist + '/assets', {recursive:true});
 const write = (file, data) => writeFile(dist + '/' + file, data);
-for (const asset of ['style.css', 'client.mjs', 'domain.mjs', 'mark.svg', 'social.png', 'chevron.svg']) {
+for (const asset of ['style.css', 'client.mjs', 'domain.mjs', 'status.mjs', 'mark.svg', 'social.png', 'chevron.svg']) {
   await copyFile('site/' + asset, dist + '/assets/' + asset);
 }
 await copyFile('site/favicon.ico', dist + '/favicon.ico');
@@ -161,9 +167,15 @@ ${content}</main>
 ${consent?.settings || ''}<p class="muted">© ${t.copyright}</p></div></footer></body></html>`;
 }
 
+const expiryValue = row => Number.isFinite(expiration(row)) ? new Date(expiration(row)).toISOString() : '';
+const freshnessNotice = (row, lang) => `<p class="notice" data-stale="${e(row.stale_at)}" data-last-checked="${e(row.last_checked_at)}"${stale(row,now) ? '' : ' hidden'}>${stale(row,now) ? copy[lang].stale : ''}</p>`;
+const elapsed = (row, lang) => `<span data-age data-last-checked="${e(row.last_checked_at)}">${freshness(row,now).days === null ? '' : dateCopy[lang].age(freshness(row,now).days)}</span>`;
 const deadlineText = (row, lang) => row.deadline
   ? time(row.deadline,lang,!row.deadline_date_only, row.deadline_timezone ||
-    (row.language === 'ja' ? 'Asia/Tokyo' : undefined)) : copy[lang].noDeadline;
+    (row.language === 'ja' ? 'Asia/Tokyo' : undefined)) : row.availability === 'ongoing' ? copy[lang].ongoing : copy[lang].noDeadline;
+const promotionText = (row, lang) => (row.promotion_countries || []).map(code => name(lang,code)).join(lang === 'ja' ? '、' : ', ');
+const geoText = (countries, lang) => countries?.length > 4 ? (lang === 'ja' ? countries.length + 'の国・地域（詳細を確認）' : countries.length + ' countries / regions — see details') : countries?.length ? countries.map(code => name(lang,code)).join(lang === 'ja' ? '、' : ', ') : copy[lang].unknown;
+const geography = (row, lang) => [[copy[lang].residency,e(compactCountries(row,lang))], ...(row.category === 'sweepstakes' ? [[copy[lang].shipping,e(geoText(row.shipping_countries,lang))]] : [[copy[lang].serviceCountries,e(geoText(row.service_countries,lang))]])];
 const compactCountries = (row, lang) => row.eligibility_verified && Array.isArray(row.eligible_countries) && row.eligible_countries.length > 4
   ? (lang === 'ja' ? row.eligible_countries.length + 'の国・地域（詳細を確認）' : row.eligible_countries.length + ' countries / regions — see details') : countryText(row,lang);
 const sourceLabel = (link, row, t) => /withdrawal|cash.?out/.test(link) ? t.sourcePayout : /privacy/.test(link) ? t.sourcePrivacy : /partner-advertiser/.test(link) ? t.sourcePolicy : /terms|rules|kiyaku|about-site|iframeView/.test(link) ? t.sourceTerms : link === row.source_url ? row.provider + (row.category === 'sweepstakes' ? ' · ' + t.sourceTerms : '') : t.sourceGuide + ' · ' + new URL(link).hostname;
@@ -171,13 +183,13 @@ const sourceLabel = (link, row, t) => /withdrawal|cash.?out/.test(link) ? t.sour
 
 function freecashCard(row, lang) {
   const t = copy[lang];
-  return `<article class="card sponsored-card task-card" data-record="${e(row.id)}" data-deadline="${e(row.deadline || '')}" data-affiliate-expires="${e(row.affiliate_expires_at)}"${analytics ? ` data-analytics-entry="${e(row.id)}" data-analytics-category="${e(row.category)}"` : ''}>
+  return `<article class="card sponsored-card task-card" data-record="${e(row.id)}" data-deadline="${e(expiryValue(row))}" data-affiliate-expires="${e(row.affiliate_expires_at)}"${analytics ? ` data-analytics-entry="${e(row.id)}" data-analytics-category="${e(row.category)}"` : ''}>
 <div class="labels"><span>${t.taskRewards}</span><span class="sponsored-label">${t.sponsoredLabel}</span></div>
 <h3>Freecash</h3><p class="card-summary">${t.freecashCardSummary}</p>
 <p class="small card-conditions">${t.freecashCardCost}<br>${t.freecashCardConditions}</p>
-<p class="notice" data-stale="${e(row.stale_at)}"${stale(row,now) ? '' : ' hidden'}>${t.stale}</p>
+${freshnessNotice(row,lang)}
 <div class="card-footer"><div class="actions">${external(row.affiliate_url,t.sponsoredVisit,'affiliate_click','Freecash')}<a class="card-details" href="${detail(lang,row)}" aria-label="${e(t.freecashCardDetails + ' · Freecash')}">${t.freecashCardDetails}</a></div>
-<p class="small card-disclosure">${t.freecashCardDisclosure}</p></div></article>`;
+<p class="stamp">${t.checked} · ${time(row.last_checked_at,lang)} · ${elapsed(row,lang)}</p><p class="small card-disclosure">${t.freecashCardDisclosure}</p></div></article>`;
 }
 
 function card(row, lang) {
@@ -187,19 +199,19 @@ function card(row, lang) {
   const sponsored = taskService(row);
   const isDraw = row.category === 'sweepstakes';
   const group = sponsored ? t.taskRewards : row.prize_category ? t.prizes[row.prize_category] : t.categories[row.category];
-  return `<article class="card${sponsored ? ' sponsored-card' : ''}" data-record="${e(row.id)}" data-deadline="${e(row.deadline || '')}"${sponsored ? ` data-affiliate-expires="${e(row.affiliate_expires_at)}"` : ''}${analytics ? ` data-analytics-entry="${e(row.id)}" data-analytics-category="${e(row.category)}"` : ''}>
+  return `<article class="card${sponsored ? ' sponsored-card' : ''}" data-record="${e(row.id)}" data-deadline="${e(expiryValue(row))}"${sponsored ? ` data-affiliate-expires="${e(row.affiliate_expires_at)}"` : ''}${analytics ? ` data-analytics-entry="${e(row.id)}" data-analytics-category="${e(row.category)}"` : ''}>
 <div class="labels"><span>${e(group)}</span>${sponsored ? `<span class="sponsored-label">${t.sponsoredLabel}</span>` : ''}</div>
 <h3><a href="${detail(lang,row)}">${e(title)}</a></h3>
 <p class="provider">${e(row.provider)}</p><p class="card-summary">${e(row['description_' + lang])}</p>
 ${fields([
-  [sponsored ? t.promotionalMarkets : lang === 'ja' ? '対象地域' : 'Location',e(compactCountries(row,lang))],
-  ...(row.deadline ? [[t.deadline,deadlineText(row,lang)]] : []),
+  ...geography(row,lang),
+  [t.deadline,deadlineText(row,lang)],
   ...(isDraw ? row.entry.registration !== 'unknown' ? [[lang === 'ja' ? '登録' : 'Account',e(t.registrations[row.entry.registration])]] : [] : [[t.expense,e(sponsored ? t.freecashCost : t.expenses[row.required_expense.kind])]]),
 ])}
 ${isDraw && row.application?.sns_required === false ? `<p class="small">${t.application.noSns}${row.application.difficulty === 'easy' ? ' · ' + t.application.easyApply : ''}</p>` : ''}
-<p class="notice" data-stale="${e(row.stale_at)}"${stale(row,now) ? '' : ' hidden'}>${t.stale}</p>
+${freshnessNotice(row,lang)}
 ${sponsored ? `<p class="small">${t.affiliateDisclosure}</p>` : ''}
-<div class="card-footer"><p class="stamp">${t.checked} · ${time(row.last_checked_at,lang)}</p>
+<div class="card-footer"><p class="stamp">${t.checked} · ${time(row.last_checked_at,lang)} · ${elapsed(row,lang)}</p>
 ${sponsored ? `<a class="text-link" href="${detail(lang,row)}">${t.details} →</a>` : external(row.official_url,isDraw ? t.officialNewTab : t.visitOfficial,row.commission ? null : 'application_click',title)}</div></article>`;
 }
 
@@ -244,6 +256,8 @@ function details(lang, row) {
   const title = row['title_' + lang];
   const personal = values => e(values.length ? values.map(value => t.personal[value]).join(lang === 'ja' ? '、' : ', ') : t.noPersonal);
   const requirements = [
+    ...geography(row,lang),
+    ...(!row.deadline ? [[t.deadline,deadlineText(row,lang)]] : []),
     ...(row.entry.registration !== 'unknown' ? [[lang === 'ja' ? '登録' : 'Account',e(t.registrations[row.entry.registration])]] : []),
     [t.sourceLanguage,e(t.languages[row.language])],
     ...(row.entry.application !== null ? [[t.applicationData,personal(row.entry.application)]] : []),
@@ -260,24 +274,25 @@ function details(lang, row) {
 ${breadcrumbs(lang,section,title)}
 <header class="detail-heading"><div class="labels"><span>${e(sponsored ? t.taskRewards : t.categories[row.category])}</span>${sponsored ? `<span class="sponsored-label">${t.sponsoredLabel}</span>` : ''}</div>
 <h1>${e(title)}</h1><p class="provider">${e(row.provider)}</p><p class="lead">${e(row['description_' + lang])}</p></header>
-<p class="notice" data-stale="${e(row.stale_at)}"${stale(row,now) ? '' : ' hidden'}>${t.stale}</p><p class="notice" data-ended hidden>${t.expired}</p>
+${freshnessNotice(row,lang)}<p class="notice" data-ended hidden></p>
 <section class="detail-overview" aria-label="${t.rewardSummary}">${fields([
     [t.expense,e(sponsored ? t.freecashCost : t.expenses[row.required_expense.kind])],
     [t.eligibility,e(row['eligibility_' + lang])],
     ...(row.deadline ? [[t.deadline,deadlineText(row,lang)]] : []),
     ...(row.reward_amount !== null ? [[t.amount,e(amount(row,lang))]] : []),
 ])}</section>
-<div class="entry-action${sponsored ? ' ad-action' : ''}" data-expiring="${e(row.deadline || '')}"${sponsored ? ` data-affiliate-expires="${e(row.affiliate_expires_at)}"` : ''}>
+<div class="entry-action${sponsored ? ' ad-action' : ''}" data-expiring="${e(expiryValue(row))}"${sponsored ? ` data-affiliate-expires="${e(row.affiliate_expires_at)}"` : ''}>
 ${sponsoredLink(row) ? `<p class="ad-disclosure"><strong>${t.sponsoredLabel}</strong> · ${t.affiliateDisclosure}</p><div class="actions">${external(row.affiliate_url,sponsored ? t.sponsoredVisit : t.sponsored,'affiliate_click')}</div><p class="secondary-official"><a href="${e(row.official_url)}" target="_blank" rel="noopener noreferrer">${t.official}</a></p>` : `<div class="actions">${external(row.official_url,row.category === 'sweepstakes' ? t.officialNewTab : t.visitOfficial,row.commission ? null : 'application_click')}</div>`}
 </div>
 <div class="detail-body"><section><h2>${t.entryRequirements}</h2>
 ${row.entry.steps ? `<p>${e(row.entry.steps[lang])}</p>` : ''}${fields(requirements)}
+${row.service_countries?.length > 4 ? `<details class="country-details"><summary>${t.serviceCountries}</summary><p>${e(row.service_countries.map(code => name(lang,code)).join(lang === 'ja' ? '、' : ', '))}</p></details>` : ''}
 ${!sponsored && row.risk_flags.some(flag => !['account','variable'].includes(flag)) ? `<p class="small">${row.risk_flags.filter(flag => !['account','variable'].includes(flag)).map(flag => e(t.risks[flag])).join(lang === 'ja' ? '・' : ' · ')}</p>` : ''}
 ${row.entry.registration === 'unknown' || (row.certainty === 'chance' && (row.entry.application === null || row.entry.winner === null)) ? `<p class="small">${t.entryUnknown}</p>` : ''}</section>
 <section><h2>${t.conditions}</h2><p>${e(row.reward_conditions[lang])}</p>
-${sponsored ? `<p>${t.freecashPayout}</p><details class="country-details"><summary>${t.markets}</summary><p>${e(countryText(row,lang))}</p><p>${t.freecashRestrictions}</p></details>` : Array.isArray(row.eligible_countries) && row.eligible_countries.length > 4 ? `<details class="country-details"><summary>${t.countries}</summary><p>${e(countryText(row,lang))}</p></details>` : ''}
+${sponsored ? `<p>${t.freecashPayout}</p><details class="country-details"><summary>${t.markets}</summary><p>${e(promotionText(row,lang))}</p><p>${t.freecashRestrictions}</p></details>` : Array.isArray(row.eligible_countries) && row.eligible_countries.length > 4 ? `<details class="country-details"><summary>${t.countries}</summary><p>${e(countryText(row,lang))}</p></details>` : ''}
 ${terms}</section></div>
-<section class="sources"><h2>${t.officialSources}</h2><p class="stamp">${t.checked} · ${time(row.last_checked_at,lang,true)}</p>
+<section class="sources"><h2>${t.officialSources}</h2><p class="stamp">${t.checked} · ${time(row.last_checked_at,lang,true)} · ${elapsed(row,lang)}</p>
 <ul class="source-links">${links.map(link => `<li><a href="${e(link)}" target="_blank" rel="noopener noreferrer">${e(sourceLabel(link,row,t))}</a></li>`).join('')}</ul></section>
 <template id="adsense-slot"></template></article>`;
 }
@@ -301,7 +316,7 @@ ${external(hapitasUrl,t.hapitas.cta,'affiliate_click')}
   const featured = giveaways.filter(row => row.deadline).sort((a,b) => expiration(a) - expiration(b) || a.id.localeCompare(b.id)).slice(0,3);
   const recent = [...consumer].sort((a,b) => b.first_seen_at.localeCompare(a.first_seen_at)).slice(0,4);
   const recentList = `<section class="section"><div class="section-heading"><h2>${t.recent}</h2></div>
-<ul class="recent-list">${recent.map(row => `<li data-expiring="${e(row.deadline || '')}"><a href="${detail(lang,row)}">${e(row['title_' + lang])}</a>
+<ul class="recent-list">${recent.map(row => `<li data-expiring="${e(expiryValue(row))}"><a href="${detail(lang,row)}">${e(row['title_' + lang])}</a>
 <span>${e(row.provider)}</span><span>${time(row.first_seen_at,lang)}</span></li>`).join('')}</ul></section>`;
   const rewardsPreview = `<section class="section"><div class="section-heading"><h2><a href="${url(lang,'rewards')}">${t.pages.rewards[0]}</a></h2><p>${t.rewardsLead}</p></div><div class="cards">${['freecash','research-panel','prolific'].map(id => rewardRows.find(row => row.id === id)).filter(Boolean).map(row => card(row,lang)).join('')}</div></section>`;
   await page(lang,'',t.tagline,t.lead,`<section class="hero"><div class="hero-copy"><p class="eyebrow">${t.cap}</p><h1>${t.tagline}</h1><p class="lead">${t.lead}</p>
@@ -357,4 +372,14 @@ await write('sitemap.xml', `<?xml version="1.0" encoding="UTF-8"?>
 ${[{path:'/',page:''}, ...maps].map(({path,page:key}) => `<url><loc>${origin.origin}${path}</loc>${languages.map(lang =>
   `<xhtml:link rel="alternate" hreflang="${lang}" href="${origin.origin}${url(lang,key)}"/>`).join('')}<xhtml:link rel="alternate" hreflang="x-default" href="${origin.origin}${key ? url('en',key) : '/'}"/></url>`).join('\n')}
 </urlset>\n`);
+// Complete rendering before updating output. Preserve directories watched by Wrangler dev.
+const generated = new Set(await readdir(dist, {recursive:true}));
+await mkdir(destination, {recursive:true});
+await cp(dist, destination, {recursive:true});
+for (const item of await readdir(destination, {recursive:true, withFileTypes:true})) {
+  if (!item.isFile()) continue;
+  const file = resolve(item.parentPath, item.name);
+  if (!generated.has(relative(destination,file))) await rm(file);
+}
+await rm(dist, {recursive:true, force:true});
 console.log(`Built ${maps.length} localized pages with ${rows.length} listings.`);

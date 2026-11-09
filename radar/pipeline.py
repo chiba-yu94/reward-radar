@@ -16,16 +16,16 @@ from .application import application_profile
 from .net import fetch_json, https_url
 
 ROOT = Path(__file__).resolve().parents[1]
-CATEGORIES = {"sweepstakes", "guaranteed", "points", "survey", "research",
-              "gift", "cashback", "registration", "international", "affiliate"}
+TAXONOMY = json.loads((ROOT / "data/taxonomy.json").read_text())
+CATEGORIES = set(TAXONOMY["categories"])
+COUNTRIES = set(TAXONOMY["countries"])
 KINDS = {"cash", "points", "gift-card", "prize", "cashback", "commission", "software"}
 METHODS = {"form", "account", "survey", "study", "shopping", "application", "app", "social"}
 CERTAINTIES = {"guaranteed", "conditional", "chance"}
-GEO = re.compile(r"[A-Z]{2}")
 ID = re.compile(r"[a-z0-9]+(?:-[a-z0-9]+)*")
 UTC = re.compile(r"\d{4}-\d\d-\d\dT\d\d:\d\d:\d\dZ")
 SHA = re.compile(r"[a-f0-9]{40}")
-PRIZES = {"collectibles", "food", "cash-gift", "electronics", "household", "digital", "other"}
+PRIZES = set(TAXONOMY["prizes"])
 PERSONAL = {"email", "name", "address", "phone", "social-account", "identity"}
 UNKNOWN_ENTRY = {"registration": "unknown", "application": None, "winner": None, "steps": None}
 STALE = timedelta(days=30)
@@ -87,9 +87,10 @@ def dump(path, data):
     atomic(path, json.dumps(data, ensure_ascii=False, indent=2, allow_nan=False) + "\n")
 
 
-def inputs():
-    rows = read(ROOT / "data/opportunities.json")
-    sources = read(ROOT / "data/sources.json")
+def inputs(directory=None):
+    directory = directory or ROOT / "data"
+    rows = read(directory / "opportunities.json")
+    sources = read(directory / "sources.json")
     index = {}
     for source in sources:
         sid = source["id"]
@@ -184,7 +185,7 @@ def validate(row, source, now):
         require(row["reward_type"] in {"cash", "points", "gift-card"}
                 and row["certainty"] == "conditional", "Sponsored rewards classification mismatch")
         if row["published_status"] == "approved" and row["affiliate_approval_status"] == "approved":
-            require(isinstance(row["eligible_countries"], list), "Sponsored rewards require a verified territory list")
+            require(isinstance(row.get("promotion_countries"), list), "Sponsored rewards require a verified promotion territory list")
     elif row["category"] == "affiliate":
         require(row["reward_type"] == "commission" and row["certainty"] == "conditional",
                 "Affiliate classification mismatch")
@@ -220,8 +221,20 @@ def validate(row, source, now):
                 and (countries != "worldwide" or source.get("worldwide_reviewed") is True),
                 "Inconsistent eligibility")
     else:
-        require(isinstance(countries, list) and countries and all(GEO.fullmatch(c) for c in countries)
+        require(isinstance(countries, list) and countries and all(c in COUNTRIES for c in countries)
                 and len(set(countries)) == len(countries) and row["eligibility_verified"], "Invalid countries")
+    for key in ("shipping_countries", "service_countries", "promotion_countries"):
+        values = row.get(key)
+        require(values is None or isinstance(values, list) and values
+                and all(isinstance(c, str) and c in COUNTRIES for c in values)
+                and len(values) == len(set(values)), f"Invalid {key}")
+    if any(row.get(key) for key in ("shipping_countries", "service_countries")):
+        evidence = row.get("geography_source_url")
+        require(evidence in [row["source_url"], *source.get("supporting_urls", [])],
+                "Geography requires a reviewed source")
+    enum(row.get("availability", "unknown"), {"ongoing", "unknown", "ended"})
+    require(not (row.get("availability") == "ongoing" and row["deadline"]),
+            "Ongoing service cannot have a deadline")
     first, checked = stamp(row["first_seen_at"]), stamp(row["last_checked_at"])
     require(first <= checked <= now + CLOCK_SKEW, "Invalid verification dates")
     require(type(row.get("deadline_date_only", False)) is bool
@@ -234,6 +247,15 @@ def validate(row, source, now):
             ZoneInfo(row["deadline_timezone"])
         except (ZoneInfoNotFoundError, ValueError, TypeError):
             raise ValueError("Invalid deadline timezone")
+    if row.get("deadline_date_only"):
+        require(row.get("deadline_timezone"), "Date-only deadline requires a source timezone")
+        local = stamp(row["deadline"]).astimezone(ZoneInfo(row["deadline_timezone"]))
+        require((local.hour, local.minute, local.second) == (23, 59, 59),
+                "Date-only deadline must represent the final second in its source timezone")
+    if row.get("availability") == "ended" and (deadline_end(row) is None or deadline_end(row) > now):
+        require(row.get("ended_source_url") in [row["source_url"], *source.get("supporting_urls", [])]
+                and first <= stamp(row.get("ended_checked_at")) <= now + CLOCK_SKEW,
+                "Early or undated ending requires reviewed evidence")
     require(isinstance(row["risk_flags"], list) and all(flag in {
         "waitlist", "third-party-id", "approval", "purchase", "variable", "capacity", "account",
     } for flag in row["risk_flags"]), "Invalid risk flags")
@@ -256,8 +278,17 @@ def validate(row, source, now):
                 and isinstance(approval["review_id"], str)
                 and re.fullmatch(r"[a-z0-9-]{6,80}", approval["review_id"])
                 and stamp(approval["expires_at"]) > checked, "Affiliate requires scoped review")
+        if row.get("promotion_countries"):
+            require(approval.get("promotion_countries") == row["promotion_countries"],
+                    "Promotion scope requires documented review")
     else:
         require(row["affiliate_url"] is None, "Unapproved affiliate URL")
+
+
+def deadline_end(row):
+    if row["deadline"] is None:
+        return None
+    return stamp(row["deadline"]) + (timedelta(seconds=1) if row.get("deadline_date_only") else timedelta())
 
 
 def collect(sources, fetch=fetch_json):
@@ -316,10 +347,13 @@ def publish(rows, sources, observation, output, database, now):
             if not (source["active"] and row["published_status"] == "approved"
                     and row["verification_status"] == "verified"):
                 continue
-            expired = row["deadline"] is not None and stamp(row["deadline"]) <= now
+            expired = row.get("availability") == "ended" or (deadline_end(row) is not None and deadline_end(row) <= now)
             if expired or (row["category"] != "affiliate" and not consumer_public(row)):
                 continue  # The reviewed snapshot and SQLite retain these entries.
             public = {key: row[key] for key in PUBLIC}
+            for key in ("shipping_countries", "service_countries", "promotion_countries", "geography_source_url"):
+                public[key] = row.get(key)
+            public["availability"] = row.get("availability", "unknown")
             public["deadline_timezone"] = row.get("deadline_timezone")
             public["deadline_date_only"] = row.get("deadline_date_only", False)
             public["application"] = application_profile(row.get("application"), row["required_expense"]["kind"] == "free")
@@ -350,6 +384,7 @@ def publish(rows, sources, observation, output, database, now):
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("mode", choices=["collect", "publish"])
+    parser.add_argument("--now", help="Fixed UTC clock for reproducible local QA")
     parser.add_argument("--observation", type=Path)
     parser.add_argument("--output", type=Path, default=ROOT / "var/published.json")
     parser.add_argument("--database", type=Path, default=ROOT / "var/operations.sqlite")
@@ -367,7 +402,7 @@ def main():
         require(set(observation) == {sid for sid, source in sources.items()
                                     if source["active"] and source["method"] != "manual"},
                 "Missing configured API results")
-    active = publish(rows, sources, observation, args.output, args.database, datetime.now(timezone.utc))
+    active = publish(rows, sources, observation, args.output, args.database, stamp(args.now) if args.now else datetime.now(timezone.utc))
     print(f"{len(active)} validated active records")
     return 0
 

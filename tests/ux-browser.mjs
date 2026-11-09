@@ -16,6 +16,7 @@ try {
   for (const width of [375,390,768,1440]) for (const lang of ['ja','en']) {
     const context = await browser.newContext({viewport:{width,height:850},reducedMotion:'reduce',deviceScaleFactor:1});
     const page = await context.newPage();
+    await page.clock.install({time:new Date(dataset.generated_at)});
     const errors=[];
     page.on('pageerror',error=>errors.push(error.message));
     page.on('console',message=>{if(message.type()==='error')errors.push(message.text())});
@@ -51,7 +52,7 @@ try {
       const cases=lang==='ja'?['懸賞','お米','米','Freecash','SNS不要','タスク報酬']:['sweepstakes','rice','United States','Freecash','no social media'];
       for(const q of cases) {
         await page.locator('[name=q]').fill(q);
-        const expected = records.filter(row => (row.category !== 'affiliate' || !row.commission) && matches(row,{q},lang,Date.now())).length;
+        const expected = records.filter(row => (row.category !== 'affiliate' || !row.commission) && matches(row,{q},lang,Date.parse(dataset.generated_at))).length;
         assert.equal(Number(await page.locator('#result-count').textContent()),expected,q);
       }
       await page.locator('[type=reset]').click();

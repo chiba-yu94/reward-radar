@@ -15,8 +15,8 @@ from radar.pipeline import collect, inputs, publish, stamp, utc, validate
 
 class TestPipeline(unittest.TestCase):
     def setUp(self):
-        self.rows, self.sources = inputs()
-        self.now = max(stamp(row["last_checked_at"]) for row in self.rows) + timedelta(minutes=1)
+        self.rows, self.sources = inputs(Path(__file__).parent / "fixtures/reviewed")
+        self.now = stamp("2026-11-08T12:00:00Z")
         self.record = self.rows[0]
         self.source = self.sources[self.record["source_id"]]
         temp = tempfile.TemporaryDirectory()
@@ -139,6 +139,7 @@ class TestPipeline(unittest.TestCase):
             "disclosure_reviewed": True,
             "commission_reviewed": True,
             "review_id": "fixture-review",
+            "promotion_countries": record["promotion_countries"],
             "expires_at": utc(self.now + timedelta(days=1)),
         }
         record.update(affiliate_url=url, affiliate_approval_status="approved",
