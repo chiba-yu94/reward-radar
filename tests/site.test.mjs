@@ -6,10 +6,7 @@ import {copy, email, verifyLocales} from '../site/locales.mjs';
 import {eligible, matches, ordered, date, money, stale, expired, allowedFilters} from '../site/domain.mjs';
 
 const origin = 'https://freebietrail.com';
-const build = () => {
-  execFileSync('python3',['-m','radar.pipeline','publish']);
-  execFileSync(process.execPath,['site/build.mjs'], {env:{...process.env,SITE_ORIGIN:origin}});
-};
+const build = () => execFileSync(process.execPath,['tests/build-fixture.mjs']);
 build();
 const read = path => readFileSync('dist/' + path,'utf8');
 const rows = JSON.parse(read('opportunities.json')).records;
@@ -79,8 +76,8 @@ test('currency, null and timezone behavior', () => {
 
 test('expiration, stale ranking, and unknown winning odds', () => {
   assert.equal(expired({...draw,deadline:'2026-11-05T18:00:00Z'},now),true);
-  assert.equal(stale({...jp,stale_at:'2026-11-05T18:00:00Z'},now),true);
-  const old = {...jp,id:'older',stale_at:'2026-11-05T18:00:00Z'};
+  assert.equal(stale({...jp,last_checked_at:'2026-10-05T18:00:00Z'},now),true);
+  const old = {...jp,id:'older',last_checked_at:'2026-10-05T18:00:00Z'};
   assert.equal(ordered([old,jp],now)[0].id,jp.id);
   for (const live of rows.filter(row => row.category === 'sweepstakes')) {
     assert.doesNotMatch(read(`en/opportunities/${live.id}/index.html`), /winning odds: [0-9]+%/i);
@@ -119,11 +116,11 @@ test('sponsored link attributes only after validated approval', () => {
     const sample = dataset.records[0];
     sample.affiliate_url = 'https://example.com/approved?key=1&context=2';
     sample.affiliate_approval_status = 'approved';
-    sample.affiliate_expires_at = new Date(Date.now() + 86_400_000).toISOString();
+    sample.affiliate_expires_at = '2026-11-09T12:00:00Z';
     // Fixture for the renderer only. Python rejects links lacking an approval record.
     const fixture = JSON.stringify(dataset);
     execFileSync(process.execPath,['-e','require("node:fs").writeFileSync("var/published.json",process.argv[1])',fixture]);
-    execFileSync(process.execPath,['site/build.mjs'], {env:{...process.env,SITE_ORIGIN:origin}});
+    execFileSync(process.execPath,['site/build.mjs'], {env:{...process.env,SITE_ORIGIN:origin,QA_NOW:'2026-11-08T12:00:00Z'}});
     const html = read('en/opportunities/' + sample.id + '/index.html');
     assert.match(html,/context=2" target="_blank" rel="sponsored nofollow noopener noreferrer"/);
     assert.match(html,/Affiliate link/);
@@ -147,7 +144,7 @@ test('Freecash uses the scoped sponsored route in both languages while current',
     assert.ok(html.includes(`href="${freecash.official_url}" target="_blank" rel="noopener noreferrer"`));
     assert.ok(html.includes(`href="${freecash.affiliate_url}" target="_blank" rel="sponsored nofollow noopener noreferrer"`));
     assert.match(html, /itemtype="https:\/\/schema.org\/BreadcrumbList"/);
-    assert.equal(freecash.eligible_countries.length,15);
+    assert.equal(freecash.promotion_countries.length,15);
   }
 });
 
@@ -258,4 +255,30 @@ test('Freecash comparison cards lead with tasks, disclose costs and link through
     assert.ok(detail.includes(copy[lang].freecashPayout));
     assert.ok(detail.includes(copy[lang].freecashRestrictions));
   }
+});
+
+
+test('invalid generated data never replaces the previous built site', () => {
+  const original = readFileSync('var/published.json','utf8');
+  const previous = read('ja/index.html');
+  try {
+    const bad = JSON.parse(original);
+    bad.records[0].last_checked_at = '2026-02-30T00:00:00Z';
+    execFileSync(process.execPath,['-e','require("node:fs").writeFileSync("var/published.json",process.argv[1])',JSON.stringify(bad)]);
+    assert.throws(()=>execFileSync(process.execPath,['site/build.mjs'],{stdio:'pipe',env:{...process.env,QA_NOW:'2026-11-08T12:00:00Z'}}),/verification dates/);
+    assert.equal(read('ja/index.html'),previous);
+  } finally {build();}
+});
+
+
+test('render failure retains the complete previous build', () => {
+  const original = readFileSync('var/published.json','utf8');
+  const previous = read('ja/index.html');
+  try {
+    const bad = JSON.parse(original);
+    bad.records.find(row=>row.deadline).deadline_timezone = 'Invalid/Timezone';
+    execFileSync(process.execPath,['-e','require("node:fs").writeFileSync("var/published.json",process.argv[1])',JSON.stringify(bad)]);
+    assert.throws(()=>execFileSync(process.execPath,['site/build.mjs'],{stdio:'pipe',env:{...process.env,QA_NOW:'2026-11-08T12:00:00Z'}}),/time zone/i);
+    assert.equal(read('ja/index.html'),previous);
+  } finally {build();}
 });

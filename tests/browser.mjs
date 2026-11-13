@@ -8,6 +8,7 @@ import assert from 'node:assert/strict';
     const hasFreecash = data.records.some(row => row.id === 'freecash');
     for (const width of [375,390,768,1440]) for (const lang of ['ja','en']) {
       const page = await browser.newPage({viewport:{width,height:850},isMobile:width<400,deviceScaleFactor:1,hasTouch:width<400});
+      await page.clock.install({time:new Date(data.generated_at)});
       const errors = [];
       page.on('pageerror',e=>errors.push(e.message));
       const paths = ['', 'opportunities/', 'opportunities/prolific/', 'affiliates/', 'contact/'];
@@ -51,7 +52,7 @@ import assert from 'node:assert/strict';
       const snsFree = page.locator('[name=noSns]');
       if (await snsFree.count()) {
         const records = data.records.filter(row => row.category === 'sweepstakes' &&
-          (!row.deadline || Date.parse(row.deadline) > Date.now()) && row.application?.sns_required === false);
+          (!row.deadline || Date.parse(row.deadline) > Date.parse(data.generated_at)) && row.application?.sns_required === false);
         const visibleIds = () => page.locator('[data-record]:visible')
           .evaluateAll(items => items.map(item => item.dataset.record).sort());
         const sweepstakesOptions = page.locator('.filter-options summary');

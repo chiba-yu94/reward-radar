@@ -28,3 +28,9 @@ Open `http://127.0.0.1:8787/ja/` or `http://127.0.0.1:8787/en/`. Run `node site/
 Support: [support@freebietrail.com](mailto:support@freebietrail.com)
 
 Browser regression checks (Chrome installed, Wrangler dev running): `npm run test:browser`. Set `TEST_ORIGIN` to exercise a deployed site.
+
+## Listing quality QA
+
+Run `npm run qa` for the offline publication gate and full geographic review inventory. Use `python3 -m radar.qa --dataset var/published.json --check-links` after publication for the sanitized-data comparison and permission-scoped link diagnostics. Unknown eligibility is a review warning, never inferred from shipping or advertising markets.
+
+For reproducible date/browser regressions, run `npm test` or `npm run build:qa` (frozen reviewed fixtures; build clock: `2026-11-08T12:00:00Z`), start `npm run dev`, then run `npm run test:dates`. All current public cards, affiliate-directory cards and their Japanese/English details are compared. `npm run test:ux`, `npm run test:seo` and `npm run test:analytics` retain the layout, URL and consent checks. To restore a current local build after fixed-clock tests, run `python3 -m radar.pipeline publish` followed by `npm run build`.

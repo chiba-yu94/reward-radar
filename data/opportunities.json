@@ -471,16 +471,8 @@
     "source_id": "microsoft-rewards",
     "provider": "Microsoft",
     "category": "points",
-    "eligible_countries": [
-      "JP",
-      "US",
-      "GB",
-      "CA",
-      "AU",
-      "DE",
-      "FR"
-    ],
-    "eligibility_verified": true,
+    "eligible_countries": null,
+    "eligibility_verified": false,
     "reward_type": "points",
     "reward_currency": null,
     "reward_amount": null,
@@ -517,14 +509,24 @@
     "title_en": "Microsoft Rewards points",
     "description_ja": "対応地域で対象の検索や活動を行い、ポイントを獲得するプログラムです。",
     "description_en": "Earn points through qualifying searches and activities in supported markets.",
-    "eligibility_ja": "公式地域一覧に日本があります。付与・交換の内容は市場によって異なります。 ここに表示する国は公式一覧の一部です。",
-    "eligibility_en": "Japan appears on the official list of markets. Earning and redemption options vary by market. The country filter covers a verified subset of the official list.",
+    "eligibility_ja": "公式サービス提供地域に日本があります。掲載する提供国は公式一覧の一部で、付与・交換の内容は市場によって異なります。応募・居住条件は未確認です。",
+    "eligibility_en": "Japan is a supported service region. The listed service countries are a subset of the official list, and earning and redemption vary by market. Entry and residence requirements are unverified.",
     "entry": {
       "registration": "organizer",
       "application": null,
       "winner": null,
       "steps": null
-    }
+    },
+    "service_countries": [
+      "JP",
+      "US",
+      "GB",
+      "CA",
+      "AU",
+      "DE",
+      "FR"
+    ],
+    "geography_source_url": "https://support.microsoft.com/ja-jp/accounts-billing/rewards/microsoft-rewards-regions"
   },
   {
     "id": "rakuten-rebates",
@@ -834,40 +836,45 @@
     "provider": "Google",
     "category": "gift",
     "eligible_countries": [
-      "AU",
+      "AE",
       "AT",
+      "AU",
       "BE",
       "BR",
       "CA",
+      "CH",
       "CL",
+      "CO",
       "CZ",
-      "DK",
-      "FR",
       "DE",
+      "DK",
+      "ES",
+      "FI",
+      "FR",
+      "GB",
       "HK",
-      "IN",
+      "HU",
       "ID",
-      "IT",
       "IE",
+      "IN",
+      "IT",
       "JP",
-      "MY",
+      "KR",
       "MX",
+      "MY",
       "NL",
-      "NZ",
       "NO",
+      "NZ",
       "PL",
       "RU",
-      "SG",
-      "KR",
-      "ES",
       "SE",
-      "CH",
-      "TW",
+      "SG",
       "TH",
       "TR",
-      "AE",
-      "GB",
-      "US"
+      "TW",
+      "US",
+      "VN",
+      "ZA"
     ],
     "eligibility_verified": true,
     "reward_type": "gift-card",
@@ -906,14 +913,56 @@
     "title_en": "Google Opinion Rewards for Android",
     "description_ja": "Android 端末で案内されるアンケートに回答し、対象の回答で Google Play クレジットを受け取ります。",
     "description_en": "Answer surveys offered through the Android app and earn Google Play credits for qualifying responses.",
-    "eligibility_ja": "日本を含む対象地域の18歳超で、対象 Android 端末と Google Play アカウントが必要です。",
-    "eligibility_en": "Available on Android to users over 18 in the listed regions, including Japan. A Google Play account is required.",
+    "eligibility_ja": "日本を含む対象地域の18歳超で、対象Android端末とGoogle Playアカウントが必要です。調査の配信と報酬通貨はGoogleアカウントの国に基づき、Playの国や現在地と異なる場合があります。",
+    "eligibility_en": "Users in the supported regions must be over 18 and use a supported Android device and Google Play account. Survey eligibility and reward currency follow the Google Account country, which can differ from the Play country or current location.",
     "entry": {
       "registration": "organizer",
       "application": null,
       "winner": null,
       "steps": null
-    }
+    },
+    "service_countries": [
+      "AE",
+      "AT",
+      "AU",
+      "BE",
+      "BR",
+      "CA",
+      "CH",
+      "CL",
+      "CO",
+      "CZ",
+      "DE",
+      "DK",
+      "ES",
+      "FI",
+      "FR",
+      "GB",
+      "HK",
+      "HU",
+      "ID",
+      "IE",
+      "IN",
+      "IT",
+      "JP",
+      "KR",
+      "MX",
+      "MY",
+      "NL",
+      "NO",
+      "NZ",
+      "PL",
+      "RU",
+      "SE",
+      "SG",
+      "TH",
+      "TR",
+      "TW",
+      "US",
+      "VN",
+      "ZA"
+    ],
+    "geography_source_url": "https://support.google.com/opinionrewards/answer/6322274?hl=en-GB"
   },
   {
     "id": "calbee-jagabee-2026",
@@ -1064,7 +1113,12 @@
       "free_registration": true,
       "source_url": "https://www.ja-town.com/shop/pages/5610/presentforyou.aspx",
       "checked_at": "2026-11-05T07:10:00Z"
-    }
+    },
+    "deadline_timezone": "Asia/Tokyo",
+    "shipping_countries": [
+      "JP"
+    ],
+    "geography_source_url": "https://www.ja-town.com/shop/pages/5610/presentforyou.aspx"
   },
   {
     "id": "yamazaki-nikuman-2026",
@@ -1214,7 +1268,8 @@
       "free_registration": null,
       "source_url": "https://www.pref.saitama.lg.jp/saitama-wassyoi/enjoy/news081027.html",
       "checked_at": "2026-11-05T07:10:00Z"
-    }
+    },
+    "deadline_timezone": "Asia/Tokyo"
   },
   {
     "id": "doutor-latte-2026",
@@ -1287,7 +1342,11 @@
       "free_registration": null,
       "source_url": "https://www.doutor.co.jp/business/wholesale/campaign/05.html",
       "checked_at": "2026-11-05T07:10:00Z"
-    }
+    },
+    "shipping_countries": [
+      "JP"
+    ],
+    "geography_source_url": "https://www.doutor.co.jp/business/wholesale/campaign/05.html"
   },
   {
     "id": "takaratomy-conan-card-2026",
@@ -1584,7 +1643,8 @@
     "description_ja": "歯間ブラシと歯ブラシのセットが抽選で50名に当たります。",
     "description_en": "Fifty entrants will win a toothbrush and interdental brush set.",
     "eligibility_ja": "日本国内に住むクラブサンスター会員。会員登録は無料です。",
-    "eligibility_en": "Club Sunstar members residing in Japan. Membership is free."
+    "eligibility_en": "Club Sunstar members residing in Japan. Membership is free.",
+    "deadline_timezone": "Asia/Tokyo"
   },
   {
     "id": "obu-city-quiz-november-2026",
@@ -1652,31 +1712,16 @@
     "description_ja": "広報クイズに正解し、アンケートに回答した人の中から、抽選で市内店舗の商品などが当たります。",
     "description_en": "Answer the newsletter quiz correctly and complete the survey for a chance to win items from local businesses.",
     "eligibility_ja": "市外からも応募可能。海外からの応募可否は未確認です。酒類は未成年者の応募不可。",
-    "eligibility_en": "People outside Obu may enter. Eligibility from overseas is unverified. Minors may not enter for alcoholic prizes."
+    "eligibility_en": "People outside Obu may enter. Eligibility from overseas is unverified. Minors may not enter for alcoholic prizes.",
+    "deadline_timezone": "Asia/Tokyo"
   },
   {
     "id": "freecash",
     "source_id": "freecash",
     "provider": "Almedia GmbH",
     "category": "affiliate",
-    "eligible_countries": [
-      "US",
-      "DE",
-      "FR",
-      "CA",
-      "AU",
-      "AT",
-      "NL",
-      "BE",
-      "IT",
-      "GB",
-      "PL",
-      "CH",
-      "JP",
-      "KR",
-      "SE"
-    ],
-    "eligibility_verified": true,
+    "eligible_countries": null,
+    "eligibility_verified": false,
     "reward_type": "cash",
     "reward_currency": null,
     "reward_amount": null,
@@ -1703,7 +1748,24 @@
       "disclosure_reviewed": true,
       "commission_reviewed": true,
       "review_id": "fc-20261107-web",
-      "expires_at": "2026-12-07T00:00:00Z"
+      "expires_at": "2026-12-07T00:00:00Z",
+      "promotion_countries": [
+        "US",
+        "DE",
+        "FR",
+        "CA",
+        "AU",
+        "AT",
+        "NL",
+        "BE",
+        "IT",
+        "GB",
+        "PL",
+        "CH",
+        "JP",
+        "KR",
+        "SE"
+      ]
     },
     "source_url": "https://freecash.com/",
     "source_permission_status": "editorial-summary",
@@ -1724,8 +1786,8 @@
     "title_en": "Freecash games and survey rewards",
     "description_ja": "ゲームの指定条件やアンケートなどのタスクを完了し、条件を満たすと報酬を受け取れるサービス。登録は無料です。",
     "description_en": "Complete game milestones, surveys or other eligible tasks for rewards. Registration is free.",
-    "eligibility_ja": "16歳以上かつ法的に契約できる方。1人・1世帯1アカウント。広告対象は日本・米国など15地域です。",
-    "eligibility_en": "Age 16+ and legally able to enter a contract. One account per person and household. Advertised in 15 markets, including Japan and the US.",
+    "eligibility_ja": "一般利用規約は16歳以上かつ法的に契約できる方が対象です。1人・1世帯1アカウント。参加前に公式サイトで利用条件をご確認ください。",
+    "eligibility_en": "General service terms require age 16+ and legal capacity to contract. One account per person and household. Check the current eligibility rules on the official site before joining.",
     "entry": {
       "registration": "organizer",
       "application": null,
@@ -1734,7 +1796,25 @@
         "ja": "無料アカウントを作成し、タスクごとの条件・期限・費用を確認して選びます。条件を達成した後、記録・承認された報酬を交換します。",
         "en": "Create a free account, choose a task after checking its rules, deadline and costs, then complete it. Redeem rewards after completion is tracked and approved."
       }
-    }
+    },
+    "promotion_countries": [
+      "US",
+      "DE",
+      "FR",
+      "CA",
+      "AU",
+      "AT",
+      "NL",
+      "BE",
+      "IT",
+      "GB",
+      "PL",
+      "CH",
+      "JP",
+      "KR",
+      "SE"
+    ],
+    "availability": "ongoing"
   },
   {
     "id": "penguin-white-company-calendar-2026",
@@ -1872,6 +1952,10 @@
       "free_registration": null,
       "source_url": "https://www.stanleytools.com/en-us/stanley-november-product-review-giveaway-2026",
       "checked_at": "2026-11-07T03:15:31Z"
-    }
+    },
+    "shipping_countries": [
+      "US"
+    ],
+    "geography_source_url": "https://www.stanleytools.com/en-us/stanley-november-product-review-giveaway-2026"
   }
 ]

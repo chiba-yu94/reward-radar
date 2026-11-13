@@ -13,7 +13,10 @@
     "test:browser": "node tests/browser.mjs",
     "test:analytics": "node tests/analytics-browser.mjs",
     "test:ux": "node tests/ux-browser.mjs",
-    "test:seo": "node tests/seo-browser.mjs"
+    "test:seo": "node tests/seo-browser.mjs",
+    "test:dates": "node tests/dates-browser.mjs",
+    "qa": "python3 -m radar.qa",
+    "build:qa": "node tests/build-fixture.mjs"
   },
   "private": true
 }

@@ -60,6 +60,13 @@ jobs:
           path: var/observation
       - run: npm test
       - run: python3 -m radar.pipeline publish --observation var/observation/observation.json
+      - run: python3 -m radar.qa --dataset var/published.json --check-links
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        if: always()
+        with:
+          name: listing-quality-publish
+          path: var/quality-report.*
+          retention-days: 14
       - run: python3 -m radar.health
       - run: npm run build
         env:

@@ -1,7 +1,30 @@
 const DAY = 86_400_000;
-export const expiration = row => row.deadline ? Date.parse(row.deadline) : Infinity;
-export const expired = (row, now) => expiration(row) <= now;
-export const stale = (row, now) => Date.parse(row.stale_at) <= now;
+// Public timestamps must include an explicit zone. Reject rollover dates and naive values.
+export function timestamp(value) {
+  if (typeof value !== 'string') return NaN;
+  const match = /^(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2}):(\d{2})(?:\.\d{1,3})?(Z|[+-]\d{2}:\d{2})$/.exec(value);
+  if (!match) return NaN;
+  const [, y, m, d, h, minute, second, zone] = match;
+  const days = new Date(Date.UTC(+y, +m, 0)).getUTCDate();
+  if (+m < 1 || +m > 12 || +d < 1 || +d > days || +h > 23 || +minute > 59 || +second > 59 ||
+      (zone !== 'Z' && (+zone.slice(1,3) > 23 || +zone.slice(4) > 59))) return NaN;
+  return Date.parse(value);
+}
+export const expiration = row => {
+  const end = timestamp(row.deadline);
+  return Number.isFinite(end) ? end + (row.deadline_date_only ? 1000 : 0) : Infinity;
+};
+export const expired = (row, now) => Number.isFinite(now) && (row.availability === 'ended' || expiration(row) <= now);
+export function freshness(row, now) {
+  const checked = timestamp(row.last_checked_at);
+  if (!Number.isFinite(checked) || !Number.isFinite(now)) return {state:'unknown', days:null};
+  if (checked > now) return {state:'future', days:null};
+  const days = Math.floor((now - checked) / DAY);
+  return {state:days >= 30 ? 'stale' : 'fresh', days};
+}
+export const stale = (row, now) => freshness(row, now).state === 'stale';
+export const listingState = (row, now) => expired(row, now) ? 'ended'
+  : Number.isFinite(expiration(row)) ? 'dated' : row.availability === 'ongoing' ? 'ongoing' : 'unknown';
 
 export function eligible(row, country) {
   return row.eligibility_verified && (row.eligible_countries === 'worldwide' ||
@@ -134,5 +157,5 @@ export function date(value, lang, includeTime = false, zone = lang === 'ja' ? 'A
     timeZone: zone,
     year: 'numeric', month: 'short', day: 'numeric',
     ...(includeTime ? {hour: '2-digit', minute: '2-digit', hourCycle: 'h23', timeZoneName: 'short'} : {}),
-  }).format(new Date(value));
+  }).format(new Date(timestamp(value)));
 }

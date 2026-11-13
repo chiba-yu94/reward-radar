@@ -18,6 +18,17 @@ jobs:
           node-version: '22'
       - run: npm ci --ignore-scripts
       - run: npm audit --audit-level=high
+      - run: python3 -m radar.qa
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        if: always()
+        with:
+          name: listing-quality-verify
+          path: var/quality-report.*
+          retention-days: 7
+      - run: python3 -m radar.pipeline publish
+      - run: npm run build
+        env:
+          SITE_ORIGIN: https://freebietrail.com
       - run: npm test
       - run: npm exec -- wrangler deploy --dry-run
         env:
@@ -33,11 +44,12 @@ jobs:
             exit 1
           fi
           node site/smoke.mjs
+          npm run test:dates
           npm run test:browser
           npm run test:ux
           npm run test:seo
           npm run test:analytics
-          GA4_MEASUREMENT_ID=G-RRTEST0001 GA4_PRIVACY_READY=true npm run build
+          GA4_MEASUREMENT_ID=G-RRTEST0001 GA4_PRIVACY_READY=true QA_NOW=2026-11-08T12:00:00Z npm run build
           EXPECT_GA4=1 npm run test:analytics
         env:
           WRANGLER_SEND_METRICS: 'false'

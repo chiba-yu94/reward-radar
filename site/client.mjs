@@ -1,11 +1,11 @@
-import {matches, ordered, allowedFilters, expiration} from './domain.mjs';
+import {matches, ordered, allowedFilters, expiration, timestamp} from './domain.mjs';
+import {updateDates} from './status.mjs';
 
 const lang = document.documentElement.lang;
 const cards = Array.from(document.querySelectorAll('[data-record]'));
-const deadline = element => Date.parse(element.dataset.deadline || element.dataset.expiring);
-const affiliateExpired = (element, now) => Date.parse(element.dataset.affiliateExpires) <= now;
+const deadline = element => expiration({deadline:element.dataset.deadline || element.dataset.expiring});
+const affiliateExpired = (element, now) => timestamp(element.dataset.affiliateExpires) <= now;
 const form = document.querySelector('#filters');
-const ended = document.querySelector('[data-ended]');
 let filter = null;
 const menu = document.querySelector('.site-menu');
 document.addEventListener('keydown', event => {
@@ -16,13 +16,7 @@ document.addEventListener('click', event => {
 });
 function checkDates() {
   const now = Date.now();
-  for (const element of document.querySelectorAll('[data-stale]')) element.hidden = Date.parse(element.dataset.stale) > now;
-  for (const element of document.querySelectorAll('[data-affiliate-expires]')) if (affiliateExpired(element,now)) element.hidden = true;
-  for (const card of cards) if (deadline(card) <= now) card.hidden = true;
-  for (const element of document.querySelectorAll('[data-expiring]')) if (deadline(element) <= now) {
-    element.hidden = true;
-    if (ended) ended.hidden = false;
-  }
+  updateDates(document, now, lang);
   if (filter) filter(false);
 }
 checkDates();
@@ -35,8 +29,11 @@ if (form) {
     const payload = await response.json();
     const records = new Map(payload.records.map(row => [row.id,row]));
     for (const card of cards.filter(card => !records.has(card.dataset.record))) {
-      if (card.hasAttribute('data-affiliate-expires') || deadline(card) <= Date.now()) card.hidden = true;
-      else throw new Error('Dataset does not match the page');
+      if (!card.hasAttribute('data-affiliate-expires') && deadline(card) > Date.now()) {
+        throw new Error('Dataset does not match the page');
+      }
+      card.dataset.unavailable = '';
+      card.hidden = true;
     }
     const byId = new Map(cards.map(card => [card.dataset.record,card]));
     const parent = document.querySelector('.cards');
