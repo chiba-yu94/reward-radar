@@ -168,6 +168,7 @@ ${consent?.settings || ''}<p class="muted">© ${t.copyright}</p></div></footer><
 }
 
 const expiryValue = row => Number.isFinite(expiration(row)) ? new Date(expiration(row)).toISOString() : '';
+const listingExpiry = row => `data-expiring="${e(expiryValue(row))}"${taskService(row) ? ` data-affiliate-expires="${e(row.affiliate_expires_at)}"` : ''}`;
 const freshnessNotice = (row, lang) => `<p class="notice" data-stale="${e(row.stale_at)}" data-last-checked="${e(row.last_checked_at)}"${stale(row,now) ? '' : ' hidden'}>${stale(row,now) ? copy[lang].stale : ''}</p>`;
 const elapsed = (row, lang) => `<span data-age data-last-checked="${e(row.last_checked_at)}">${freshness(row,now).days === null ? '' : dateCopy[lang].age(freshness(row,now).days)}</span>`;
 const deadlineText = (row, lang) => row.deadline
@@ -249,10 +250,44 @@ function directory(lang, available) {
 <section class="cards" aria-labelledby="listing-results"><h2 class="sr-only" id="listing-results" tabindex="-1">${e(t.results)}</h2>${available.map(row => card(row,lang)).join('')}</section>`;
 }
 
+function relatedListings(row) {
+  return rows.filter(candidate => candidate.id !== row.id && candidate.category === row.category &&
+      Boolean(candidate.commission) === Boolean(row.commission))
+    .map(candidate => {
+      const sameRegion = row.eligibility_verified && candidate.eligibility_verified &&
+        (row.eligible_countries === 'worldwide' || candidate.eligible_countries === 'worldwide' ||
+          row.eligible_countries.some(country => candidate.eligible_countries.includes(country)));
+      if (row.eligibility_verified && candidate.eligibility_verified && !sameRegion) return {candidate, score:0};
+      const sameFlag = key => typeof row.application?.[key] === 'boolean' && row.application[key] === candidate.application?.[key];
+      const score = 3 * Number(row.participation_method === candidate.participation_method) +
+        2 * Number(sameRegion) + Number(sameFlag('sns_required')) + Number(sameFlag('web_only')) +
+        Number(row.required_expense.kind !== 'unknown' && row.required_expense.kind === candidate.required_expense.kind);
+      return {candidate, score};
+    })
+    .filter(({score}) => score > 0)
+    .sort((a,b) => b.score - a.score).slice(0,3).map(({candidate}) => candidate);
+}
+
+function sweepstakesGuide(lang, available) {
+  const t = copy[lang];
+  const guide = t.sweepstakesGuide;
+  const matches = available.filter(row => row.required_expense.kind === 'free' &&
+    row.application?.sns_required === false && row.application.web_only === true);
+  return `<section class="section" id="no-sns-giveaways" aria-labelledby="no-sns-heading">
+<div class="section-heading"><h2 id="no-sns-heading">${e(guide.title)}</h2><p>${e(guide.entry)}</p><p>${e(guide.region)}</p></div>
+<ul class="giveaway-list" data-expiry-list${matches.length ? '' : ' hidden'}>${matches.map(row => `<li ${listingExpiry(row)}>
+<h3><a href="${detail(lang,row)}">${e(row['title_' + lang])}</a></h3>
+<p class="small">${e(t.residency)} · ${e(countryText(row,lang))} / ${e(t.deadline)} · ${deadlineText(row,lang)}</p>
+<p>${e(row['eligibility_' + lang])}${row.entry.steps ? ` ${e(row.entry.steps[lang])}` : ''}</p></li>`).join('')}</ul>
+<p data-expiry-empty${matches.length ? ' hidden' : ''}>${e(guide.empty)}</p></section>`;
+}
+
 function details(lang, row) {
   const t = copy[lang];
   const sponsored = taskService(row);
-  const section = sponsored ? 'rewards' : row.commission ? 'affiliates' : 'opportunities';
+  const section = row.commission ? 'affiliates' : row.category === 'sweepstakes' ? 'sweepstakes' :
+    row.certainty === 'guaranteed' ? 'guaranteed' : 'rewards';
+  const related = relatedListings(row);
   const title = row['title_' + lang];
   const personal = values => e(values.length ? values.map(value => t.personal[value]).join(lang === 'ja' ? '、' : ', ') : t.noPersonal);
   const requirements = [
@@ -294,6 +329,9 @@ ${sponsored ? `<p>${t.freecashPayout}</p><details class="country-details"><summa
 ${terms}</section></div>
 <section class="sources"><h2>${t.officialSources}</h2><p class="stamp">${t.checked} · ${time(row.last_checked_at,lang,true)} · ${elapsed(row,lang)}</p>
 <ul class="source-links">${links.map(link => `<li><a href="${e(link)}" target="_blank" rel="noopener noreferrer">${e(sourceLabel(link,row,t))}</a></li>`).join('')}</ul></section>
+${related.length ? `<section class="sources" aria-labelledby="related-listings"><h2 id="related-listings">${e(t.relatedListings)}</h2>
+<ul class="source-links" data-expiry-list>${related.map(candidate => `<li ${listingExpiry(candidate)}><a href="${detail(lang,candidate)}">${e(candidate['title_' + lang])}</a></li>`).join('')}</ul></section>` : ''}
+<p><a class="text-link" href="${url(lang,'opportunities')}">${e(t.back)}</a></p>
 <template id="adsense-slot"></template></article>`;
 }
 
@@ -321,7 +359,7 @@ ${external(hapitasUrl,t.hapitas.cta,'affiliate_click')}
   const rewardsPreview = `<section class="section"><div class="section-heading"><h2><a href="${url(lang,'rewards')}">${t.pages.rewards[0]}</a></h2><p>${t.rewardsLead}</p></div><div class="cards">${['freecash','research-panel','prolific'].map(id => rewardRows.find(row => row.id === id)).filter(Boolean).map(row => card(row,lang)).join('')}</div></section>`;
   await page(lang,'',t.tagline,t.lead,`<section class="hero"><div class="hero-copy"><p class="eyebrow">${t.cap}</p><h1>${t.tagline}</h1><p class="lead">${t.lead}</p>
 <form class="home-search" role="search" action="${url(lang,'opportunities')}" method="get"><label class="sr-only" for="home-query">${t.search}</label><input id="home-query" type="search" name="q" maxlength="150" placeholder="${e(t.placeholder)}"><button type="submit">${t.searchSubmit}</button></form>
-<div class="home-shortcuts"><a href="${url(lang,'sweepstakes')}?noSns=yes">${t.application.noSns}</a><a href="${url(lang,'sweepstakes')}?easyApply=yes">${t.application.easyApply}</a><a href="${url(lang,'international')}">${t.pages.international[0]}</a></div></div></section>
+<div class="home-shortcuts"><a href="${url(lang,'sweepstakes')}#no-sns-giveaways">${e(t.sweepstakesGuide.shortcut)}</a><a href="${url(lang,'sweepstakes')}?easyApply=yes">${t.application.easyApply}</a><a href="${url(lang,'international')}">${t.pages.international[0]}</a></div></div></section>
 <section class="section featured"><div class="section-heading"><h2>${t.closing}</h2><a href="${url(lang,'sweepstakes')}">${t.browse} →</a></div>
 <div class="cards">${featured.length ? featured.map(row => card(row,lang)).join('') : `<p>${t.empty}</p>`}</div></section>
 ${rewardsPreview}${recentList}${hapitasAd}`);
@@ -336,7 +374,7 @@ ${rewardsPreview}${recentList}${hapitasAd}`);
   for (const [key, available] of Object.entries(pages)) {
     const [title, description] = t.pages[key];
     await page(lang,key,title,description,`<header class="intro"><h1>${e(title)}</h1><p class="lead">${e(description)}</p>
-${key === 'sweepstakes' && lang === 'en' ? '<p class="region-note">Most listings are for Japan residents. Filter by your country before entering.</p>' : ''}${key === 'affiliates' ? `<a href="${url(lang,'rewards')}">${t.pages.rewards[0]} →</a>` : ''}</header>${directory(lang,available)}`,available.length > 0);
+${key === 'sweepstakes' && lang === 'en' ? '<p class="region-note">Most listings are for Japan residents. Filter by your country before entering.</p>' : ''}${key === 'affiliates' ? `<a href="${url(lang,'rewards')}">${t.pages.rewards[0]} →</a>` : ''}</header>${key === 'sweepstakes' ? sweepstakesGuide(lang,available) : ''}${directory(lang,available)}`,available.length > 0);
   }
   for (const key of secondary.filter(key => !['affiliates','guaranteed'].includes(key))) {
     const [title, description] = t.pages[key];

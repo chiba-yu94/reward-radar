@@ -25,31 +25,48 @@ jobs:
           name: listing-quality-verify
           path: var/quality-report.*
           retention-days: 7
+      - run: npm test
       - run: python3 -m radar.pipeline publish
       - run: npm run build
         env:
           SITE_ORIGIN: https://freebietrail.com
-      - run: npm test
       - run: npm exec -- wrangler deploy --dry-run
         env:
           WRANGLER_SEND_METRICS: 'false'
       - name: Check mobile and desktop layouts
         run: |
           mkdir -p var
-          npm run dev > var/dev.log 2>&1 &
-          dev_pid=$!
-          trap 'kill "$dev_pid" 2>/dev/null || true' EXIT
-          if ! curl --silent --fail --retry 12 --retry-connrefused --retry-delay 1 http://127.0.0.1:8787/en/ -o /dev/null; then
-            cat var/dev.log
-            exit 1
-          fi
+          start_dev() {
+            node node_modules/wrangler/bin/wrangler.js dev --ip 127.0.0.1 > var/dev.log 2>&1 &
+            dev_pid=$!
+            if ! curl --silent --fail --retry 12 --retry-connrefused --retry-delay 1 http://127.0.0.1:8787/en/ -o /dev/null; then
+              cat var/dev.log
+              exit 1
+            fi
+          }
+          stop_dev() {
+            if [[ -n "${dev_pid:-}" ]]; then
+              kill "$dev_pid" 2>/dev/null || true
+              wait "$dev_pid" 2>/dev/null || true
+              dev_pid=
+            fi
+          }
+          trap stop_dev EXIT
+          start_dev
           node site/smoke.mjs
+          npm run test:seo
+          stop_dev
+          npm run build:qa
+          start_dev
           npm run test:dates
           npm run test:browser
           npm run test:ux
           npm run test:seo
           npm run test:analytics
-          GA4_MEASUREMENT_ID=G-RRTEST0001 GA4_PRIVACY_READY=true QA_NOW=2026-11-08T12:00:00Z npm run build
+          stop_dev
+          export HAPITAS_REFERRAL_URL='https://hapitas.jp/register?i=qa-fixture&route=qa'
+          GA4_MEASUREMENT_ID=G-RRTEST0001 GA4_PRIVACY_READY=true HAPITAS_REFERRAL_APPROVED=true npm run build:qa
+          start_dev
           EXPECT_GA4=1 npm run test:analytics
         env:
           WRANGLER_SEND_METRICS: 'false'

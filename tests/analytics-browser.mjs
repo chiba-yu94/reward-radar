@@ -9,6 +9,27 @@ const browser = await chromium.launch({channel:'chrome', executablePath:process.
 try {
   for (const lang of ['ja', 'en']) {
     const pageUrl = origin + '/' + lang + '/opportunities/prolific/';
+    const landing = pageUrl + '?utm_source=review&utm_campaign=private%40example.invalid&email=private%40example.invalid#main';
+    if (configured) {
+      const fresh = await browser.newContext();
+      const requests = [];
+      await fresh.route('**/*', route => {
+        const url = route.request().url();
+        if (url.startsWith(origin + '/')) return route.continue();
+        requests.push(url);
+        return route.fulfill({contentType:'application/javascript',body:'window.analyticsTestTagLoaded = true;'});
+      });
+      const first = await fresh.newPage();
+      await first.goto(landing);
+      await first.locator('[data-analytics-id]').waitFor({state:'visible'});
+      assert.deepEqual(requests,[]);
+      await first.locator('[data-analytics-id] [data-analytics-choice="accept"]').click();
+      await first.waitForFunction(() => window.analyticsTestTagLoaded === true);
+      assert.equal(requests.length,1);
+      assert.ok(requests[0].startsWith(tag + '?id='));
+      assert.equal(await first.evaluate(() => window.dataLayer.filter(args => args[1] === 'page_view').length),1);
+      await fresh.close();
+    }
     const calls = [];
     const context = await browser.newContext({viewport:{width:375,height:850}});
     context.on('request', request => {
@@ -24,7 +45,7 @@ try {
       return route.fulfill({status:200,body:'Test destination'});
     });
     const page = await context.newPage();
-    const response = await page.goto(pageUrl);
+    const response = await page.goto(pageUrl + '?utm_source=first-visit');
     assert.equal(response.status(),200);
     const csp = response.headers()['content-security-policy'];
     assert.match(csp,/frame-ancestors 'none'/);
@@ -45,6 +66,8 @@ try {
       continue;
     }
 
+    const {records} = await (await context.request.get(origin + '/opportunities.json')).json();
+
     await banner.waitFor({state:'visible'});
     assert.match(csp,/script-src 'self' https:\/\/www\.googletagmanager\.com\/gtag\//);
     assert.doesNotMatch(csp,/unsafe-inline|doubleclick|googlesyndication/);
@@ -61,17 +84,12 @@ try {
     await rejectedLink.click();
     assert.deepEqual(calls,[]);
 
-    // Even after opt-in, a page URL with private query or fragment data is not measured.
-    await page.goto(pageUrl + '?gtm_debug=1');
+    await page.goto(landing, {referer:'https://www.google.com/search?q=private@example.invalid'});
     await settings.click();
     await dialog.locator('[data-analytics-choice="accept"]').click();
-    assert.deepEqual(calls,[]);
-    await page.goto(pageUrl + '?q=private@example.invalid#name');
-    assert.deepEqual(calls,[]);
-
-    await page.goto(pageUrl, {referer:'https://www.google.com/search?q=private@example.invalid'});
     await page.waitForFunction(() => window.analyticsTestTagLoaded === true);
     assert.equal(calls.filter(url => url.startsWith(tag)).length,1);
+    assert.equal(page.url(),landing);
     const queued = () => page.evaluate(() => window.dataLayer.map(args => Array.from(args)));
     const [[set, safeDefaults]] = await queued();
     assert.equal(set, 'set');
@@ -79,26 +97,45 @@ try {
     assert.equal(safeDefaults.page_referrer, origin + '/');
     assert.equal(safeDefaults.send_page_view, false);
     const config = (await queued()).find(args => args[0] === 'config')[2];
+    assert.equal(config.page_location,pageUrl);
+    assert.equal(config.page_referrer,origin + '/');
+    assert.equal(config.ignore_referrer,true);
     assert.equal(config.send_page_view,false);
     assert.equal(config.allow_google_signals,false);
     const views = (await queued()).filter(args => args[0] === 'event' && args[1] === 'page_view');
     assert.equal(views.length,1);
     assert.equal(views[0][2].site_language,lang);
+    assert.equal(views[0][2].page_group,'research');
     assert.equal(views[0][2].traffic_group,'search');
     assert.equal(views[0][2].page_location,pageUrl);
-    assert.doesNotMatch(JSON.stringify(await queued()),/private@example|search\?q/);
+    assert.doesNotMatch(JSON.stringify([await queued(), calls]),/private(?:@|%40)example|utm_|search\?q|#main/);
 
     const application = page.locator('[data-analytics-click="application_click"]');
     const officialUrl = await application.getAttribute('href');
+    assert.equal(officialUrl,records.find(row => row.id === 'prolific').official_url);
     const [officialPage] = await Promise.all([context.waitForEvent('page'), application.click()]);
     await officialPage.waitForURL(officialUrl);
     await page.waitForFunction(() => window.dataLayer.some(event => event[1] === 'application_click'));
     const clicks = (await queued()).filter(args => args[0] === 'event' && args[1] === 'application_click');
     assert.equal(clicks.length,1);
     assert.equal(clicks[0][2].opportunity_id,'prolific');
-    assert.doesNotMatch(JSON.stringify(clicks),/prolific\.com/);
+    assert.equal(clicks[0][2].page_group,'research');
+    assert.equal(clicks[0][2].site_language,lang);
+    assert.doesNotMatch(JSON.stringify(clicks),/prolific\.com|private@example|utm_/);
 
-    await page.goto(origin + '/' + lang + '/opportunities/');
+    await page.reload();
+    await page.waitForFunction(() => window.analyticsTestTagLoaded === true);
+    assert.equal((await queued()).filter(args => args[1] === 'page_view').length,1);
+    calls.length = 0;
+    await page.goto(pageUrl + '?q=private@example.invalid#private-fragment');
+    assert.deepEqual(calls,[]);
+    assert.equal(await page.evaluate(() => typeof window.gtag),'undefined');
+
+    const directory = origin + '/' + lang + '/opportunities/';
+    await page.goto(directory + '?q=Prolific&utm_medium=review');
+    await page.locator('#filters').waitFor({state:'visible'});
+    assert.equal(await page.locator('[name=q]').inputValue(),'Prolific');
+    assert.equal((await queued()).find(args => args[1] === 'page_view')[2].page_location,directory);
     await page.locator('[name=q]').fill('Prolific');
     await page.evaluate(() => history.replaceState(null,'','?q=private@example.invalid'));
     const cardLink = page.locator('[data-record="prolific"] [data-analytics-click="application_click"]');
@@ -107,10 +144,18 @@ try {
     assert.equal(cardEvent[2].opportunity_id,'prolific');
     assert.doesNotMatch(JSON.stringify(cardEvent),/prolific\.com|private@example|Prolific/);
 
+    const guide = origin + '/' + lang + '/sweepstakes/';
+    await page.goto(guide + '?utm_source=review#no-sns-giveaways');
+    await page.waitForFunction(() => window.analyticsTestTagLoaded === true);
+    assert.equal((await queued()).find(args => args[1] === 'page_view')[2].page_location,guide);
+
     const affiliatePage = origin + '/' + lang + '/opportunities/freecash/';
-    if ((await page.goto(affiliatePage)).status() === 200) {
+    if ((await page.goto(affiliatePage + '?utm_source=review')).status() === 200) {
       const sponsored = page.locator('[data-analytics-click="affiliate_click"]');
       const destination = await sponsored.getAttribute('href');
+      assert.equal(destination,records.find(row => row.id === 'freecash').affiliate_url);
+      assert.equal(await sponsored.getAttribute('target'),'_blank');
+      assert.equal(await sponsored.getAttribute('rel'),'sponsored nofollow noopener noreferrer');
       async function openSponsored() {
         const [opened] = await Promise.all([context.waitForEvent('page'), sponsored.click()]);
         await opened.waitForURL(destination);
@@ -122,8 +167,9 @@ try {
       assert.deepEqual(Object.keys(affiliate[0][2]).sort(),
         ['opportunity_id','page_group','page_location','page_referrer','send_to','site_language']);
       assert.equal(affiliate[0][2].opportunity_id,'freecash');
+      assert.equal(affiliate[0][2].page_group,'affiliate');
       assert.equal(affiliate[0][2].site_language,lang);
-      assert.doesNotMatch(JSON.stringify(affiliate),/pxf\.io|freecash\.com|user_id/);
+      assert.doesNotMatch(JSON.stringify(affiliate),/pxf\.io|freecash\.com|user_id|utm_/);
 
       calls.length = 0;
       await settings.click();
@@ -147,6 +193,9 @@ try {
         await page.goto(origin + '/' + lang + '/' + path);
         const card = page.locator('[data-record="freecash"]');
         const cardLink = card.locator('[data-analytics-click="affiliate_click"]');
+        assert.equal(await cardLink.getAttribute('href'),destination);
+        assert.equal(await cardLink.getAttribute('target'),'_blank');
+        assert.equal(await cardLink.getAttribute('rel'),'sponsored nofollow noopener noreferrer');
         async function openCard() {
           const [opened] = await Promise.all([context.waitForEvent('page'),cardLink.click()]);
           await opened.waitForURL(destination);
@@ -191,12 +240,16 @@ try {
       await page.evaluate(() => {
         const fixture = document.createElement('aside');
         fixture.dataset.analyticsAffiliate = 'hapitas-referral';
-        fixture.innerHTML = '<a href="https://example.invalid/" data-analytics-click="affiliate_click">Test placement</a>';
+        fixture.innerHTML = '<a href="https://example.invalid/" target="_blank" data-analytics-click="affiliate_click">Test placement</a>';
         document.querySelector('main').prepend(fixture);
       });
     }
     const referral = placement.locator('a[data-analytics-click="affiliate_click"]');
-    await referral.evaluate(link => link.target = '_blank');
+    if (process.env.HAPITAS_REFERRAL_URL) {
+      assert.equal(await referral.getAttribute('href'),process.env.HAPITAS_REFERRAL_URL);
+      assert.equal(await referral.getAttribute('target'),'_blank');
+      assert.equal(await referral.getAttribute('rel'),'sponsored nofollow noopener noreferrer');
+    }
     await referral.click();
     const referralClicks = (await queued()).filter(args => args[0] === 'event' && args[1] === 'affiliate_click');
     assert.equal(referralClicks.length,1);
@@ -214,7 +267,7 @@ try {
     await dialog.locator('[data-analytics-status="reject"]').waitFor({state:'visible'});
     assert.deepEqual(calls,[]);
     assert.equal(await page.evaluate(() => typeof window.gtag), 'undefined');
-    console.log(lang + ': no requests before consent, on rejection or after withdrawal; one application event and one referral event');
+    console.log(lang + ': query landing, consent, rejection, withdrawal, application event and referral event passed');
     await context.close();
   }
 } finally {

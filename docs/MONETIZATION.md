@@ -9,15 +9,30 @@ Production builds are off by default. A missing `GA4_MEASUREMENT_ID` or an unset
 3. Set GitHub repository variables `GA4_MEASUREMENT_ID` and `GA4_PRIVACY_READY=true` only after completing step 2. Run `gh workflow run publish.yml --ref main`. Verify both languages with a fresh browser profile: Reject should cause zero Google analytics requests, Accept should create one page view, and a click on an official application link should create one event. Check GA4 Realtime/DebugView using test traffic and the browser network panel before relying on reports. Do not add a second GA or Tag Manager snippet.
 4. To disable collection for everyone, unset `GA4_PRIVACY_READY` or remove `GA4_MEASUREMENT_ID` and rebuild. Individual visitors can withdraw through Analytics settings in the footer or privacy page.
 
-Analytics is limited to canonical Japanese and English pages. The language picker, error pages and URLs carrying a query string or arbitrary fragment are excluded. The site sends its canonical route, locale, listing ID where applicable and a broad referrer category. Raw referrers, URL queries, entered search terms, outbound URLs, names and emails are excluded. GA4 cookie identifiers and device/connection information are handled by Google after consent. The CSP opens only Google Tag's `/gtag/` script path and the analytics transport endpoints on configured builds. Ad consent values remain denied. [Google privacy information](https://policies.google.com/technologies/partner-sites) · [GA4 PII guidance](https://support.google.com/analytics/answer/6366371?hl=en) · [Page views](https://developers.google.com/analytics/devguides/collection/ga4/views?technology=websites) · [CSP guidance](https://developers.google.com/tag-platform/security/guides/csp)
+Analytics runs on Japanese and English pages after consent, including arrivals with campaign or directory-filter query strings. The language picker, error pages and unrecognized fragments are excluded. The site sends its clean canonical path, locale, listing ID where applicable and a broad referrer category. It leaves the address bar and filters intact. Raw referrers, URL queries (including UTM values), entered search terms, outbound URLs, names and emails are excluded from the site's analytics payload. GA4 cookie identifiers and device/connection information are handled by Google after consent. The CSP opens only Google Tag's `/gtag/` script path and the analytics transport endpoints on configured builds. Ad consent values remain denied. [Google privacy information](https://policies.google.com/technologies/partner-sites) · [GA4 PII guidance](https://support.google.com/analytics/answer/6366371?hl=en) · [Page views](https://developers.google.com/analytics/devguides/collection/ga4/views?technology=websites) · [CSP guidance](https://developers.google.com/tag-platform/security/guides/csp)
 
-For Tag Assistant, start with a canonical localized page such as `https://freebietrail.com/en/`. Clear **Include debug signal in the URL**, then allow analytics on the site. The language picker has no analytics and query strings, including Tag Assistant's debug parameter, suppress tag loading. Keep the consent and query guards in place. If the debug window cannot connect, check the actual collect requests and GA4 Realtime separately. [Google troubleshooting](https://support.google.com/tagmanager/answer/10039345?hl=en)
+For Tag Assistant, start with a localized page such as `https://freebietrail.com/en/`, then allow analytics on the site. If the debug window cannot connect, check the collect requests and GA4 Realtime separately. [Google troubleshooting](https://support.google.com/tagmanager/answer/10039345?hl=en)
 
 When changing tag startup, verify the first real collect request for a visit from an external referrer. The sanitized page location and referrer and the automatic page-view setting must be set before Google tag initialization. The test stub checks command order but cannot detect changes in Google's live tag.
 
 ## GA4 reports
 
-Register `site_language`, `traffic_group`, `page_group`, and `opportunity_id` as event-scoped custom dimensions before collecting production data. In Explore, use Event count for activity and Total users for the language comparison. Apply these dimensions and event filters.
+### Register custom dimensions
+
+1. Sign in to the Freebie Trail GA4 property with Editor or Administrator access.
+2. Go to **Admin → Data display → Custom definitions → Custom dimensions**. Check the existing definitions for the event parameter names below before creating any.
+3. For each missing parameter, choose **Create custom dimension**, enter the display name and exact event parameter below, set **Scope** to **Event**, and save.
+
+| Display name | Event parameter |
+| --- | --- |
+| Site language | `site_language` |
+| Traffic group | `traffic_group` |
+| Page group | `page_group` |
+| Opportunity ID | `opportunity_id` |
+
+4. Once data has arrived, allow 24–48 hours for reporting. In **Explore → Free form**, import the custom dimensions and **Event name**. Add **Event count**, put the dimensions in Rows, and filter by the relevant event name. Use **Total users** for language comparisons. The definitions are created in GA4 by the property operator. [Google Analytics instructions](https://support.google.com/analytics/answer/14239696)
+
+### Report examples
 
 | Report | Event | Grouping or filter |
 | --- | --- | --- |
@@ -28,7 +43,7 @@ Register `site_language`, `traffic_group`, `page_group`, and `opportunity_id` as
 | Official application links | `application_click` | `opportunity_id`, `site_language` |
 | Approved affiliate links | `affiliate_click` | `opportunity_id`, `site_language` |
 
-Traffic groups are based on the browser's available referrer information and are distinct from GA4's campaign or session acquisition reports. Counts represent activity by consenting visitors on eligible pages. A visitor who uses both site languages may be counted in both language groups. Official application links open a new tab so the listing stays loaded while GA4 dispatches the click. Clicks are directional measurements and may be lost to browser restrictions. Partner dashboards supply verified conversions.
+Traffic groups are based on the browser's available referrer information. The existing `page_referrer` value points to the site's own origin and `ignore_referrer` stays enabled because Google uses that field to calculate traffic sources. Visits with UTM values count as visits under the clean page path. Use Search Console for Google organic clicks and impressions, and `traffic_group` for broad referral categories among consenting visitors. A visitor who uses both site languages may be counted in both language groups. Official application links open a new tab so the listing stays loaded while GA4 dispatches the click. Clicks are directional measurements and may be lost to browser restrictions. Partner dashboards supply verified conversions. [Google tag configuration](https://developers.google.com/analytics/devguides/collection/ga4/reference/config#page_referrer)
 
 ## Affiliate approval and private ledger
 
