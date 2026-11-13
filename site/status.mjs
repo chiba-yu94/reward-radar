@@ -23,6 +23,12 @@ export function updateDates(root, now, lang) {
     const end = expiration({deadline:element.dataset.deadline || element.dataset.expiring});
     element.hidden = element.hasAttribute('data-unavailable') || end <= now || timestamp(element.dataset.affiliateExpires) <= now;
   }
+  for (const list of root.querySelectorAll('[data-expiry-list]')) {
+    list.hidden = !list.querySelector('li:not([hidden])');
+    const empty = list.parentElement.querySelector('[data-expiry-empty]');
+    if (empty) empty.hidden = !list.hidden;
+    else list.parentElement.hidden = list.hidden;
+  }
   const ended = root.querySelector('[data-ended]');
   if (ended) {
     const action = root.querySelector('.entry-action[data-expiring]');

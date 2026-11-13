@@ -66,6 +66,21 @@ test('country filtering keeps unknown out and explicitly accepts Japan', () => {
   assert.equal(matches(study,{reward_currency:'unknown'},'en',now),false);
 });
 
+test('detail links include the closest listed peer and omit the section without a peer', () => {
+  for (const lang of ['ja','en']) {
+    const prolific = read(`${lang}/opportunities/prolific/index.html`);
+    assert.match(prolific, new RegExp(`aria-labelledby="related-listings".*href="/${lang}/opportunities/usertesting/"`, 's'));
+    assert.doesNotMatch(read(`${lang}/opportunities/freecash/index.html`), /aria-labelledby="related-listings"/);
+    const guide = read(`${lang}/sweepstakes/index.html`).split('<form class="filter"')[0];
+    for (const id of ['club-sunstar-november-2026','obu-city-quiz-november-2026','penguin-white-company-calendar-2026','stanley-review-november-2026']) {
+      assert.ok(guide.includes(`href="/${lang}/opportunities/${id}/"`), id);
+    }
+    for (const id of ['ja-wakayama-rice-2026-11','calbee-jagabee-2026','rakuten-app-draw']) {
+      assert.ok(!guide.includes(`href="/${lang}/opportunities/${id}/"`), id);
+    }
+  }
+});
+
 test('currency, null and timezone behavior', () => {
   assert.match(money(1000,'JPY','ja','unknown'), /1,000/);
   assert.match(money(7.5,'USD','en','unknown'), /USD.*7\.50/);

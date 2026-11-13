@@ -52,6 +52,28 @@ try {
       }
     }
     await page.clock.setFixedTime(now);
+    await page.goto(`${origin}/${lang}/opportunities/calbee-jagabee-2026/`);
+    const related = page.locator('[aria-labelledby="related-listings"]');
+    assert.equal(await related.isVisible(),true);
+    await page.clock.setFixedTime(new Date('2026-12-01T05:00:00Z'));
+    await page.evaluate(()=>window.dispatchEvent(new Event('pageshow')));
+    assert.equal(await related.isVisible(),false);
+    checks++;
+
+    await page.clock.setFixedTime(now);
+    await page.goto(`${origin}/${lang}/sweepstakes/`);
+    const guide = page.locator('#no-sns-giveaways');
+    assert.equal(await guide.locator('li:visible').count(),4);
+    await page.clock.setFixedTime(new Date('2026-11-15T15:00:00Z'));
+    await page.evaluate(()=>window.dispatchEvent(new Event('pageshow')));
+    assert.equal(await guide.locator('li:visible').count(),3);
+    await page.clock.setFixedTime(new Date('2026-12-01T05:00:00Z'));
+    await page.evaluate(()=>window.dispatchEvent(new Event('pageshow')));
+    assert.equal(await guide.locator('ul').isVisible(),false);
+    assert.equal(await guide.locator('[data-expiry-empty]').isVisible(),true);
+    checks += 3;
+
+    await page.clock.setFixedTime(now);
     await page.goto(`${origin}/${lang}/opportunities/`);
     await page.waitForFunction(()=>document.querySelector('#filters').hidden===false);
     const listFacts = {};

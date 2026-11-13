@@ -19,6 +19,13 @@ export const copy = {
 
     application: {noSns:'SNS不要', webOnly:'Web完結', easyApply:'簡単応募', sns:'SNS', platforms:'対象SNS', web:'Web完結', registration:'無料会員登録', operations:'応募操作', count:'応募手順数', difficulty:'応募の難易度', evidence:'応募条件の確認元', yes:'必要', no:'不要', webYes:'確認済み', webNo:'Web以外の手続きあり', easy:'簡単', standard:'標準', hard:'手間あり',
       names:{review:'商品レビューを書く', form:'フォーム入力', 'read-issue':'広報誌を確認', quiz:'クイズに回答', survey:'アンケートに回答', email:'メール送信', 'email-verify':'メール認証', register:'登録', follow:'フォロー', repost:'リポスト', like:'いいね', comment:'コメント', 'create-post':'新規投稿', 'quote-post':'引用投稿', 'link-accounts':'アカウント連携'}},
+    sweepstakesGuide: {
+      title:'SNS不要・無料でWeb応募できる懸賞', shortcut:'SNS不要・Web応募の懸賞',
+      entry:'応募に参加費・購入・SNSアカウントが不要で、Webで応募を完了できると確認した懸賞です。主催者への会員登録、クイズ、アンケート、手持ち商品のレビューなどが必要な場合があります。',
+      region:'応募できる居住地と景品の配送先は、詳細ページでそれぞれ確認できます。地域や年齢の条件が未確認の場合や、当選後に別の手続きがある場合は、応募前に公式の条件をご確認ください。',
+      empty:'現在、この条件をすべて確認できる掲載中の懸賞はありません。',
+    },
+    relatedListings:'条件が近い掲載',
     hapitas:{label:'広告・PR', title:'ハピタス紹介プログラム', body:'日本国内向けのポイントサービスです。11月のキャンペーンでは、期限までに紹介リンクから初めて登録し、メール認証を済ませ、登録日から3日連続でログインすると100ポイントの対象になります。追加特典には別の条件があります。運営者が紹介報酬を受け取る場合があります。', cta:'ハピタスの紹介ページを開く', terms:'公式キャンペーン条件', deadline:'登録・メール認証の締切'},
     language: '日本語', otherLanguage: 'EN', skip: '本文へ移動', home: 'ホーム',
     analytics: {
@@ -70,7 +77,7 @@ export const copy = {
     pages: {
       rewards: ['ポイ活・タスク報酬', 'アンケート、ゲーム、ポイントサービスの参加条件と受け取り方法。'],
       opportunities: ['掲載一覧', '消費者向けの特典を、費用・対象地域・参加方法から絞り込めます。'],
-      sweepstakes: ['懸賞・プレゼント', '応募期限、抽選条件と対象地域を、提供元の公式資料で確認できます。'],
+      sweepstakes: ['懸賞・プレゼント', 'SNS不要で無料のWeb応募懸賞を探せます。応募期限、対象地域、会員登録などの条件を確認してから応募できます。'],
       guaranteed: ['条件達成の特典', '条件を満たすと付与される特典です。金額、交換方法、必要な費用は詳細ページに記載します。'],
       international: ['海外向けの募集', '複数の国・地域を対象とする募集を掲載します。日本在住者として応募できるか、対象地域と個別条件を確認してください。'],
       affiliates: ['サイト運営者向け提携', 'サイト・コンテンツ制作者向けの制度。アンケートやタスク報酬は「ポイ活・タスク報酬」に掲載しています。'],
@@ -127,6 +134,13 @@ export const copy = {
 
     application: {noSns:'No social account needed', webOnly:'Web only', easyApply:'Easy entry', sns:'Social account', platforms:'Social platforms', web:'Web-only entry', registration:'Free membership registration', operations:'Entry actions', count:'Number of steps', difficulty:'Entry difficulty', evidence:'Entry requirements source', yes:'Required', no:'Not required', webYes:'Verified', webNo:'Requires a step outside the website', easy:'Easy', standard:'Standard', hard:'More involved',
       names:{review:'Write a product review', form:'Fill out a form', 'read-issue':'Read the newsletter', quiz:'Answer the quiz', survey:'Complete the survey', email:'Send an email', 'email-verify':'Verify your email', register:'Register', follow:'Follow', repost:'Repost', like:'Like', comment:'Comment', 'create-post':'Create a post', 'quote-post':'Quote-post', 'link-accounts':'Link accounts'}},
+    sweepstakesGuide: {
+      title:'Free online giveaways with no social media required', shortcut:'Online giveaways without social media',
+      entry:'We checked that you can enter these giveaways online without an entry fee, a purchase, or a social media account. You may still need to create an organizer account, answer a quiz, complete a survey, or review a product you already own.',
+      region:'Each listing gives residency and prize delivery information separately. Check the official rules before entering if age or location requirements are unverified, or if winners have extra steps to claim a prize.',
+      empty:'There are currently no open listings with all three entry conditions confirmed.',
+    },
+    relatedListings:'Similar listings',
     hapitas:{label:'Sponsored', title:'Hapitas referral program', body:'Hapitas is a rewards service for use in Japan. For the November campaign, first-time members qualify for 100 points by registering through the referral link and verifying their email by the deadline, then logging in on three consecutive days starting on the registration date. Additional rewards have separate conditions. The site operator may receive a referral reward.', cta:'Open the Hapitas referral page', terms:'Official campaign terms', deadline:'Registration and email verification deadline'},
     language: 'English', otherLanguage: '日本語', skip: 'Skip to content', home: 'Home',
     analytics: {
@@ -179,7 +193,7 @@ export const copy = {
     pages: {
       rewards: ['Rewards', 'Surveys, games and points services. Check task costs, eligibility and cashout requirements.'],
       opportunities: ['All opportunities', 'Search giveaways, surveys and task rewards by country and entry requirements.'],
-      sweepstakes: ['Sweepstakes and giveaways', 'Check entry deadlines, prize terms and geographic restrictions against the official source.'],
+      sweepstakes: ['Sweepstakes and giveaways', 'Find free online giveaways that require no social media account. Check deadlines, eligible countries and any registration requirements before entering.'],
       guaranteed: ['Rewards on completion', 'These rewards are granted once the listed conditions are met. See each listing for value, redemption and any required spending.'],
       international: ['International opportunities', 'Browse opportunities that accept multiple countries or regions. Check residency and the individual requirements before you apply.'],
       affiliates: ['Publisher affiliate programs', 'Programs for website owners and creators. Looking for surveys or task rewards? See Rewards.'],

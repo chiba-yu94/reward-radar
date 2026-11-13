@@ -35,15 +35,19 @@ function referrerGroup(referrer) {
 }
 
 function start() {
-  // The tag may read browser URLs itself. Skip URLs with arbitrary query or fragment values.
+  // Known navigation anchors can share the same page view. Arbitrary fragments remain excluded.
   if (running || choice !== 'accept' || canonical.pathname !== location.pathname ||
-      location.search || (location.hash && location.hash !== '#main')) return;
+      (location.hash && location.hash !== '#main' &&
+        !(location.hash === '#no-sns-giveaways' && document.getElementById('no-sns-giveaways')))) return;
   running = true;
   window[disableKey] = false;
-  const common = {
+  const safeUrls = {
     page_location: location.origin + canonical.pathname,
     // A nonempty, site-owned value prevents a fallback to the raw referrer.
     page_referrer: location.origin + '/',
+  };
+  const common = {
+    ...safeUrls,
     site_language: locale,
     page_group: page?.dataset.analyticsCategory || 'site',
     ...(page ? {opportunity_id: page.dataset.analyticsOpportunity} : {}),
@@ -58,6 +62,7 @@ function start() {
   gtag('consent', 'update', {...consent, analytics_storage:'granted'});
   gtag('js', new Date());
   gtag('config', id, {
+    ...safeUrls,
     send_page_view:false,
     allow_google_signals:false,
     allow_ad_personalization_signals:false,
