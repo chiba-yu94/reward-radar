@@ -182,6 +182,31 @@ class TestPipeline(unittest.TestCase):
             tls.assert_called_once()
             response.read.assert_not_called()
 
+    def test_stateless_actions_token_passed_unchanged_to_reviewed_endpoint(self):
+        source = self.sources["github-student"]
+        # Synthetic token only; no real credential or JWT claims are needed.
+        token = "ghs_12345_header-part.payload_part.signature-part"
+        with patch("radar.net.PinnedHTTPS") as tls:
+            response = tls.return_value.getresponse.return_value
+            response.status = 200
+            response.getheader.return_value = "application/json; charset=utf-8"
+            response.read.return_value = json.dumps(
+                {"type": "file", "sha": source["reviewed_revision"]}
+            ).encode()
+            report = collect({"github-student": source}, token=token)
+            self.assertEqual(report["github-student"]["status"], "unchanged")
+            self.assertEqual(report["github-student"]["revision"], source["reviewed_revision"])
+            headers = tls.return_value.request.call_args.kwargs["headers"]
+            self.assertEqual(headers["Authorization"], "Bearer " + token)
+            tls.assert_called_once()
+
+        for invalid in (token + "\r\nX-Unwanted: yes", token + " ", "foo.bar.baz",
+                        "ghs_12345_header..signature", "ghs_12345_header.payload"):
+            with self.subTest(invalid=invalid), patch("radar.net.PinnedHTTPS") as tls:
+                with self.assertRaisesRegex(ValueError, "Invalid collection credential"):
+                    fetch_json(GITHUB_STUDENT_ENDPOINT, GITHUB_STUDENT_ENDPOINT, token=invalid)
+                tls.assert_not_called()
+
     def test_diagnostics_are_sanitized_and_still_fail_closed(self):
         source = self.sources["github-student"]
         with patch("radar.net.PinnedHTTPS") as tls:

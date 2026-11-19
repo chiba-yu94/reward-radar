@@ -1,6 +1,7 @@
 """Bounded HTTPS requests to exactly reviewed URLs, with DNS pinning."""
 import http.client
 import ipaddress
+import re
 import socket
 import ssl
 from urllib.parse import urlsplit
@@ -12,6 +13,10 @@ GITHUB_STUDENT_ENDPOINT = (
     "about-github-education/github-education-for-students/"
     "apply-to-github-education-as-a-student.md?ref=main"
 )
+
+# GitHub Actions installation tokens may be opaque or ghs_APPID_JWT.
+# Check header-safe syntax only; GitHub validates the credential itself.
+GITHUB_BEARER = re.compile(r"(?:[A-Za-z0-9_]+|ghs_[A-Za-z0-9-]+_[A-Za-z0-9_-]+(?:\.[A-Za-z0-9_-]+){2})")
 
 
 class UpstreamHTTPError(ValueError):
@@ -70,7 +75,7 @@ def fetch_json(url, allowed_url, *, token=None):
     if token:
         if url != GITHUB_STUDENT_ENDPOINT or allowed_url != GITHUB_STUDENT_ENDPOINT:
             raise ValueError("Credential target not approved")
-        if not token.isascii() or not all(c.isalnum() or c == "_" for c in token):
+        if not GITHUB_BEARER.fullmatch(token):
             raise ValueError("Invalid collection credential")
         headers["Authorization"] = "Bearer " + token
     return fetch_document(url, allowed_url, ("application/json",), headers)
