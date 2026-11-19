@@ -87,7 +87,7 @@ import assert from 'node:assert/strict';
       assert.equal(await sweepCountry.evaluate(el => el.form?.id),'filters');
       assert.equal(await sweepCountry.isEnabled(),true);
       const residenceText = () => sweepCountry.evaluate(el => el.selectedOptions[0].text);
-      assert.equal(await residenceText(),lang === 'ja' ? '居住国' : 'Where you live');
+      assert.equal(await residenceText(),lang === 'ja' ? '居住国' : 'Residence');
       const checkHeader = async viewportWidth => {
         const boxes = await Promise.all(['.header-inner .brand','.header-inner .language','.header-inner .masthead-residence']
           .map(selector => page.locator('header ' + selector).boundingBox()));

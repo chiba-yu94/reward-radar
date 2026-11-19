@@ -154,7 +154,7 @@ export const copy = {
       names:{review:'Write a product review', form:'Fill out a form', 'read-issue':'Read the newsletter', quiz:'Answer the quiz', survey:'Complete the survey', email:'Send an email', 'email-verify':'Verify your email', register:'Register', follow:'Follow', repost:'Repost', like:'Like', comment:'Comment', 'create-post':'Create a post', 'quote-post':'Quote-post', 'link-accounts':'Link accounts'}},
     sweepstakesGuide: {
       title:'Free online giveaways with no social media required', shortcut:'Online giveaways without social media',
-      residence:'Country of residence', anyResidence:'Where you live',
+      residence:'Country of residence', anyResidence:'Residence',
       japan:'Giveaways open to Japan residents', japanEmpty:'No listings currently have both Japan residency eligibility and open entry confirmed.',
       other:'Other giveaways: check the entry rules', source:'Official source',
       empty:'There are currently no open listings with all three entry conditions confirmed.',
