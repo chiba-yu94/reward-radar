@@ -79,17 +79,24 @@ test('canonical, hreflang, language switching and internal links', () => {
 test('listing controls expose residence outside of advanced options and a collapsed Safari tip', () => {
   for (const lang of ['ja','en']) for (const path of ['opportunities','sweepstakes','rewards']) {
     const page = read(`${lang}/${path}/index.html`);
-    assert.equal((page.match(/<select name="country">/g) || []).length, 1);
+    assert.equal((page.match(/<select[^>]*name="country"/g) || []).length, 1);
     const search = page.match(/<div class="search-row[^"]*">([\s\S]*?)<\/div>/)[1];
     assert.deepEqual(Array.from(search.matchAll(/name="([^"]+)"/g),m=>m[1]),
-      path === 'sweepstakes' ? ['country','q','sort'] : ['q','country','sort']);
-    assert.match(search, /<select name="country"><option value="">/);
+      path === 'sweepstakes' ? ['q','sort'] : ['q','country','sort']);
+    if (path !== 'sweepstakes') {
+      assert.match(search, /<select name="country"><option value="">/);
+      assert.doesNotMatch(page, /<select class="masthead-residence"/);
+    }
     if (path === 'sweepstakes') {
-      const country = search.match(/<select name="country">([\s\S]*?)<\/select>/)[1];
+      const masthead = page.match(/<header class="masthead">([\s\S]*?)<\/header>/)[1];
+      const country = masthead.match(/<select class="masthead-residence" name="country" form="filters" aria-label="([^"]+)" disabled>([\s\S]*?)<\/select>/);
+      assert.equal(country[1],copy[lang].sweepstakesGuide.residence);
+      assert.ok(country[2].startsWith(`<option value="">${copy[lang].sweepstakesGuide.anyResidence}</option>`));
+      assert.match(masthead, /class="language"[^>]*>[^<]+<\/a><select class="masthead-residence"/);
+      assert.doesNotMatch(search,/name="country"/);
       const verified = new Set(rows.filter(row=>row.category === 'sweepstakes' && row.eligibility_verified &&
         Array.isArray(row.eligible_countries)).flatMap(row=>row.eligible_countries));
-      assert.deepEqual(new Set(Array.from(country.matchAll(/<option value="([^"]+)">/g),m=>m[1])),verified);
-      assert.match(search, new RegExp(copy[lang].sweepstakesGuide.residence + '<select name="country"><option value="">' + copy[lang].sweepstakesGuide.anyResidence));
+      assert.deepEqual(new Set(Array.from(country[2].matchAll(/<option value="([^"]+)">/g),m=>m[1])),verified);
       assert.match(page, /<header class="intro"><h1>[^<]+<\/h1>\s*<\/header><form class="filter"/);
       assert.ok(page.indexOf('id="listing-results"') < page.indexOf('id="no-sns-giveaways"'));
       assert.match(page, /id="no-sns-giveaways"[^>]*data-unfiltered-guide/);

@@ -125,8 +125,7 @@ dd { margin:0; overflow-wrap:anywhere; }
 .filter { margin:1rem 0; padding:1rem; background:var(--surface); border:1px solid var(--line); border-radius:var(--radius); }
 .search-row { display:grid; gap:.65rem; grid-template-columns:minmax(0,1fr) minmax(0,8rem); align-items:end; }
 .search-row .search { grid-column:1 / -1; }
-.search-row--residence-first > label:first-child { grid-column:1 / -1; }
-.search-row--residence-first .search { grid-column:auto; }
+.search-row--no-residence .search { grid-column:auto; }
 
 .home-screen-help { margin:-.65rem 0 .75rem; color:var(--muted); font-size:.8rem; }
 .home-screen-help summary { cursor:pointer; display:list-item; min-height:44px; padding:.65rem 0; width:fit-content; }
@@ -169,8 +168,7 @@ footer { background:var(--surface); border-top:1px solid var(--line); margin-top
 @media (min-width:48rem) {
   .search-row { grid-template-columns:minmax(0,1fr) minmax(0,13rem) minmax(0,12rem); }
   .search-row .search { grid-column:auto; }
-  .search-row--residence-first { grid-template-columns:minmax(0,13rem) minmax(0,1fr) minmax(0,12rem); }
-  .search-row--residence-first > label:first-child { grid-column:auto; }
+  .search-row--no-residence { grid-template-columns:minmax(0,1fr) minmax(0,12rem); }
 
   .recent-list li { grid-template-columns:minmax(15rem,2fr) 1fr auto; align-items:center; }
   .recent-list a { grid-column:auto; }
@@ -198,6 +196,19 @@ footer { background:var(--surface); border-top:1px solid var(--line); margin-top
 .filter fieldset { border:0; padding:0; margin:0; min-width:0; }
 
 select { -webkit-appearance:none; appearance:none; padding-right:1.8rem; background:white url("/assets/chevron.svg") no-repeat right .65rem center; }
+.masthead-residence { flex:0 0 auto; width:5.25rem; margin:0; padding:.45rem 1.25rem .45rem .4rem; font-size:.84rem; background-position:right .28rem center; background-size:.8rem; text-overflow:ellipsis; }
+@media (min-width:64rem) { .masthead-residence { order:5; } }
+@media (max-width:30rem) {
+  .header-inner--residence { width:calc(100% - 1rem); gap:.25rem; }
+  .header-inner--residence .brand { min-width:0; gap:.3rem; font-size:.85rem; }
+  .header-inner--residence .brand img { width:25px; height:25px; flex:none; }
+  .header-inner--residence .brand span { overflow:hidden; text-overflow:ellipsis; }
+  .header-inner--residence .language { flex:none; }
+  .header-inner--residence .site-menu { flex:none; }
+  .header-inner--residence .site-menu summary { justify-content:center; width:44px; padding:0; font-size:0; }
+  .header-inner--residence .site-menu summary::after { margin-left:0; }
+}
+
 
 /* Service cards share neutral surfaces; the advertising label identifies sponsorship. */
 .card.task-card { background:var(--page); border-color:var(--line); }

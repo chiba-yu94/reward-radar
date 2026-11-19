@@ -134,7 +134,7 @@ ${href ? `<a itemprop="item" href="${href}">${text}</a>` : `<span aria-current="
   }).join('')}</ol></nav>`;
 }
 
-function layout(lang, page, title, description, content, indexable = true) {
+function layout(lang, page, title, description, content, indexable = true, mastheadControl = '') {
   const t = copy[lang];
   const other = lang === 'ja' ? 'en' : 'ja';
   const current = url(lang, page);
@@ -161,8 +161,8 @@ ${languages.map(locale => `<link rel="alternate" hreflang="${locale}" href="${or
 ${iconLinks}<link rel="stylesheet" href="/assets/style.css">
 <script type="module" src="/assets/client.mjs"></script>
 ${consent ? '<script type="module" src="/assets/analytics.mjs"></script>' : ''}</head>
-<body><a class="skip" href="#main">${t.skip}</a><header class="masthead"><div class="wrap header-inner">
-<a href="${url(lang)}" class="brand">${brand(t.copyright)}</a>${switcher}
+<body><a class="skip" href="#main">${t.skip}</a><header class="masthead"><div class="wrap header-inner${mastheadControl ? ' header-inner--residence' : ''}">
+<a href="${url(lang)}" class="brand">${brand(t.copyright)}</a>${switcher}${mastheadControl}
 <nav class="desktop-nav" aria-label="${e(t.navigation)}">${links(primary)}</nav><details class="site-menu"><summary>${t.menu}</summary><nav aria-label="${e(t.navigation)}">${links(primary)}</nav></details></div></header>
 ${consent?.panel || ''}
 <main id="main" class="wrap"${page === '' ? ' itemscope itemtype="https://schema.org/WebSite"' : ''}>
@@ -224,18 +224,30 @@ ${sponsored ? `<p class="small">${t.affiliateDisclosure}</p>` : ''}
 ${sponsored ? `<a class="text-link" href="${detail(lang,row)}">${t.details} →</a>` : external(row.official_url,isDraw ? t.officialNewTab : t.visitOfficial,row.commission ? null : 'application_click',title)}</div></article>`;
 }
 
+function residenceCountries(lang, available, onlyVerified = false) {
+  const countries = new Set(available.flatMap(row => (!onlyVerified || row.eligibility_verified) &&
+    Array.isArray(row.eligible_countries) ? row.eligible_countries : []));
+  return [...countries].sort((a,b) => name(lang,a).localeCompare(name(lang,b),lang));
+}
+
+function mastheadResidence(lang, available) {
+  const guide = copy[lang].sweepstakesGuide;
+  const countries = residenceCountries(lang,available,true);
+  const shortNames = lang === 'ja' ? {GB:'英国',US:'米国'} : {GB:'UK',US:'US'};
+  return `<select class="masthead-residence" name="country" form="filters" aria-label="${e(guide.residence)}" disabled><option value="">${e(guide.anyResidence)}</option>${countries.map(code =>
+    `<option value="${e(code)}">${e(shortNames[code] ?? name(lang,code))}</option>`).join('')}</select>`;
+}
+
 function filters(lang, available, sweepstakes = false) {
   const t = copy[lang];
-  const countries = [...new Set(available.flatMap(row => (!sweepstakes || row.eligibility_verified) && Array.isArray(row.eligible_countries) ? row.eligible_countries : []))];
-  countries.sort((a,b) => name(lang,a).localeCompare(name(lang,b),lang));
-  const options = (id,label,values,empty = true, emptyText = t.all) => `<label>${e(label)}<select name="${id}">${empty ? `<option value="">${e(emptyText)}</option>` : ''}${Object.entries(values).map(([value,text]) => `<option value="${e(value)}">${e(text)}</option>`).join('')}</select></label>`;
+  const countries = sweepstakes ? [] : residenceCountries(lang,available);
+  const options = (id,label,values,empty = true) => `<label>${e(label)}<select name="${id}">${empty ? `<option value="">${e(t.all)}</option>` : ''}${Object.entries(values).map(([value,text]) => `<option value="${e(value)}">${e(text)}</option>`).join('')}</select></label>`;
   const keyword = `<label class="search">${t.search}<input type="search" name="q" placeholder="${e(t.placeholder)}" maxlength="150"></label>`;
-  const country = options('country',sweepstakes ? t.sweepstakesGuide.residence : t.country,
-    {...Object.fromEntries(countries.map(c => [c,name(lang,c)])),...(!sweepstakes ? {unknown:t.unknown} : {})},
-    true,sweepstakes ? t.sweepstakesGuide.anyResidence : t.all);
+  const country = sweepstakes ? '' :
+    options('country',t.country,{...Object.fromEntries(countries.map(c => [c,name(lang,c)])),unknown:t.unknown});
   return `<form class="filter" id="filters" role="search" aria-labelledby="filter-title" aria-busy="true"><fieldset disabled>
 <h2 id="filter-title" class="sr-only">${t.filters}</h2>
-<div class="search-row${sweepstakes ? ' search-row--residence-first' : ''}">${sweepstakes ? country + keyword : keyword + country}
+<div class="search-row${sweepstakes ? ' search-row--no-residence' : ''}">${keyword}${country}
 
 ${options('sort',t.sort,{'':t.recommended,deadline:t.deadlineSort,newest:t.newest},false)}</div>
 <div class="quick-filters">${[['noSns',t.application.noSns],['freeEntry',t.freeEntry],['closingSoon',t.closingSoon],['easyApply',t.application.easyApply]].map(([key,label]) => `<label class="filter-chip"><input type="checkbox" name="${key}" value="yes"><span>${label}</span></label>`).join('')}</div>
@@ -395,10 +407,10 @@ ${related.length ? `<section class="sources" aria-labelledby="related-listings">
 <template id="adsense-slot"></template></article>`;
 }
 
-async function page(lang, key, title, description, content, indexable = true) {
+async function page(lang, key, title, description, content, indexable = true, mastheadControl = '') {
   const folder = url(lang,key).slice(1);
   await mkdir(dist + '/' + folder, {recursive:true});
-  await write(folder + 'index.html', layout(lang,key,title,description,content,indexable));
+  await write(folder + 'index.html', layout(lang,key,title,description,content,indexable,mastheadControl));
 }
 
 const consumer = rows.filter(row => row.category !== 'affiliate' || taskService(row));
@@ -435,7 +447,8 @@ ${rewardsPreview}${recentList}${hapitasAd}`);
     const [title, description] = t.pages[key];
     const sweepstakes = key === 'sweepstakes';
     await page(lang,key,title,description,`<header class="intro"><h1>${e(title)}</h1>${sweepstakes ? '' : `<p class="lead">${e(description)}</p>`}
-${key === 'affiliates' ? `<a href="${url(lang,'rewards')}">${t.pages.rewards[0]} →</a>` : ''}</header>${key === 'rewards' ? rewardsGuide(lang,available) + rewardsSponsorLink(lang,available) : ''}${directory(lang,available,sweepstakes)}${sweepstakes ? sweepstakesGuide(lang,available) + rewardsGuideLink(lang) : ''}`,key === 'rewards' || available.length > 0);
+${key === 'affiliates' ? `<a href="${url(lang,'rewards')}">${t.pages.rewards[0]} →</a>` : ''}</header>${key === 'rewards' ? rewardsGuide(lang,available) + rewardsSponsorLink(lang,available) : ''}${directory(lang,available,sweepstakes)}${sweepstakes ? sweepstakesGuide(lang,available) + rewardsGuideLink(lang) : ''}`,key === 'rewards' || available.length > 0,
+      sweepstakes && available.length ? mastheadResidence(lang,available) : '');
   }
   for (const key of secondary.filter(key => !['affiliates','guaranteed'].includes(key))) {
     const [title, description] = t.pages[key];

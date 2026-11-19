@@ -80,14 +80,25 @@ import assert from 'node:assert/strict';
       await page.locator('header .language').click();
       assert.match(page.url(),lang==='ja'?/\/en\/opportunities\/prolific\/$/:/\/ja\/opportunities\/prolific\/$/);
       await page.goto(`${base}/${lang}/sweepstakes/`);
-      const sweepCountry = page.locator('.search-row--residence-first [name=country]');
-      const sweepKeyword = page.locator('.search-row--residence-first [name=q]');
+      const sweepCountry = page.locator('header .header-inner > select[form=filters][name=country]');
       const sweepGuide = page.locator('[data-unfiltered-guide]');
       await page.locator('#filters[aria-busy=false]').waitFor({state:'visible'});
-      const sweepCountryBox = await sweepCountry.boundingBox();
-      const sweepKeywordBox = await sweepKeyword.boundingBox();
-      if (width < 768) assert.ok(sweepKeywordBox.y >= sweepCountryBox.y + sweepCountryBox.height);
-      else assert.ok(sweepKeywordBox.x >= sweepCountryBox.x + sweepCountryBox.width);
+      assert.equal(await page.locator('#filters [name=country]').count(),0);
+      assert.equal(await sweepCountry.evaluate(el => el.form?.id),'filters');
+      assert.equal(await sweepCountry.isEnabled(),true);
+      const checkHeader = async viewportWidth => {
+        const boxes = await Promise.all(['.header-inner .brand','.header-inner .language','.header-inner .masthead-residence']
+          .map(selector => page.locator('header ' + selector).boundingBox()));
+        for (const box of boxes) assert.ok(box.x >= 0 && box.x + box.width <= viewportWidth + 1);
+        for (const box of boxes) assert.ok(Math.abs(box.y + box.height / 2 - boxes[0].y - boxes[0].height / 2) < 3);
+        assert.ok(boxes[1].x + boxes[1].width <= boxes[2].x + 1);
+      };
+      await checkHeader(width);
+      if (width === 375) {
+        await page.setViewportSize({width:320,height:850});
+        await checkHeader(320);
+        await page.setViewportSize({width,height:850});
+      }
       assert.equal(await sweepGuide.isVisible(),true);
       await sweepCountry.selectOption('JP');
       assert.equal(new URL(page.url()).searchParams.get('country'),'JP');

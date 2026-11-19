@@ -40,6 +40,7 @@ if (form) {
     const active = form.querySelector('.active-filters');
     const unfilteredGuide = document.querySelector('[data-unfiltered-guide]');
     const reset = form.querySelector('[type=reset]');
+    const mastheadResidence = document.querySelector('.masthead-residence[form=filters]');
     const values = Object.fromEntries(Array.from(form.elements).filter(input => input.name).map(input => [input.name,
       input instanceof HTMLSelectElement ? Array.from(input.options).map(option => option.value) : input.type === 'checkbox' ? ['yes'] : []]));
     function restore() {
@@ -87,6 +88,7 @@ if (form) {
       }
     };
     form.addEventListener('input',() => filter());
+    mastheadResidence?.addEventListener('change',() => filter());
     form.addEventListener('submit',event => event.preventDefault());
     form.addEventListener('reset',() => window.requestAnimationFrame(() => { form.elements.q.focus(); filter(); }));
     window.addEventListener('popstate',() => { restore(); filter(false); });
@@ -95,6 +97,7 @@ if (form) {
       document.querySelector('#listing-results').focus();
     });
     form.querySelector('fieldset').disabled = false;
+    if (mastheadResidence) mastheadResidence.disabled = false;
     form.setAttribute('aria-busy','false');
     form.hidden = false;
     filter(false);
