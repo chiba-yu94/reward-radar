@@ -86,12 +86,24 @@ import assert from 'node:assert/strict';
       assert.equal(await page.locator('#filters [name=country]').count(),0);
       assert.equal(await sweepCountry.evaluate(el => el.form?.id),'filters');
       assert.equal(await sweepCountry.isEnabled(),true);
+      const residenceText = () => sweepCountry.evaluate(el => el.selectedOptions[0].text);
+      assert.equal(await residenceText(),lang === 'ja' ? '居住国' : 'Where you live');
       const checkHeader = async viewportWidth => {
         const boxes = await Promise.all(['.header-inner .brand','.header-inner .language','.header-inner .masthead-residence']
           .map(selector => page.locator('header ' + selector).boundingBox()));
         for (const box of boxes) assert.ok(box.x >= 0 && box.x + box.width <= viewportWidth + 1);
         for (const box of boxes) assert.ok(Math.abs(box.y + box.height / 2 - boxes[0].y - boxes[0].height / 2) < 3);
         assert.ok(boxes[1].x + boxes[1].width <= boxes[2].x + 1);
+        assert.ok(await sweepCountry.evaluate(el => {
+          const css = getComputedStyle(el);
+          const canvas = document.createElement('canvas');
+          const context = canvas.getContext('2d');
+          context.font = `${css.fontWeight} ${css.fontSize} ${css.fontFamily}`;
+          const room = el.clientWidth - parseFloat(css.paddingLeft) - parseFloat(css.paddingRight);
+          return context.measureText(el.selectedOptions[0].text).width <= room;
+        }),`${lang} residence label fits ${viewportWidth}px`);
+        assert.ok(await page.locator('header .header-inner .brand span')
+          .evaluate(el => el.scrollWidth <= el.clientWidth + 1),`${lang} brand fits ${viewportWidth}px`);
       };
       await checkHeader(width);
       if (width === 375) {
@@ -102,6 +114,7 @@ import assert from 'node:assert/strict';
       assert.equal(await sweepGuide.isVisible(),true);
       await sweepCountry.selectOption('JP');
       assert.equal(new URL(page.url()).searchParams.get('country'),'JP');
+      assert.equal(await residenceText(),lang === 'ja' ? '日本' : 'Japan');
       assert.equal(await sweepGuide.isVisible(),false);
       assert.ok((await page.locator('[data-record]:visible').evaluateAll(items=>items.map(x=>x.dataset.record))).every(id=>{
         const row=data.records.find(x=>x.id===id);

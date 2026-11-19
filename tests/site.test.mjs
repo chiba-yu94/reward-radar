@@ -91,7 +91,7 @@ test('listing controls expose residence outside of advanced options and a collap
       const masthead = page.match(/<header class="masthead">([\s\S]*?)<\/header>/)[1];
       const country = masthead.match(/<select class="masthead-residence" name="country" form="filters" aria-label="([^"]+)" disabled>([\s\S]*?)<\/select>/);
       assert.equal(country[1],copy[lang].sweepstakesGuide.residence);
-      assert.ok(country[2].startsWith(`<option value="">${copy[lang].sweepstakesGuide.anyResidence}</option>`));
+      assert.ok(country[2].startsWith(`<option value="">${lang === 'ja' ? '居住国' : 'Where you live'}</option>`));
       assert.match(masthead, /class="language"[^>]*>[^<]+<\/a><select class="masthead-residence"/);
       assert.doesNotMatch(search,/name="country"/);
       const verified = new Set(rows.filter(row=>row.category === 'sweepstakes' && row.eligibility_verified &&

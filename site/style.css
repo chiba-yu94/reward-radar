@@ -197,9 +197,11 @@ footer { background:var(--surface); border-top:1px solid var(--line); margin-top
 
 select { -webkit-appearance:none; appearance:none; padding-right:1.8rem; background:white url("/assets/chevron.svg") no-repeat right .65rem center; }
 .masthead-residence { flex:0 0 auto; width:5.25rem; margin:0; padding:.45rem 1.25rem .45rem .4rem; font-size:.84rem; background-position:right .28rem center; background-size:.8rem; text-overflow:ellipsis; }
+html[lang="en"] .masthead-residence { width:6.75rem; }
 @media (min-width:64rem) { .masthead-residence { order:5; } }
 @media (max-width:30rem) {
   .header-inner--residence { width:calc(100% - 1rem); gap:.25rem; }
+  html[lang="en"] .header-inner--residence { width:calc(100% - .5rem); gap:.125rem; }
   .header-inner--residence .brand { min-width:0; gap:.3rem; font-size:.85rem; }
   .header-inner--residence .brand img { width:25px; height:25px; flex:none; }
   .header-inner--residence .brand span { overflow:hidden; text-overflow:ellipsis; }
