@@ -224,11 +224,11 @@ function filters(lang, available) {
   return `<form class="filter" id="filters" role="search" aria-labelledby="filter-title" aria-busy="true"><fieldset disabled>
 <h2 id="filter-title" class="sr-only">${t.filters}</h2>
 <div class="search-row"><label class="search">${t.search}<input type="search" name="q" placeholder="${e(t.placeholder)}" maxlength="150"></label>
+${options('country',t.country,{...Object.fromEntries(countries.map(c => [c,name(lang,c)])),unknown:t.unknown})}
 ${options('sort',t.sort,{'':t.recommended,deadline:t.deadlineSort,newest:t.newest},false)}</div>
 <div class="quick-filters">${[['noSns',t.application.noSns],['freeEntry',t.freeEntry],['closingSoon',t.closingSoon],['easyApply',t.application.easyApply]].map(([key,label]) => `<label class="filter-chip"><input type="checkbox" name="${key}" value="yes"><span>${label}</span></label>`).join('')}</div>
 <div class="filter-toolbar"><p class="result-status" role="status" aria-live="polite" aria-atomic="true"><span id="result-count">${available.length}</span>${t.count}</p><button type="reset" disabled>${t.reset}</button></div>
 <details class="filter-options"><summary>${t.advanced}</summary><div class="advanced-scroll"><div class="filter-grid">
-${options('country',t.country,{...Object.fromEntries(countries.map(c => [c,name(lang,c)])),unknown:t.unknown})}
 ${options('category',t.category,Object.fromEntries([...new Set(available.map(row => row.category))].map(key => [key,key === 'affiliate' && available.some(taskService) ? t.taskRewards : t.categories[key]])))}${options('prize_category',t.prizeCategory,t.prizes)}
 ${options('registration',t.registration,t.registrations)}${options('language',t.sourceLanguage,t.languages)}
 ${options('reward_type',t.reward,t.rewards)}${options('expense',t.expense,t.expenses)}
@@ -239,6 +239,7 @@ ${options('participation_method',t.method,t.methods)}${options('deadline',t.dead
 <label class="checkbox"><input type="checkbox" name="webOnly" value="yes">${t.application.webOnly}</label>
 </div></div><button type="button" data-show-results>${t.showResults} <span data-result-count>${available.length}</span></button></details>
 <div class="active-filters sr-only" hidden><span>${t.activeFilters}</span><ul></ul></div></fieldset></form>
+<details class="home-screen-help"><summary>${e(t.addToHome)}</summary><p>${e(t.addToHomeSafari)}</p></details>
 <noscript><p class="notice">${t.javascript}</p></noscript><p class="notice" data-filter-error hidden>${t.failure}</p>`;
 }
 

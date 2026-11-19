@@ -27,6 +27,37 @@ import assert from 'node:assert/strict';
         assert.ok(await page.evaluate(()=>document.documentElement.scrollWidth <= window.innerWidth), `overflow: ${width} ${lang} ${path}`);
       }
       await page.goto(`${base}/${lang}/opportunities/`);
+      const country = page.locator('.search-row [name=country]');
+      const keyword = page.locator('.search-row [name=q]');
+      await country.waitFor({state:'visible'});
+      assert.equal(await page.locator('[name=country]').count(),1);
+      assert.equal(await country.inputValue(),'');
+      const countryBox = await country.boundingBox();
+      const keywordBox = await keyword.boundingBox();
+      if (width < 768) assert.ok(countryBox.y >= keywordBox.y + keywordBox.height);
+      else assert.ok(countryBox.x >= keywordBox.x + keywordBox.width && Math.abs(countryBox.y - keywordBox.y) < 2);
+      const homeTip = page.locator('.home-screen-help');
+      assert.equal(await homeTip.getAttribute('open'),null);
+      await homeTip.locator('summary').focus();
+      await page.keyboard.press('Enter');
+      assert.ok(await homeTip.getAttribute('open') !== null);
+      assert.ok(await homeTip.locator('p').isVisible());
+      await page.keyboard.press('Enter');
+      await country.selectOption('JP');
+      assert.equal(new URL(page.url()).searchParams.get('country'),'JP');
+      await page.reload();
+      await page.locator('#filters[aria-busy=false]').waitFor({state:'visible'});
+      assert.equal(await country.inputValue(),'JP');
+      const shown = await page.locator('[data-record]:visible').evaluateAll(items=>items.map(el=>el.dataset.record));
+      assert.ok(shown.includes('prolific'));
+      assert.ok(shown.every(id=>{
+        const row=data.records.find(x=>x.id===id);
+        return row.eligibility_verified && (row.eligible_countries==='worldwide' || row.eligible_countries?.includes('JP'));
+      }));
+      await page.locator('button[type=reset]').click();
+      await page.waitForFunction(() => !new URL(location.href).searchParams.has('country'));
+      assert.equal(await country.inputValue(),'');
+      assert.equal(new URL(page.url()).searchParams.has('country'),false);
       const options = page.locator('.filter-options summary');
       if (await options.count()) {
         await options.focus();

@@ -52,6 +52,16 @@ test('canonical, hreflang, language switching and internal links', () => {
   assert.ok(!read('sitemap.xml').includes('rakuten-app-draw'));
 });
 
+test('listing controls expose residence outside of advanced options and a collapsed Safari tip', () => {
+  for (const lang of ['ja','en']) for (const path of ['opportunities','sweepstakes','rewards']) {
+    const page = read(`${lang}/${path}/index.html`);
+    assert.equal((page.match(/<select name="country">/g) || []).length, 1);
+    assert.match(page, /class="search-row"[\s\S]*?name="q"[\s\S]*?<select name="country"><option value="">[\s\S]*?<select name="sort"/);
+    assert.doesNotMatch(page.match(/<details class="filter-options">[\s\S]*?<\/details>/)[0], /name="country"/);
+    assert.match(page, /<\/form>\s*<details class="home-screen-help"><summary>[^<]+<\/summary><p>Safari|<\/form>\s*<details class="home-screen-help"><summary>[^<]+<\/summary><p>In Safari/);
+  }
+});
+
 test('country filtering keeps unknown out and explicitly accepts Japan', () => {
   assert.equal(eligible(jp,'JP'),true);
   assert.equal(eligible(jp,'US'),false);

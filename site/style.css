@@ -123,7 +123,11 @@ dd { margin:0; overflow-wrap:anywhere; }
 .recent-list a { grid-column:1/-1; padding-block:.25rem; font-size:.92rem; }
 .recent-list span { font-size:.78rem; color:var(--muted); }
 .filter { margin:1rem 0; padding:1rem; background:var(--surface); border:1px solid var(--line); border-radius:var(--radius); }
-.search-row { display:grid; gap:.65rem; grid-template-columns:minmax(0,1fr) 8rem; }
+.search-row { display:grid; gap:.65rem; grid-template-columns:minmax(0,1fr) minmax(0,8rem); align-items:end; }
+.search-row .search { grid-column:1 / -1; }
+.home-screen-help { margin:-.65rem 0 .75rem; color:var(--muted); font-size:.8rem; }
+.home-screen-help summary { cursor:pointer; display:list-item; min-height:44px; padding:.65rem 0; width:fit-content; }
+.home-screen-help p { margin:0 0 .5rem; }
 label { display:block; min-width:0; font-size:.84rem; font-weight:600; }
 input[type=search],select { width:100%; display:block; min-height:44px; margin-top:.25rem; padding:.55rem .65rem; border:1px solid #8993a2; border-radius:var(--radius); font:inherit; font-size:1rem; background:white; color:var(--ink); }
 .quick-filters { display:flex; gap:.45rem; flex-wrap:wrap; margin-top:.75rem; }
@@ -160,7 +164,8 @@ footer { background:var(--surface); border-top:1px solid var(--line); margin-top
 #analytics-dialog::backdrop { background:#20273366; }
 .root-links { margin-top:1.5rem; }
 @media (min-width:48rem) {
-  .search-row { grid-template-columns:minmax(0,1fr) 12rem; }
+  .search-row { grid-template-columns:minmax(0,1fr) minmax(0,13rem) minmax(0,12rem); }
+  .search-row .search { grid-column:auto; }
   .recent-list li { grid-template-columns:minmax(15rem,2fr) 1fr auto; align-items:center; }
   .recent-list a { grid-column:auto; }
   .detail-body { display:grid; grid-template-columns:minmax(0,1.25fr) minmax(0,1fr); gap:2.25rem; }
@@ -181,7 +186,6 @@ footer { background:var(--surface); border-top:1px solid var(--line); margin-top
 @media (max-width:25rem) {
   .facts>div { grid-template-columns:5.5rem minmax(0,1fr); gap:.65rem; }
   .card { padding:1rem; }
-  .search-row { grid-template-columns:minmax(0,1fr) 7rem; }
 }
 @media (prefers-reduced-motion:reduce) { *,*::before,*::after { scroll-behavior:auto !important; transition:none !important; } }
 
