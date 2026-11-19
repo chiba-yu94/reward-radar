@@ -7,6 +7,17 @@ from urllib.parse import urlsplit
 
 LIMIT = 256_000
 GLOBAL_IPV6 = ipaddress.ip_network("2000::/3")
+GITHUB_STUDENT_ENDPOINT = (
+    "https://api.github.com/repos/github/docs/contents/content/education/"
+    "about-github-education/github-education-for-students/"
+    "apply-to-github-education-as-a-student.md?ref=main"
+)
+
+
+class UpstreamHTTPError(ValueError):
+    def __init__(self, status):
+        self.status = status
+        super().__init__(f"Upstream HTTP {status}")
 
 
 def public_ip(address):
@@ -51,11 +62,18 @@ class PinnedHTTPS(http.client.HTTPSConnection):
             raise
 
 
-def fetch_json(url, allowed_url):
-    return fetch_document(url, allowed_url, ("application/json",), {
+def fetch_json(url, allowed_url, *, token=None):
+    headers = {
         "Accept": "application/vnd.github+json",
         "X-GitHub-Api-Version": "2022-11-28",
-    })
+    }
+    if token:
+        if url != GITHUB_STUDENT_ENDPOINT or allowed_url != GITHUB_STUDENT_ENDPOINT:
+            raise ValueError("Credential target not approved")
+        if not token.isascii() or not all(c.isalnum() or c == "_" for c in token):
+            raise ValueError("Invalid collection credential")
+        headers["Authorization"] = "Bearer " + token
+    return fetch_document(url, allowed_url, ("application/json",), headers)
 
 
 def fetch_document(url, allowed_url, media_types, request_headers=None):
@@ -76,7 +94,7 @@ def fetch_document(url, allowed_url, media_types, request_headers=None):
         if 300 <= response.status < 400:
             raise ValueError("Redirect requires review")
         if response.status != 200:
-            raise ValueError(f"Upstream HTTP {response.status}")
+            raise UpstreamHTTPError(response.status)
         if response.getheader("Content-Type", "").partition(";")[0].strip().lower() not in media_types:
             raise ValueError("Unexpected content type")
         body = response.read(LIMIT + 1)

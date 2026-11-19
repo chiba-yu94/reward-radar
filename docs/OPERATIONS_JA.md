@@ -11,7 +11,7 @@ gh run view RUN_ID --log-failed
 gh run download RUN_ID -n source-observation -D var/observations/RUN_ID
 ```
 
-公開工程に失敗した日は本番を前回成功版に維持します。
+公開工程に失敗した日は本番を前回成功版に維持します。収集ログと観測ファイルには失敗の分類と、上流 HTTP エラーの場合はステータスコードだけが出ます。認証・権限の問題やレート制限を確認し、不明な応答やリビジョン差異を成功扱いしないでください。
 
 `gh run list --workflow publish.yml --event schedule --limit 5` で自動起動時刻を確認してください。翌朝、予定時刻を過ぎても実行がなければ GitHub の状態とワークフロー有効状態を確認し、手動起動します。
 

@@ -9,7 +9,7 @@ from datetime import timedelta
 from pathlib import Path
 from unittest.mock import patch
 
-from radar.net import fetch_json, https_url, PinnedHTTPS, public_ip
+from radar.net import GITHUB_STUDENT_ENDPOINT, fetch_json, https_url, PinnedHTTPS, public_ip
 from radar.pipeline import collect, inputs, publish, stamp, utc, validate
 
 
@@ -162,6 +162,49 @@ class TestPipeline(unittest.TestCase):
             with self.assertRaisesRegex(ValueError, "Redirect"):
                 fetch_json("https://example.com/a", "https://example.com/a")
             tls.assert_called_once()
+
+    def test_collection_token_only_reaches_exact_reviewed_endpoint(self):
+        for url in (GITHUB_STUDENT_ENDPOINT.replace("?ref=main", ""),
+                    GITHUB_STUDENT_ENDPOINT.replace("api.github.com", "api.github.com.example.org"),
+                    GITHUB_STUDENT_ENDPOINT + "#unreviewed"):
+            with self.subTest(url=url), patch("radar.net.PinnedHTTPS") as tls:
+                with self.assertRaisesRegex(ValueError, "Credential target"):
+                    fetch_json(url, url, token="fixture_token")
+                tls.assert_not_called()
+        with patch("radar.net.PinnedHTTPS") as tls:
+            response = tls.return_value.getresponse.return_value
+            response.status = 302
+            response.getheader.return_value = "https://other.example/redirect"
+            with self.assertRaisesRegex(ValueError, "Redirect"):
+                fetch_json(GITHUB_STUDENT_ENDPOINT, GITHUB_STUDENT_ENDPOINT, token="fixture_token")
+            self.assertEqual(tls.call_args.args, ("api.github.com",))
+            self.assertEqual(tls.return_value.request.call_args.kwargs["headers"]["Authorization"], "Bearer fixture_token")
+            tls.assert_called_once()
+            response.read.assert_not_called()
+
+    def test_diagnostics_are_sanitized_and_still_fail_closed(self):
+        source = self.sources["github-student"]
+        with patch("radar.net.PinnedHTTPS") as tls:
+            response = tls.return_value.getresponse.return_value
+            response.status = 403
+            report = collect({"github-student":source}, token="fixture_token")
+            self.assertEqual(report["github-student"],
+                             {"status":"failed", "error_type":"upstream_http", "http_status":403})
+            response.read.assert_not_called()
+        self.assertEqual(collect(self.sources, lambda *_: b'{"type":"file","sha":"0000000000000000000000000000000000000000"}')
+                         ["github-student"]["error_type"], "revision_changed")
+        with self.assertRaises(ValueError):
+            self.run_publish(report)
+
+    def test_collect_does_not_send_token_to_other_reviewed_api_sources(self):
+        source = self.sources["github-student"]
+        alternate = {**source, "endpoint": source["endpoint"].replace("?ref=main", "?ref=other")}
+        def fake_fetch(url, allowed_url, **credentials):
+            self.assertEqual(url, allowed_url)
+            self.assertEqual(credentials, {"token":"fixture_token"} if url == GITHUB_STUDENT_ENDPOINT else {})
+            return json.dumps({"type":"file", "sha":source["reviewed_revision"]})
+        self.assertTrue(all(x["status"] == "unchanged" for x in collect(
+            {"github-student":source, "alternate":alternate}, fake_fetch, token="fixture_token").values()))
 
     def test_hostname_checks_and_dns_rebinding(self):
         for url in ["http://example.com", "javascript:alert(1)", "https://example.com@evil.com",

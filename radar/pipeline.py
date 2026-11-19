@@ -3,6 +3,7 @@ import argparse
 import hashlib
 import json
 import math
+import os
 import re
 import sqlite3
 import sys
@@ -13,7 +14,7 @@ from pathlib import Path
 from zoneinfo import ZoneInfo, ZoneInfoNotFoundError
 
 from .application import application_profile
-from .net import fetch_json, https_url
+from .net import GITHUB_STUDENT_ENDPOINT, UpstreamHTTPError, fetch_json, https_url
 
 ROOT = Path(__file__).resolve().parents[1]
 TAXONOMY = json.loads((ROOT / "data/taxonomy.json").read_text())
@@ -291,18 +292,26 @@ def deadline_end(row):
     return stamp(row["deadline"]) + (timedelta(seconds=1) if row.get("deadline_date_only") else timedelta())
 
 
-def collect(sources, fetch=fetch_json):
+def collect(sources, fetch=fetch_json, *, token=None):
     report = {}
     for sid, source in sources.items():
         if not source["active"] or source["method"] != "github-content":
             continue
         endpoint = source["endpoint"]
         try:
-            doc = json.loads(fetch(endpoint, endpoint))
-            require(doc["type"] == "file" and SHA.fullmatch(doc["sha"]), "Unexpected API document")
-            require(doc["sha"] == source["reviewed_revision"], "Source revision changed; review required")
+            credentials = {"token": token} if token and sid == "github-student" and endpoint == GITHUB_STUDENT_ENDPOINT else {}
+            doc = json.loads(fetch(endpoint, endpoint, **credentials))
+            sha = doc.get("sha") if isinstance(doc, dict) else None
+            if not isinstance(sha, str) or not SHA.fullmatch(sha) or doc.get("type") != "file":
+                report[sid] = {"status": "failed", "error_type": "unexpected_document"}
+                continue
+            if sha != source["reviewed_revision"]:
+                report[sid] = {"status": "failed", "error_type": "revision_changed"}
+                continue
             report[sid] = {"status": "unchanged", "revision": doc["sha"],
                            "checked_at": utc(datetime.now(timezone.utc))}
+        except UpstreamHTTPError as error:
+            report[sid] = {"status": "failed", "error_type": "upstream_http", "http_status": error.status}
         except (OSError, ValueError, KeyError, TypeError, AttributeError) as error:
             report[sid] = {"status": "failed", "error_type": type(error).__name__}
     return report
@@ -392,10 +401,12 @@ def main():
     rows, sources = inputs()
     if args.mode == "collect":
         require(args.observation, "Specify --observation for collection")
-        report = collect(sources)
+        report = collect(sources, token=os.environ.get("REVIEWED_GITHUB_CONTENTS_TOKEN"))
         dump(args.observation, report)
         for sid, result in report.items():
-            print(f"{sid}: {result['status']}")
+            error = f" ({result['error_type']})" if "error_type" in result else ""
+            http_status = f" HTTP {result['http_status']}" if "http_status" in result else ""
+            print(f"{sid}: {result['status']}{error}{http_status}")
         return int(any(result["status"] == "failed" for result in report.values()))
     observation = read(args.observation) if args.observation else {}
     if args.observation:
