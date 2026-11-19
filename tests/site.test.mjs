@@ -14,6 +14,30 @@ const jp = rows.find(row => row.id === 'macromill');
 const draw = {...jp, eligible_countries:null, eligibility_verified:false, deadline:null};
 const now = Date.parse('2026-11-06T00:00:00Z');
 
+test('root and localized pages share the pixel mark and home screen icon', () => {
+  for (const path of ['index.html','ja/index.html','en/index.html','ja/sweepstakes/index.html','en/sweepstakes/index.html']) {
+    const page = read(path);
+    assert.match(page, /<link rel="icon" href="\/favicon-5cf2e8207d44\.ico">/);
+    assert.match(page, /<link rel="icon" type="image\/svg\+xml" href="\/assets\/mark-5cf2e8207d44\.svg">/);
+    assert.match(page, /<link rel="apple-touch-icon" sizes="180x180" href="\/apple-touch-icon-5cf2e8207d44\.png">/);
+    assert.equal((page.match(/<img src="\/assets\/mark-5cf2e8207d44\.svg" alt="" width="32" height="32">/g) || []).length, path === 'index.html' ? 1 : 2);
+  }
+  for (const path of ['favicon.ico','assets/mark.svg','apple-touch-icon.png']) {
+    const versioned = path.replace(/\.([^.]+)$/,'-5cf2e8207d44.$1');
+    assert.deepEqual(readFileSync('dist/' + versioned), readFileSync('dist/' + path));
+  }
+  const svg = read('assets/mark.svg');
+  assert.match(svg, /viewBox="0 0 48 48" shape-rendering="crispEdges"/);
+  const touch = readFileSync('dist/apple-touch-icon.png');
+  assert.equal(touch.readUInt32BE(0),0x89504e47);
+  assert.equal(touch.readUInt32BE(16),180);
+  assert.equal(touch.readUInt32BE(20),180);
+  const ico = readFileSync('dist/favicon.ico');
+  assert.equal(ico.readUInt16LE(2),1);
+  assert.equal(ico.readUInt16LE(4),3);
+  assert.deepEqual([ico[6],ico[22],ico[38]].sort((a,b)=>a-b),[16,32,48]);
+});
+
 test('locale structure, missing translation and actual HTML', () => {
   verifyLocales();
   assert.match(read('ja/index.html'), /<span>懸賞さんぽ<\/span>/);

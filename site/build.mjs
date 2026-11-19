@@ -45,10 +45,17 @@ await mkdir('var', {recursive:true});
 const dist = await mkdtemp(resolve('var/site-build-'));
 await mkdir(dist + '/assets', {recursive:true});
 const write = (file, data) => writeFile(dist + '/' + file, data);
+const iconVersion = '5cf2e8207d44';
+const versionedIcon = path => path.replace(/\.([^.]+)$/, `-${iconVersion}.$1`);
+const iconAssets = ['favicon.ico', 'apple-touch-icon.png', 'assets/mark.svg'];
+
 for (const asset of ['style.css', 'client.mjs', 'domain.mjs', 'status.mjs', 'mark.svg', 'social.png', 'chevron.svg']) {
   await copyFile('site/' + asset, dist + '/assets/' + asset);
 }
-await copyFile('site/favicon.ico', dist + '/favicon.ico');
+for (const asset of ['favicon.ico', 'apple-touch-icon.png']) {
+  await copyFile('site/' + asset, dist + '/' + asset);
+}
+for (const icon of iconAssets) await copyFile(dist + '/' + icon, dist + '/' + versionedIcon(icon));
 if (analytics) await copyFile('site/analytics.mjs', dist + '/assets/analytics.mjs');
 const headers = await readFile('site/_headers', 'utf8');
 const collection = 'https://www.google-analytics.com https://region1.google-analytics.com https://analytics.google.com';
@@ -66,7 +73,8 @@ const url = (lang, page = '') => '/' + lang + '/' + (page ? page + '/' : '');
 const detail = (lang, row) => url(lang, 'opportunities/' + row.id);
 const time = (value, lang, full = false, zone) => `<time datetime="${e(value)}">${e(date(value, lang, full, zone))}</time>`;
 const address = `<a href="mailto:${email}">${email}</a>`;
-const brand = name => `<img src="/assets/mark.svg" alt="" width="32" height="32"><span>${e(name)}</span>`;
+const iconLinks = `<link rel="icon" href="${versionedIcon('/favicon.ico')}"><link rel="icon" type="image/svg+xml" href="${versionedIcon('/assets/mark.svg')}"><link rel="apple-touch-icon" sizes="180x180" href="${versionedIcon('/apple-touch-icon.png')}">`;
+const brand = name => `<img src="${versionedIcon('/assets/mark.svg')}" alt="" width="32" height="32"><span>${e(name)}</span>`;
 const primary = ['opportunities', 'sweepstakes', 'rewards', 'international'];
 const secondary = ['guaranteed', 'affiliates', 'ranking', 'about', 'contact', 'privacy', 'disclosure'];
 const maps = [];
@@ -150,7 +158,7 @@ ${languages.map(locale => `<link rel="alternate" hreflang="${locale}" href="${or
 <meta property="og:locale" content="${lang === 'ja' ? 'ja_JP' : 'en_US'}"><meta property="og:locale:alternate" content="${other === 'ja' ? 'ja_JP' : 'en_US'}">
 <meta property="og:url" content="${origin.origin}${current}">
 <meta property="og:image" content="${origin.origin}/assets/social.png"><meta property="og:image:width" content="1200"><meta property="og:image:height" content="630"><meta name="twitter:card" content="summary_large_image">
-<link rel="icon" type="image/svg+xml" href="/assets/mark.svg"><link rel="stylesheet" href="/assets/style.css">
+${iconLinks}<link rel="stylesheet" href="/assets/style.css">
 <script type="module" src="/assets/client.mjs"></script>
 ${consent ? '<script type="module" src="/assets/analytics.mjs"></script>' : ''}</head>
 <body><a class="skip" href="#main">${t.skip}</a><header class="masthead"><div class="wrap header-inner">
@@ -438,7 +446,7 @@ ${key === 'privacy' && analytics ? `<p><button type="button" data-analytics-sett
 await write('index.html', `<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width">
 <title>Freebie Trail / 懸賞さんぽ | Choose a language</title>${adsenseMeta}${impactMeta}
 <meta name="description" content="Find giveaways you can enter without a purchase.">
-<meta property="og:image" content="${origin.origin}/assets/social.png"><meta name="twitter:card" content="summary_large_image"><link rel="icon" href="/favicon.ico"><meta property="og:title" content="Freebie Trail / 懸賞さんぽ"><meta property="og:description" content="Find giveaways you can enter without a purchase."><meta property="og:url" content="${origin.origin}/"><link rel="canonical" href="${origin.origin}/">
+<meta property="og:image" content="${origin.origin}/assets/social.png"><meta name="twitter:card" content="summary_large_image">${iconLinks}<meta property="og:title" content="Freebie Trail / 懸賞さんぽ"><meta property="og:description" content="Find giveaways you can enter without a purchase."><meta property="og:url" content="${origin.origin}/"><link rel="canonical" href="${origin.origin}/">
 ${languages.map(lang => `<link rel="alternate" hreflang="${lang}" href="${origin.origin}${url(lang)}">`).join('')}
 <link rel="alternate" hreflang="x-default" href="${origin.origin}/">
 ${configured ? '' : '<meta name="robots" content="noindex">'}
