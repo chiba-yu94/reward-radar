@@ -210,6 +210,12 @@ html[lang="en"] .masthead-residence { width:6.5rem; padding-left:.3rem; }
   .header-inner--residence .site-menu summary { justify-content:center; width:44px; padding:0; font-size:0; }
   .header-inner--residence .site-menu summary::after { margin-left:0; }
 }
+@media (max-width:350px) {
+  html[lang="en"] .header-inner--residence { width:calc(100% - 4px); }
+  html[lang="en"] .header-inner--residence .brand { font-size:.75rem; gap:.125rem; }
+  html[lang="en"] .header-inner--residence .brand img { width:21px; height:21px; }
+}
+
 
 
 /* Service cards share neutral surfaces; the advertising label identifies sponsorship. */
