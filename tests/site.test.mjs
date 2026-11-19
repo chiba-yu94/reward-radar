@@ -339,6 +339,67 @@ test('Freecash comparison cards lead with tasks, disclose costs and link through
 });
 
 
+test('Rewards adds a neutral Japan comparison and keeps the existing ad and giveaway paths distinct', () => {
+  for (const lang of ['ja','en']) {
+    const path = `/${lang}/rewards/`;
+    const html = read(path.slice(1) + 'index.html');
+    const comparison = html.match(/<section[^>]+id="rewards-comparison".*?<\/section>/s)?.[0];
+    assert.ok(comparison);
+    assert.ok(comparison.includes(copy[lang].rewardsGuide.costs));
+    assert.ok(comparison.includes(copy[lang].expenses.free));
+    assert.ok(comparison.includes(copy[lang].registrations.organizer));
+    assert.match(comparison, /data-expire-when-stale=/);
+    for (const id of ['research-panel','prolific']) {
+      assert.ok(comparison.includes(`href="/${lang}/opportunities/${id}/"`));
+      assert.ok(comparison.includes(`href="/${lang}/opportunities/${id}/#official-sources"`));
+    }
+    assert.doesNotMatch(comparison, /freecash|usertesting|affiliate_click|application_click|sponsored-card/i);
+    const rewardAd = html.match(/data-record="freecash"/g) ?? [];
+    assert.equal(rewardAd.length, rows.some(row => row.id === 'freecash') ? 1 : 0);
+    const sponsor = html.match(/<aside class="rewards-sponsored-link[^>]*>.*?<\/aside>/s)?.[0];
+    if (rewardAd.length) {
+      assert.ok(sponsor);
+      assert.ok(sponsor.includes(copy[lang].sponsoredLabel));
+      assert.ok(sponsor.includes(`href="/${lang}/opportunities/freecash/"`));
+      assert.match(sponsor, /data-affiliate-expires="[^"]+"/);
+      assert.match(sponsor, /data-expire-when-stale="[^"]+"/);
+      assert.doesNotMatch(sponsor, /https?:|affiliate_click|research-panel|prolific/);
+      assert.ok(html.indexOf(sponsor) > html.indexOf(comparison) + comparison.length - 1);
+      assert.ok(html.indexOf(sponsor) < html.indexOf('id="filters"'));
+    } else {
+      assert.equal(sponsor, undefined);
+    }
+    assert.ok(html.includes(`rel="canonical" href="${origin}${path}"`));
+    assert.match(html, /<meta name="robots" content="index, follow">/);
+    const anchor = `href="${path}#rewards-comparison"`;
+    assert.ok(read(`${lang}/index.html`).includes(anchor));
+    const draws = read(`${lang}/sweepstakes/index.html`);
+    assert.ok(draws.includes(anchor));
+    assert.ok(draws.indexOf(anchor) > draws.indexOf('id="listing-results"'));
+    assert.doesNotMatch(draws, /data-record="freecash"|affiliate_click/);
+  }
+});
+
+test('Rewards shortcut is omitted after approval expiry or stale verification', () => {
+  const original = readFileSync('var/published.json','utf8');
+  const data = JSON.parse(original);
+  const freecash = data.records.find(row => row.id === 'freecash');
+  if (!freecash) return;
+  const buildLater = () => execFileSync(process.execPath,['site/build.mjs'], {
+    env:{...process.env,SITE_ORIGIN:origin,QA_NOW:'2026-12-08T00:00:00Z'}
+  });
+  try {
+    buildLater();
+    assert.doesNotMatch(read('ja/rewards/index.html'), /rewards-sponsored-link|data-record="freecash"/);
+    freecash.affiliate_expires_at = '2026-12-15T00:00:00Z';
+    execFileSync(process.execPath,['-e','require("node:fs").writeFileSync("var/published.json",process.argv[1])',JSON.stringify(data)]);
+    buildLater();
+    const rewards = read('ja/rewards/index.html');
+    assert.match(rewards, /data-record="freecash"/);
+    assert.doesNotMatch(rewards, /rewards-sponsored-link/);
+  } finally { build(); }
+});
+
 test('invalid generated data never replaces the previous built site', () => {
   const original = readFileSync('var/published.json','utf8');
   const previous = read('ja/index.html');

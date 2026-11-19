@@ -15,7 +15,15 @@ export const copy = {
     freecashCost:'登録は無料。購入・課金が条件のタスクもあります。',
     freecashPayout:'初回出金の目安は25米ドル（地域により異なる）。本人確認が必要です。出金方法ごとに最低額・手数料が異なります。Cashout画面で確認してください。',
     freecashRestrictions:'サービス提供国は未確認です。VPNで居住地を偽る利用は禁止されています。',
-    rewardsLead:'ゲーム・アンケート・調査など、取り組む内容と報酬の受け取り方を比較。',
+    rewardsLead:'アンケート・調査・ゲームの参加費用と、報酬の受け取り方を確認。',
+    rewardsGuide: {
+      title:'日本から参加できるアンケート・有償調査の比較',
+      entry:'日本在住者の参加条件と、参加費・購入が不要なことを確認した例です。参加資格や募集の有無は調査ごとに異なります。',
+      costs:'タスク型サービスは登録が無料でも、購入やアプリ内課金が条件の案件があります。始める前に費用と受取条件を確認してください。',
+      empty:'現在、日本から費用なしで参加できると確認した比較対象はありません。',
+      link:'アンケート・有償調査の参加費用と受取方法を比べる',
+      sponsoredLink:'Freecashの費用と参加条件を見る',
+    },
 
     application: {noSns:'SNS不要', webOnly:'Web完結', easyApply:'簡単応募', sns:'SNS', platforms:'対象SNS', web:'Web完結', registration:'無料会員登録', operations:'応募操作', count:'応募手順数', difficulty:'応募の難易度', evidence:'応募条件の確認元', yes:'必要', no:'不要', webYes:'確認済み', webNo:'Web以外の手続きあり', easy:'簡単', standard:'標準', hard:'手間あり',
       names:{review:'商品レビューを書く', form:'フォーム入力', 'read-issue':'広報誌を確認', quiz:'クイズに回答', survey:'アンケートに回答', email:'メール送信', 'email-verify':'メール認証', register:'登録', follow:'フォロー', repost:'リポスト', like:'いいね', comment:'コメント', 'create-post':'新規投稿', 'quote-post':'引用投稿', 'link-accounts':'アカウント連携'}},
@@ -77,7 +85,7 @@ export const copy = {
     compare: '参加方法を比較する', compareLead: '公式資料をもとに、選考や換金条件の違いを確認できます。',
     legalContact: 'お問い合わせ先', copyright: '懸賞さんぽ',
     pages: {
-      rewards: ['ポイ活・タスク報酬', 'アンケート、ゲーム、ポイントサービスの参加条件と受け取り方法。'],
+      rewards: ['ポイ活・タスク報酬', '日本から参加できるアンケートや有償調査を比較。参加費、ポイント交換・出金の条件と、ゲーム案件の購入や課金の有無を確認できます。'],
       opportunities: ['掲載一覧', '消費者向けの特典を、費用・対象地域・参加方法から絞り込めます。'],
       sweepstakes: ['懸賞・プレゼント', '日本在住者が応募できる、SNS不要・無料のWeb懸賞を探せます。締切、会員登録の要否、公式の応募条件を確認できます。'],
       guaranteed: ['条件達成の特典', '条件を満たすと付与される特典です。金額、交換方法、必要な費用は詳細ページに記載します。'],
@@ -132,7 +140,15 @@ export const copy = {
     freecashCost:'Free registration. Some tasks require a purchase or in-app spending.',
     freecashPayout:'The first cashout is typically US$25 (varies by region) and requires ID verification. Minimums and fees depend on the method. Check the Cashout screen before starting.',
     freecashRestrictions:'Service availability by country is unverified. Using a VPN to misrepresent your location is prohibited.',
-    rewardsLead:'Compare what you do and how you redeem rewards: games, surveys or research studies.',
+    rewardsLead:'Compare participation costs and how to redeem rewards from surveys, research, and games.',
+    rewardsGuide: {
+      title:'Compare surveys and paid research available to Japan residents',
+      entry:'These examples explicitly include Japan residents and require no entry fee or purchase. Qualification and availability vary by study.',
+      costs:'Some task platforms are free to join, but individual offers may require a purchase or in-app spending. Check the cost and payout terms first.',
+      empty:'No no-cost services with verified eligibility in Japan currently qualify for this comparison.',
+      link:'Compare entry costs and payout terms for surveys and research',
+      sponsoredLink:'Check Freecash costs and eligibility',
+    },
 
     application: {noSns:'No social account needed', webOnly:'Web only', easyApply:'Easy entry', sns:'Social account', platforms:'Social platforms', web:'Web-only entry', registration:'Free membership registration', operations:'Entry actions', count:'Number of steps', difficulty:'Entry difficulty', evidence:'Entry requirements source', yes:'Required', no:'Not required', webYes:'Verified', webNo:'Requires a step outside the website', easy:'Easy', standard:'Standard', hard:'More involved',
       names:{review:'Write a product review', form:'Fill out a form', 'read-issue':'Read the newsletter', quiz:'Answer the quiz', survey:'Complete the survey', email:'Send an email', 'email-verify':'Verify your email', register:'Register', follow:'Follow', repost:'Repost', like:'Like', comment:'Comment', 'create-post':'Create a post', 'quote-post':'Quote-post', 'link-accounts':'Link accounts'}},
@@ -195,7 +211,7 @@ export const copy = {
     compare: 'Compare ways to participate', compareLead: 'Use official-source facts to compare screening and redemption requirements.',
     legalContact: 'Contact', copyright: 'Freebie Trail',
     pages: {
-      rewards: ['Rewards', 'Surveys, games and points services. Check task costs, eligibility and cashout requirements.'],
+      rewards: ['Rewards', 'Compare surveys and paid research available in Japan. Check entry costs, redemption or cashout terms, and whether game tasks may require spending.'],
       opportunities: ['All opportunities', 'Search giveaways, surveys and task rewards by country and entry requirements.'],
       sweepstakes: ['Sweepstakes and giveaways', 'Find free online giveaways without social media, including listings for Japan residents. Check deadlines, registration requirements and official rules.'],
       guaranteed: ['Rewards on completion', 'These rewards are granted once the listed conditions are met. See each listing for value, redemption and any required spending.'],

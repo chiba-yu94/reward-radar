@@ -65,8 +65,10 @@ button:disabled { color:var(--muted); background:var(--surface); cursor:default;
 .section-heading p { width:100%; margin:0; color:var(--muted); font-size:.9rem; }
 .giveaway-list { list-style:none; padding:0; margin:0; max-width:49rem; }
 .giveaway-list li { padding:.65rem 0; border-bottom:1px solid var(--line); }
-.giveaway-list h4 { margin-bottom:.2rem; }
+.giveaway-list h4, .rewards-comparison h3 { margin-bottom:.2rem; }
 .giveaway-list p { margin-bottom:.35rem; }
+.rewards-sponsored-link { margin:0 0 1.25rem; padding:.6rem 0; border-top:1px solid var(--line); border-bottom:1px solid var(--line); }
+.rewards-cross-link { margin-top:1.5rem; }
 .cards { display:grid; grid-template-columns:repeat(auto-fill,minmax(min(100%,20rem),1fr)); gap:1rem; }
 .card { display:flex; flex-direction:column; min-width:0; border:1px solid var(--line); border-radius:var(--radius); padding:1.15rem; background:white; overflow-wrap:anywhere; }
 .card h3 { margin-bottom:.2rem; }

@@ -292,6 +292,43 @@ ${list(others)}<p data-expiry-empty hidden>${e(guide.empty)}</p></section>` : ''
 </section>`;
 }
 
+function rewardsGuide(lang, available) {
+  const t = copy[lang];
+  const guide = t.rewardsGuide;
+  // This comparison is editorial. Ads and unverified service markets never qualify.
+  const organic = available.filter(row => ['survey','research'].includes(row.category) &&
+    !taskService(row) && !row.affiliate_url && row.eligibility_verified &&
+    Array.isArray(row.eligible_countries) && row.eligible_countries.includes('JP') &&
+    row.required_expense.kind === 'free' && freshness(row,now).state === 'fresh');
+  // Keep the comparison short and cover both formats when verified listings exist.
+  const example = (category, preferredId) => organic.find(row => row.id === preferredId) ??
+    organic.find(row => row.category === category);
+  const examples = [example('survey','research-panel'), example('research','prolific')].filter(Boolean);
+  return `<section class="section" id="rewards-comparison" aria-labelledby="rewards-comparison-heading">
+<div class="section-heading"><h2 id="rewards-comparison-heading">${e(guide.title)}</h2><p>${e(guide.entry)}</p></div>
+<ul class="giveaway-list rewards-comparison" data-expiry-list${examples.length ? '' : ' hidden'}>${examples.map(row => `<li ${listingExpiry(row)} data-expire-when-stale="${e(row.last_checked_at)}">
+<h3><a href="${detail(lang,row)}">${e(row['title_' + lang])}</a></h3>
+<p class="small">${e(t.categories[row.category])} · ${e(t.expenses.free)}${row.entry.registration !== 'unknown' ? ` · ${e(t.registrations[row.entry.registration])}` : ''} · ${e(t.checked)} ${time(row.last_checked_at,lang)}</p>
+<p>${e(row.reward_conditions[lang])}</p>
+<p class="small"><a href="${detail(lang,row)}#official-sources">${e(t.officialSources)}</a></p>
+</li>`).join('')}</ul>
+<p data-expiry-empty${examples.length ? ' hidden' : ''}>${e(guide.empty)}</p>
+<p class="small">${e(guide.costs)}</p></section>`;
+}
+
+function rewardsSponsorLink(lang, available) {
+  const row = available.find(row => row.id === 'freecash' && sponsoredLink(row) &&
+    freshness(row,now).state === 'fresh');
+  if (!row) return '';
+  const t = copy[lang];
+  return `<aside class="rewards-sponsored-link small" ${listingExpiry(row)} data-expire-when-stale="${e(row.last_checked_at)}">
+<span class="sponsored-label">${e(t.sponsoredLabel)}</span> <a href="${detail(lang,row)}">${e(t.rewardsGuide.sponsoredLink)}</a></aside>`;
+}
+
+function rewardsGuideLink(lang) {
+  return `<p class="small rewards-cross-link"><a href="${url(lang,'rewards')}#rewards-comparison">${e(copy[lang].rewardsGuide.link)}</a></p>`;
+}
+
 function details(lang, row) {
   const t = copy[lang];
   const sponsored = taskService(row);
@@ -366,7 +403,7 @@ ${external(hapitasUrl,t.hapitas.cta,'affiliate_click')}
   const recentList = `<section class="section"><div class="section-heading"><h2>${t.recent}</h2></div>
 <ul class="recent-list">${recent.map(row => `<li data-expiring="${e(expiryValue(row))}"><a href="${detail(lang,row)}">${e(row['title_' + lang])}</a>
 <span>${e(row.provider)}</span><span>${time(row.first_seen_at,lang)}</span></li>`).join('')}</ul></section>`;
-  const rewardsPreview = `<section class="section"><div class="section-heading"><h2><a href="${url(lang,'rewards')}">${t.pages.rewards[0]}</a></h2><p>${t.rewardsLead}</p></div><div class="cards">${['freecash','research-panel','prolific'].map(id => rewardRows.find(row => row.id === id)).filter(Boolean).map(row => card(row,lang)).join('')}</div></section>`;
+  const rewardsPreview = `<section class="section"><div class="section-heading"><h2><a href="${url(lang,'rewards')}#rewards-comparison">${t.pages.rewards[0]}</a></h2><p>${t.rewardsLead}</p></div><div class="cards">${['freecash','research-panel','prolific'].map(id => rewardRows.find(row => row.id === id)).filter(Boolean).map(row => card(row,lang)).join('')}</div></section>`;
   await page(lang,'',t.tagline,t.lead,`<section class="hero"><div class="hero-copy"><p class="eyebrow">${t.cap}</p><h1>${t.tagline}</h1><p class="lead">${t.lead}</p>
 <form class="home-search" role="search" action="${url(lang,'opportunities')}" method="get"><label class="sr-only" for="home-query">${t.search}</label><input id="home-query" type="search" name="q" maxlength="150" placeholder="${e(t.placeholder)}"><button type="submit">${t.searchSubmit}</button></form>
 <div class="home-shortcuts"><a href="${url(lang,'sweepstakes')}#no-sns-giveaways">${e(t.sweepstakesGuide.shortcut)}</a><a href="${url(lang,'sweepstakes')}?easyApply=yes">${t.application.easyApply}</a><a href="${url(lang,'international')}">${t.pages.international[0]}</a></div></div></section>
@@ -384,7 +421,7 @@ ${rewardsPreview}${recentList}${hapitasAd}`);
   for (const [key, available] of Object.entries(pages)) {
     const [title, description] = t.pages[key];
     await page(lang,key,title,description,`<header class="intro"><h1>${e(title)}</h1><p class="lead">${e(description)}</p>
-${key === 'sweepstakes' && lang === 'en' ? '<p class="region-note">Most listings are for Japan residents. Filter by your country before entering.</p>' : ''}${key === 'affiliates' ? `<a href="${url(lang,'rewards')}">${t.pages.rewards[0]} →</a>` : ''}</header>${key === 'sweepstakes' ? sweepstakesGuide(lang,available) : ''}${directory(lang,available)}`,available.length > 0);
+${key === 'sweepstakes' && lang === 'en' ? '<p class="region-note">Most listings are for Japan residents. Filter by your country before entering.</p>' : ''}${key === 'affiliates' ? `<a href="${url(lang,'rewards')}">${t.pages.rewards[0]} →</a>` : ''}</header>${key === 'sweepstakes' ? sweepstakesGuide(lang,available) : key === 'rewards' ? rewardsGuide(lang,available) + rewardsSponsorLink(lang,available) : ''}${directory(lang,available)}${key === 'sweepstakes' ? rewardsGuideLink(lang) : ''}`,key === 'rewards' || available.length > 0);
   }
   for (const key of secondary.filter(key => !['affiliates','guaranteed'].includes(key))) {
     const [title, description] = t.pages[key];
