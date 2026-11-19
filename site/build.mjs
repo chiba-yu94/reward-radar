@@ -1,7 +1,7 @@
 import {readFile, mkdir, writeFile, copyFile, rm, cp, readdir, mkdtemp} from 'node:fs/promises';
 import {resolve, relative} from 'node:path';
 import {copy, email, languages, verifyLocales} from './locales.mjs';
-import {date, expiration, expired, money, ordered, stale, freshness} from './domain.mjs';
+import {date, expiration, expired, money, ordered, stale, freshness, verifiedJapanGiveaway} from './domain.mjs';
 
 import {dateCopy} from './status.mjs';
 import {validatePublic} from './quality.mjs';
@@ -273,13 +273,23 @@ function sweepstakesGuide(lang, available) {
   const guide = t.sweepstakesGuide;
   const matches = available.filter(row => row.required_expense.kind === 'free' &&
     row.application?.sns_required === false && row.application.web_only === true);
+  const source = row => row.source_url === row.official_url
+    ? `<a href="${detail(lang,row)}#official-sources">${e(guide.source)}</a>`
+    : `<a href="${e(row.source_url)}" rel="noopener noreferrer" target="_blank">${e(guide.source)}</a>`;
+  const list = (entries, fresh = false) => `<ul class="giveaway-list" data-expiry-list${entries.length ? '' : ' hidden'}>${entries.map(row => `<li ${listingExpiry(row)}${fresh ? ` data-expire-when-stale="${e(row.last_checked_at)}"` : ''}>
+<h4><a href="${detail(lang,row)}">${e(row['title_' + lang])}</a></h4>
+<p class="small">${e(t.residency)} · ${e(countryText(row,lang))} / ${e(t.deadline)} · ${deadlineText(row,lang)}</p>
+<p>${e(row['eligibility_' + lang])}${row.entry.steps ? ` ${e(row.entry.steps[lang])}` : ''}</p>
+<p class="small">${e(t.registration)} · ${e(t.registrations[row.entry.registration] ?? t.unknown)} / ${e(t.checked)} · ${time(row.last_checked_at,lang)} / ${source(row)}</p>${freshnessNotice(row,lang)}</li>`).join('')}</ul>`;
+  const japan = matches.filter(row => verifiedJapanGiveaway(row, now));
+  const others = matches.filter(row => !japan.includes(row));
   return `<section class="section" id="no-sns-giveaways" aria-labelledby="no-sns-heading">
 <div class="section-heading"><h2 id="no-sns-heading">${e(guide.title)}</h2><p>${e(guide.entry)}</p><p>${e(guide.region)}</p></div>
-<ul class="giveaway-list" data-expiry-list${matches.length ? '' : ' hidden'}>${matches.map(row => `<li ${listingExpiry(row)}>
-<h3><a href="${detail(lang,row)}">${e(row['title_' + lang])}</a></h3>
-<p class="small">${e(t.residency)} · ${e(countryText(row,lang))} / ${e(t.deadline)} · ${deadlineText(row,lang)}</p>
-<p>${e(row['eligibility_' + lang])}${row.entry.steps ? ` ${e(row.entry.steps[lang])}` : ''}</p></li>`).join('')}</ul>
-<p data-expiry-empty${matches.length ? ' hidden' : ''}>${e(guide.empty)}</p></section>`;
+<section aria-labelledby="japan-giveaways"><h3 id="japan-giveaways">${e(guide.japan)}</h3>
+${list(japan, true)}<p data-expiry-empty${japan.length ? ' hidden' : ''}>${e(guide.japanEmpty)}</p></section>
+${others.length ? `<section aria-labelledby="other-giveaways"><h3 id="other-giveaways">${e(guide.other)}</h3>
+${list(others)}<p data-expiry-empty hidden>${e(guide.empty)}</p></section>` : ''}
+</section>`;
 }
 
 function details(lang, row) {
@@ -327,7 +337,7 @@ ${row.entry.registration === 'unknown' || (row.certainty === 'chance' && (row.en
 <section><h2>${t.conditions}</h2><p>${e(row.reward_conditions[lang])}</p>
 ${sponsored ? `<p>${t.freecashPayout}</p><details class="country-details"><summary>${t.markets}</summary><p>${e(promotionText(row,lang))}</p><p>${t.freecashRestrictions}</p></details>` : Array.isArray(row.eligible_countries) && row.eligible_countries.length > 4 ? `<details class="country-details"><summary>${t.countries}</summary><p>${e(countryText(row,lang))}</p></details>` : ''}
 ${terms}</section></div>
-<section class="sources"><h2>${t.officialSources}</h2><p class="stamp">${t.checked} · ${time(row.last_checked_at,lang,true)} · ${elapsed(row,lang)}</p>
+<section class="sources" id="official-sources"><h2>${t.officialSources}</h2><p class="stamp">${t.checked} · ${time(row.last_checked_at,lang,true)} · ${elapsed(row,lang)}</p>
 <ul class="source-links">${links.map(link => `<li><a href="${e(link)}" target="_blank" rel="noopener noreferrer">${e(sourceLabel(link,row,t))}</a></li>`).join('')}</ul></section>
 ${related.length ? `<section class="sources" aria-labelledby="related-listings"><h2 id="related-listings">${e(t.relatedListings)}</h2>
 <ul class="source-links" data-expiry-list>${related.map(candidate => `<li ${listingExpiry(candidate)}><a href="${detail(lang,candidate)}">${e(candidate['title_' + lang])}</a></li>`).join('')}</ul></section>` : ''}

@@ -21,7 +21,9 @@ export function updateDates(root, now, lang) {
   }
   for (const element of root.querySelectorAll('[data-record], [data-expiring]')) {
     const end = expiration({deadline:element.dataset.deadline || element.dataset.expiring});
-    element.hidden = element.hasAttribute('data-unavailable') || end <= now || timestamp(element.dataset.affiliateExpires) <= now;
+    const guideStale = element.hasAttribute('data-expire-when-stale') &&
+      freshness({last_checked_at:element.dataset.expireWhenStale},now).state !== 'fresh';
+    element.hidden = element.hasAttribute('data-unavailable') || end <= now || guideStale || timestamp(element.dataset.affiliateExpires) <= now;
   }
   for (const list of root.querySelectorAll('[data-expiry-list]')) {
     list.hidden = !list.querySelector('li:not([hidden])');

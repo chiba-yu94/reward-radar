@@ -4,7 +4,7 @@ import {copy} from '../site/locales.mjs';
 
 const origin = process.env.TEST_ORIGIN || 'http://127.0.0.1:8787';
 const now = new Date('2026-11-08T12:00:00Z');
-const browser = await chromium.launch({channel:'chrome'});
+const browser = await chromium.launch({channel:'chrome', executablePath:process.env.CHROME_BIN || undefined});
 let checks = 0;
 try {
   const context = await browser.newContext();
@@ -64,14 +64,23 @@ try {
     await page.goto(`${origin}/${lang}/sweepstakes/`);
     const guide = page.locator('#no-sns-giveaways');
     assert.equal(await guide.locator('li:visible').count(),4);
+    const japanGuide = guide.locator('[aria-labelledby="japan-giveaways"]');
+    const otherGuide = guide.locator('[aria-labelledby="other-giveaways"]');
+    assert.equal(await japanGuide.locator('li:visible').count(),1);
+    assert.equal(await otherGuide.locator('li:visible').count(),3);
     await page.clock.setFixedTime(new Date('2026-11-15T15:00:00Z'));
     await page.evaluate(()=>window.dispatchEvent(new Event('pageshow')));
     assert.equal(await guide.locator('li:visible').count(),3);
+    // Verification may become stale before the giveaway deadline on a cached page.
+    await japanGuide.locator('li').evaluate(el => el.dataset.expireWhenStale = '2026-10-16T15:00:00Z');
+    await page.evaluate(()=>window.dispatchEvent(new Event('pageshow')));
+    assert.equal(await japanGuide.locator('li:visible').count(),0);
+    assert.equal(await japanGuide.locator('[data-expiry-empty]').isVisible(),true);
     await page.clock.setFixedTime(new Date('2026-12-01T05:00:00Z'));
     await page.evaluate(()=>window.dispatchEvent(new Event('pageshow')));
-    assert.equal(await guide.locator('ul').isVisible(),false);
-    assert.equal(await guide.locator('[data-expiry-empty]').isVisible(),true);
-    checks += 3;
+    assert.equal(await guide.locator('ul:visible').count(),0);
+    assert.equal(await guide.locator('[data-expiry-empty]:visible').count(),2);
+    checks += 7;
 
     await page.clock.setFixedTime(now);
     await page.goto(`${origin}/${lang}/opportunities/`);

@@ -31,6 +31,15 @@ export function eligible(row, country) {
     (Array.isArray(row.eligible_countries) && row.eligible_countries.includes(country)));
 }
 
+// The Japan guide requires explicit residency evidence. Shipping destinations
+// and broad worldwide eligibility never qualify a listing for that label.
+export function verifiedJapanGiveaway(row, now) {
+  return row.category === 'sweepstakes' && row.required_expense.kind === 'free' &&
+    row.application?.sns_required === false && row.application.web_only === true &&
+    Array.isArray(row.eligible_countries) && eligible(row, 'JP') &&
+    freshness(row, now).state === 'fresh' && ['dated', 'ongoing'].includes(listingState(row, now));
+}
+
 export function matches(row, query, lang, now) {
   if (expired(row, now)) return false;
   if (query.explicitJapan && !(Array.isArray(row.eligible_countries) && eligible(row, 'JP'))) return false;

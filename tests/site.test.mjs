@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import {existsSync, readFileSync, readdirSync} from 'node:fs';
 import {execFileSync} from 'node:child_process';
 import {copy, email, verifyLocales} from '../site/locales.mjs';
-import {eligible, matches, ordered, date, money, stale, expired, allowedFilters} from '../site/domain.mjs';
+import {eligible, matches, ordered, date, money, stale, expired, allowedFilters, verifiedJapanGiveaway} from '../site/domain.mjs';
 
 const origin = 'https://freebietrail.com';
 const build = () => execFileSync(process.execPath,['tests/build-fixture.mjs']);
@@ -79,6 +79,72 @@ test('detail links include the closest listed peer and omit the section without 
       assert.ok(!guide.includes(`href="/${lang}/opportunities/${id}/"`), id);
     }
   }
+});
+
+test('Japan guide requires explicit, current residence eligibility and open free web entry', () => {
+  const checked = Date.parse('2026-11-08T12:00:00Z');
+  const valid = rows.find(row => row.id === 'club-sunstar-november-2026');
+  assert.equal(verifiedJapanGiveaway(valid, checked), true);
+  for (const changed of [
+    {eligible_countries:'worldwide'},
+    {eligible_countries:['GB'], shipping_countries:['JP']},
+    {eligibility_verified:false},
+    {availability:'ended'},
+    {deadline:'2026-11-08T11:59:59Z', deadline_date_only:false},
+    {deadline:null, availability:'unknown'},
+    {last_checked_at:'2026-10-09T12:00:00Z'},
+    {last_checked_at:'2026-11-08T12:00:01Z'},
+    {application:{...valid.application, sns_required:true}},
+    {application:{...valid.application, web_only:false}},
+    {required_expense:{kind:'purchase'}},
+  ]) assert.equal(verifiedJapanGiveaway({...valid,...changed}, checked), false, JSON.stringify(changed));
+  assert.equal(verifiedJapanGiveaway({...valid,eligible_countries:['JP','US']}, checked),true);
+  assert.equal(verifiedJapanGiveaway({...valid,deadline:null,availability:'ongoing'}, checked),true);
+  for (const lang of ['ja','en']) {
+    const page = read(`${lang}/sweepstakes/index.html`);
+    const japan = page.match(/<section aria-labelledby="japan-giveaways">.*?<\/section>/s)[0];
+    const other = page.match(/<section aria-labelledby="other-giveaways">.*?<\/section>/s)[0];
+    assert.match(japan,/club-sunstar/);
+    assert.doesNotMatch(japan,/penguin|stanley|obu-city/);
+    assert.match(other,/obu-city/);
+    assert.match(other,/penguin/);
+    assert.doesNotMatch(other,/club-sunstar/);
+    assert.ok(japan.includes(copy[lang].checked));
+    assert.ok(japan.includes(copy[lang].registration));
+    const escapedSource = valid.source_url.replaceAll('&','&amp;');
+    const detailPath = `/${lang}/opportunities/${valid.id}/`;
+    if (valid.source_url === valid.official_url) {
+      assert.ok(japan.includes(`href="${detailPath}#official-sources"`));
+      assert.ok(!japan.includes(`href="${escapedSource}"`));
+      assert.match(read(detailPath.slice(1) + 'index.html'), /id="official-sources"/);
+    } else {
+      assert.ok(japan.includes(`href="${escapedSource}"`));
+    }
+    assert.doesNotMatch(japan,/data-event="application_click"/);
+  }
+});
+
+test('cached Japan guide hides stale items and restores its empty message before deadline', async () => {
+  const {updateDates} = await import('../site/status.mjs');
+  const date = '2026-11-05T06:00:00Z';
+  const item = {
+    hidden: false, dataset: {expireWhenStale:date, expiring:'2026-12-10T15:00:00Z'},
+    hasAttribute: key => key === 'data-expire-when-stale',
+  };
+  const empty = {hidden:true};
+  const list = {
+    hidden:false, parentElement:{querySelector:()=>empty},
+    querySelector:()=>item.hidden ? null : item,
+  };
+  const root = {
+    querySelector:()=>null,
+    querySelectorAll:selector=>selector === '[data-expiry-list]' ? [list]
+      : selector === '[data-record], [data-expiring]' ? [item] : [],
+  };
+  updateDates(root, Date.parse('2026-12-05T05:59:59Z'),'ja');
+  assert.deepEqual([item.hidden,list.hidden,empty.hidden],[false,false,true]);
+  updateDates(root, Date.parse('2026-12-05T06:00:00Z'),'ja');
+  assert.deepEqual([item.hidden,list.hidden,empty.hidden],[true,true,false]);
 });
 
 test('currency, null and timezone behavior', () => {
