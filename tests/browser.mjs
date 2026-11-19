@@ -80,6 +80,29 @@ import assert from 'node:assert/strict';
       await page.locator('header .language').click();
       assert.match(page.url(),lang==='ja'?/\/en\/opportunities\/prolific\/$/:/\/ja\/opportunities\/prolific\/$/);
       await page.goto(`${base}/${lang}/sweepstakes/`);
+      const sweepCountry = page.locator('.search-row--residence-first [name=country]');
+      const sweepKeyword = page.locator('.search-row--residence-first [name=q]');
+      const sweepGuide = page.locator('[data-unfiltered-guide]');
+      await page.locator('#filters[aria-busy=false]').waitFor({state:'visible'});
+      const sweepCountryBox = await sweepCountry.boundingBox();
+      const sweepKeywordBox = await sweepKeyword.boundingBox();
+      if (width < 768) assert.ok(sweepKeywordBox.y >= sweepCountryBox.y + sweepCountryBox.height);
+      else assert.ok(sweepKeywordBox.x >= sweepCountryBox.x + sweepCountryBox.width);
+      assert.equal(await sweepGuide.isVisible(),true);
+      await sweepCountry.selectOption('JP');
+      assert.equal(new URL(page.url()).searchParams.get('country'),'JP');
+      assert.equal(await sweepGuide.isVisible(),false);
+      assert.ok((await page.locator('[data-record]:visible').evaluateAll(items=>items.map(x=>x.dataset.record))).every(id=>{
+        const row=data.records.find(x=>x.id===id);
+        return row.eligibility_verified && (row.eligible_countries==='worldwide' || row.eligible_countries?.includes('JP'));
+      }));
+      await page.reload();
+      await page.locator('#filters[aria-busy=false]').waitFor({state:'visible'});
+      assert.equal(await sweepCountry.inputValue(),'JP');
+      assert.equal(await sweepGuide.isVisible(),false);
+      await page.locator('button[type=reset]').click();
+      await page.waitForFunction(() => !new URL(location.href).searchParams.has('country'));
+      assert.equal(await sweepGuide.isVisible(),true);
       const snsFree = page.locator('[name=noSns]');
       if (await snsFree.count()) {
         const records = data.records.filter(row => row.category === 'sweepstakes' &&

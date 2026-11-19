@@ -38,6 +38,7 @@ if (form) {
     const byId = new Map(cards.map(card => [card.dataset.record,card]));
     const parent = document.querySelector('.cards');
     const active = form.querySelector('.active-filters');
+    const unfilteredGuide = document.querySelector('[data-unfiltered-guide]');
     const reset = form.querySelector('[type=reset]');
     const values = Object.fromEntries(Array.from(form.elements).filter(input => input.name).map(input => [input.name,
       input instanceof HTMLSelectElement ? Array.from(input.options).map(option => option.value) : input.type === 'checkbox' ? ['yes'] : []]));
@@ -74,6 +75,7 @@ if (form) {
         return item;
       }));
       active.hidden = !selected.length;
+      if (unfilteredGuide) unfilteredGuide.hidden = selected.length !== 0;
       reset.disabled = !selected.length;
       document.querySelector('#result-count').textContent = visible;
       for (const counter of document.querySelectorAll('[data-result-count]')) counter.textContent = visible;

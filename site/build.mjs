@@ -224,15 +224,19 @@ ${sponsored ? `<p class="small">${t.affiliateDisclosure}</p>` : ''}
 ${sponsored ? `<a class="text-link" href="${detail(lang,row)}">${t.details} →</a>` : external(row.official_url,isDraw ? t.officialNewTab : t.visitOfficial,row.commission ? null : 'application_click',title)}</div></article>`;
 }
 
-function filters(lang, available) {
+function filters(lang, available, sweepstakes = false) {
   const t = copy[lang];
-  const countries = [...new Set(available.flatMap(row => Array.isArray(row.eligible_countries) ? row.eligible_countries : []))];
+  const countries = [...new Set(available.flatMap(row => (!sweepstakes || row.eligibility_verified) && Array.isArray(row.eligible_countries) ? row.eligible_countries : []))];
   countries.sort((a,b) => name(lang,a).localeCompare(name(lang,b),lang));
-  const options = (id,label,values,empty = true) => `<label>${e(label)}<select name="${id}">${empty ? `<option value="">${t.all}</option>` : ''}${Object.entries(values).map(([value,text]) => `<option value="${e(value)}">${e(text)}</option>`).join('')}</select></label>`;
+  const options = (id,label,values,empty = true, emptyText = t.all) => `<label>${e(label)}<select name="${id}">${empty ? `<option value="">${e(emptyText)}</option>` : ''}${Object.entries(values).map(([value,text]) => `<option value="${e(value)}">${e(text)}</option>`).join('')}</select></label>`;
+  const keyword = `<label class="search">${t.search}<input type="search" name="q" placeholder="${e(t.placeholder)}" maxlength="150"></label>`;
+  const country = options('country',sweepstakes ? t.sweepstakesGuide.residence : t.country,
+    {...Object.fromEntries(countries.map(c => [c,name(lang,c)])),...(!sweepstakes ? {unknown:t.unknown} : {})},
+    true,sweepstakes ? t.sweepstakesGuide.anyResidence : t.all);
   return `<form class="filter" id="filters" role="search" aria-labelledby="filter-title" aria-busy="true"><fieldset disabled>
 <h2 id="filter-title" class="sr-only">${t.filters}</h2>
-<div class="search-row"><label class="search">${t.search}<input type="search" name="q" placeholder="${e(t.placeholder)}" maxlength="150"></label>
-${options('country',t.country,{...Object.fromEntries(countries.map(c => [c,name(lang,c)])),unknown:t.unknown})}
+<div class="search-row${sweepstakes ? ' search-row--residence-first' : ''}">${sweepstakes ? country + keyword : keyword + country}
+
 ${options('sort',t.sort,{'':t.recommended,deadline:t.deadlineSort,newest:t.newest},false)}</div>
 <div class="quick-filters">${[['noSns',t.application.noSns],['freeEntry',t.freeEntry],['closingSoon',t.closingSoon],['easyApply',t.application.easyApply]].map(([key,label]) => `<label class="filter-chip"><input type="checkbox" name="${key}" value="yes"><span>${label}</span></label>`).join('')}</div>
 <div class="filter-toolbar"><p class="result-status" role="status" aria-live="polite" aria-atomic="true"><span id="result-count">${available.length}</span>${t.count}</p><button type="reset" disabled>${t.reset}</button></div>
@@ -251,9 +255,9 @@ ${options('participation_method',t.method,t.methods)}${options('deadline',t.dead
 <noscript><p class="notice">${t.javascript}</p></noscript><p class="notice" data-filter-error hidden>${t.failure}</p>`;
 }
 
-function directory(lang, available) {
+function directory(lang, available, sweepstakes = false) {
   const t = copy[lang];
-  const filtered = available.length ? filters(lang,available) : '';
+  const filtered = available.length ? filters(lang,available,sweepstakes) : '';
   return `${filtered}${available.length ? '' : `<p class="stamp" role="status"><span id="result-count">0</span>${t.count}</p>`}
 <p class="notice" data-empty ${available.length ? 'hidden' : ''}>${t.empty} <a href="${url(lang,'rewards')}">${t.relatedRewards}</a></p>
 <section class="cards" aria-labelledby="listing-results"><h2 class="sr-only" id="listing-results" tabindex="-1">${e(t.results)}</h2>${available.map(row => card(row,lang)).join('')}</section>`;
@@ -292,8 +296,8 @@ function sweepstakesGuide(lang, available) {
 <p class="small">${e(t.registration)} · ${e(t.registrations[row.entry.registration] ?? t.unknown)} / ${e(t.checked)} · ${time(row.last_checked_at,lang)} / ${source(row)}</p>${freshnessNotice(row,lang)}</li>`).join('')}</ul>`;
   const japan = matches.filter(row => verifiedJapanGiveaway(row, now));
   const others = matches.filter(row => !japan.includes(row));
-  return `<section class="section" id="no-sns-giveaways" aria-labelledby="no-sns-heading">
-<div class="section-heading"><h2 id="no-sns-heading">${e(guide.title)}</h2><p>${e(guide.entry)}</p><p>${e(guide.region)}</p></div>
+  return `<section class="section" id="no-sns-giveaways" aria-labelledby="no-sns-heading" data-unfiltered-guide>
+<div class="section-heading"><h2 id="no-sns-heading">${e(guide.title)}</h2></div>
 <section aria-labelledby="japan-giveaways"><h3 id="japan-giveaways">${e(guide.japan)}</h3>
 ${list(japan, true)}<p data-expiry-empty${japan.length ? ' hidden' : ''}>${e(guide.japanEmpty)}</p></section>
 ${others.length ? `<section aria-labelledby="other-giveaways"><h3 id="other-giveaways">${e(guide.other)}</h3>
@@ -429,8 +433,9 @@ ${rewardsPreview}${recentList}${hapitasAd}`);
   };
   for (const [key, available] of Object.entries(pages)) {
     const [title, description] = t.pages[key];
-    await page(lang,key,title,description,`<header class="intro"><h1>${e(title)}</h1><p class="lead">${e(description)}</p>
-${key === 'sweepstakes' && lang === 'en' ? '<p class="region-note">Most listings are for Japan residents. Filter by your country before entering.</p>' : ''}${key === 'affiliates' ? `<a href="${url(lang,'rewards')}">${t.pages.rewards[0]} →</a>` : ''}</header>${key === 'sweepstakes' ? sweepstakesGuide(lang,available) : key === 'rewards' ? rewardsGuide(lang,available) + rewardsSponsorLink(lang,available) : ''}${directory(lang,available)}${key === 'sweepstakes' ? rewardsGuideLink(lang) : ''}`,key === 'rewards' || available.length > 0);
+    const sweepstakes = key === 'sweepstakes';
+    await page(lang,key,title,description,`<header class="intro"><h1>${e(title)}</h1>${sweepstakes ? '' : `<p class="lead">${e(description)}</p>`}
+${key === 'affiliates' ? `<a href="${url(lang,'rewards')}">${t.pages.rewards[0]} →</a>` : ''}</header>${key === 'rewards' ? rewardsGuide(lang,available) + rewardsSponsorLink(lang,available) : ''}${directory(lang,available,sweepstakes)}${sweepstakes ? sweepstakesGuide(lang,available) + rewardsGuideLink(lang) : ''}`,key === 'rewards' || available.length > 0);
   }
   for (const key of secondary.filter(key => !['affiliates','guaranteed'].includes(key))) {
     const [title, description] = t.pages[key];

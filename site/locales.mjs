@@ -29,8 +29,7 @@ export const copy = {
       names:{review:'商品レビューを書く', form:'フォーム入力', 'read-issue':'広報誌を確認', quiz:'クイズに回答', survey:'アンケートに回答', email:'メール送信', 'email-verify':'メール認証', register:'登録', follow:'フォロー', repost:'リポスト', like:'いいね', comment:'コメント', 'create-post':'新規投稿', 'quote-post':'引用投稿', 'link-accounts':'アカウント連携'}},
     sweepstakesGuide: {
       title:'SNS不要・無料でWeb応募できる懸賞', shortcut:'SNS不要・無料で応募できる懸賞',
-      entry:'応募に参加費・購入・SNSアカウントが不要で、Webで応募を完了できると確認した懸賞です。主催者への会員登録、クイズ、アンケート、手持ち商品のレビューなどが必要な場合があります。',
-      region:'応募できる居住地と景品の配送先は、詳細ページでそれぞれ確認できます。地域や年齢の条件が未確認の場合や、当選後に別の手続きがある場合は、応募前に公式の条件をご確認ください。',
+      residence:'居住国', anyResidence:'指定なし',
       japan:'日本在住者が応募できる懸賞', japanEmpty:'現在、日本在住者の応募条件と受付中であることを確認できる掲載はありません。',
       other:'そのほかの懸賞（応募条件を確認）', source:'公式の確認元',
       empty:'現在、この条件をすべて確認できる掲載中の懸賞はありません。',
@@ -155,8 +154,7 @@ export const copy = {
       names:{review:'Write a product review', form:'Fill out a form', 'read-issue':'Read the newsletter', quiz:'Answer the quiz', survey:'Complete the survey', email:'Send an email', 'email-verify':'Verify your email', register:'Register', follow:'Follow', repost:'Repost', like:'Like', comment:'Comment', 'create-post':'Create a post', 'quote-post':'Quote-post', 'link-accounts':'Link accounts'}},
     sweepstakesGuide: {
       title:'Free online giveaways with no social media required', shortcut:'Online giveaways without social media',
-      entry:'We checked that you can enter these giveaways online without an entry fee, a purchase, or a social media account. You may still need to create an organizer account, answer a quiz, complete a survey, or review a product you already own.',
-      region:'Each listing gives residency and prize delivery information separately. Check the official rules before entering if age or location requirements are unverified, or if winners have extra steps to claim a prize.',
+      residence:'Country of residence', anyResidence:'Any',
       japan:'Giveaways open to Japan residents', japanEmpty:'No listings currently have both Japan residency eligibility and open entry confirmed.',
       other:'Other giveaways: check the entry rules', source:'Official source',
       empty:'There are currently no open listings with all three entry conditions confirmed.',

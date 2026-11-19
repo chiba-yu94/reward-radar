@@ -80,7 +80,21 @@ test('listing controls expose residence outside of advanced options and a collap
   for (const lang of ['ja','en']) for (const path of ['opportunities','sweepstakes','rewards']) {
     const page = read(`${lang}/${path}/index.html`);
     assert.equal((page.match(/<select name="country">/g) || []).length, 1);
-    assert.match(page, /class="search-row"[\s\S]*?name="q"[\s\S]*?<select name="country"><option value="">[\s\S]*?<select name="sort"/);
+    const search = page.match(/<div class="search-row[^"]*">([\s\S]*?)<\/div>/)[1];
+    assert.deepEqual(Array.from(search.matchAll(/name="([^"]+)"/g),m=>m[1]),
+      path === 'sweepstakes' ? ['country','q','sort'] : ['q','country','sort']);
+    assert.match(search, /<select name="country"><option value="">/);
+    if (path === 'sweepstakes') {
+      const country = search.match(/<select name="country">([\s\S]*?)<\/select>/)[1];
+      const verified = new Set(rows.filter(row=>row.category === 'sweepstakes' && row.eligibility_verified &&
+        Array.isArray(row.eligible_countries)).flatMap(row=>row.eligible_countries));
+      assert.deepEqual(new Set(Array.from(country.matchAll(/<option value="([^"]+)">/g),m=>m[1])),verified);
+      assert.match(search, new RegExp(copy[lang].sweepstakesGuide.residence + '<select name="country"><option value="">' + copy[lang].sweepstakesGuide.anyResidence));
+      assert.match(page, /<header class="intro"><h1>[^<]+<\/h1>\s*<\/header><form class="filter"/);
+      assert.ok(page.indexOf('id="listing-results"') < page.indexOf('id="no-sns-giveaways"'));
+      assert.match(page, /id="no-sns-giveaways"[^>]*data-unfiltered-guide/);
+      assert.match(page, /<h2 id="no-sns-heading">[^<]+<\/h2><\/div>/);
+    }
     assert.doesNotMatch(page.match(/<details class="filter-options">[\s\S]*?<\/details>/)[0], /name="country"/);
     assert.match(page, /<\/form>\s*<details class="home-screen-help"><summary>[^<]+<\/summary><p>Safari|<\/form>\s*<details class="home-screen-help"><summary>[^<]+<\/summary><p>In Safari/);
   }
@@ -105,7 +119,8 @@ test('detail links include the closest listed peer and omit the section without 
     const prolific = read(`${lang}/opportunities/prolific/index.html`);
     assert.match(prolific, new RegExp(`aria-labelledby="related-listings".*href="/${lang}/opportunities/usertesting/"`, 's'));
     assert.doesNotMatch(read(`${lang}/opportunities/freecash/index.html`), /aria-labelledby="related-listings"/);
-    const guide = read(`${lang}/sweepstakes/index.html`).split('<form class="filter"')[0];
+    const html = read(`${lang}/sweepstakes/index.html`);
+    const guide = html.slice(html.indexOf('id="no-sns-giveaways"'),html.indexOf('rewards-cross-link'));
     for (const id of ['club-sunstar-november-2026','obu-city-quiz-november-2026','penguin-white-company-calendar-2026','stanley-review-november-2026']) {
       assert.ok(guide.includes(`href="/${lang}/opportunities/${id}/"`), id);
     }

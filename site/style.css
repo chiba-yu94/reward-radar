@@ -125,6 +125,9 @@ dd { margin:0; overflow-wrap:anywhere; }
 .filter { margin:1rem 0; padding:1rem; background:var(--surface); border:1px solid var(--line); border-radius:var(--radius); }
 .search-row { display:grid; gap:.65rem; grid-template-columns:minmax(0,1fr) minmax(0,8rem); align-items:end; }
 .search-row .search { grid-column:1 / -1; }
+.search-row--residence-first > label:first-child { grid-column:1 / -1; }
+.search-row--residence-first .search { grid-column:auto; }
+
 .home-screen-help { margin:-.65rem 0 .75rem; color:var(--muted); font-size:.8rem; }
 .home-screen-help summary { cursor:pointer; display:list-item; min-height:44px; padding:.65rem 0; width:fit-content; }
 .home-screen-help p { margin:0 0 .5rem; }
@@ -166,6 +169,9 @@ footer { background:var(--surface); border-top:1px solid var(--line); margin-top
 @media (min-width:48rem) {
   .search-row { grid-template-columns:minmax(0,1fr) minmax(0,13rem) minmax(0,12rem); }
   .search-row .search { grid-column:auto; }
+  .search-row--residence-first { grid-template-columns:minmax(0,13rem) minmax(0,1fr) minmax(0,12rem); }
+  .search-row--residence-first > label:first-child { grid-column:auto; }
+
   .recent-list li { grid-template-columns:minmax(15rem,2fr) 1fr auto; align-items:center; }
   .recent-list a { grid-column:auto; }
   .detail-body { display:grid; grid-template-columns:minmax(0,1.25fr) minmax(0,1fr); gap:2.25rem; }
