@@ -1,0 +1,123 @@
+{
+  "quests": [
+    {
+      "id": "korezo-yamanashi-2026",
+      "status": "candidate",
+      "official_url": "https://korezo.pref.yamanashi.jp/",
+      "review": {
+        "evidence_url": "https://korezo.pref.yamanashi.jp/assets/pdf/korezo_requirements.pdf",
+        "note": "県外在住者も応募可。2026年11月30日必着。日付のみ公表。賞金は入賞者のみ。応募にかかる費用は応募者負担とされており、前払い・入金の有無と具体的な賞金の受取方法は未確認。"
+      },
+      "last_checked_at": "2026-11-23T02:14:00Z"
+    },
+    {
+      "id": "life-design-art-2026",
+      "status": "approved",
+      "type": "visual-art",
+      "deadline": "2026-11-29T14:59:59Z",
+      "deadline_date_only": true,
+      "last_checked_at": "2026-11-23T02:20:00Z",
+      "official_url": "https://life-design-art.jp/competition/2nd/",
+      "review": {
+        "accepting": true,
+        "japan_eligible": true,
+        "no_upfront_cost": true,
+        "payment_verified": true,
+        "evidence_url": "https://life-design-art.jp/competition/2nd/"
+      },
+      "reward": {"kind": "prize", "amount": 500000, "currency": "JPY", "maximum": true},
+      "copy": {
+        "ja": {
+          "title": "Life Design Art「居場所の記憶」作品公募",
+          "description": "壁に掛けられる完成作品の公募です。グランプリは50万円。一次審査通過後に現物審査があります。",
+          "task": "制作から2年以内の壁掛け可能な完成作品をWebで応募。1人3点まで。一次審査を通過した場合は、指定日に現物を搬入します。",
+          "eligibility": "継続して制作活動をしている40歳未満の方。日本国内で手続きと作品の発送ができ、日本国内の銀行口座を指定できること。日本語で連絡できること。",
+          "expenses": "出品料は無料。一次審査通過後の梱包費や、直接搬入する場合の費用は応募者負担です。",
+          "reward_terms": "グランプリは1点に50万円。入選は約25点に各10万円。入選以上の作品は賞金をもって買い上げとなります。",
+          "payment": "2027年3月末に指定の国内銀行口座へ振込。",
+          "organizer": "Life Design Art事務局（東急イーライフデザイン）"
+        },
+        "en": {
+          "title": "Life Design Art open call: Memories of a Place to Belong",
+          "description": "Submit finished wall-mounted art for a grand prize of ¥500,000. Shortlisted entrants must deliver their work for the second round.",
+          "task": "Enter up to three finished, wall-mountable works made in the last two years. Shortlisted entrants must deliver the physical work on the specified date.",
+          "eligibility": "Artists under 40 who are actively making work, can handle submissions and shipping within Japan, have a Japanese bank account for payment, and can communicate in Japanese.",
+          "expenses": "Entry is free. Shortlisted entrants cover packaging costs or the cost of delivering their work in person.",
+          "reward_terms": "One grand prize winner receives ¥500,000. About 25 selected works receive ¥100,000 each. The organizers acquire selected and winning works for the prize amount.",
+          "payment": "Transfer to the designated Japanese bank account at the end of March 2027.",
+          "organizer": "Life Design Art office (Tokyu E-Life Design)"
+        }
+      }
+    },
+    {
+      "id": "hacktale-award-2027",
+      "status": "approved",
+      "type": "design",
+      "deadline": "2027-02-28T14:59:00Z",
+      "last_checked_at": "2026-11-23T08:25:37Z",
+      "official_url": "https://kabuexlabs.com/hacktale-award/",
+      "review": {
+        "accepting": true,
+        "japan_eligible": true,
+        "no_upfront_cost": true,
+        "payment_verified": true,
+        "evidence_url": "https://kabuexlabs.com/hacktale-award/"
+      },
+      "reward": {"kind": "prize", "amount": 300000, "currency": "JPY", "maximum": true},
+      "copy": {
+        "ja": {
+          "title": "第1回 ハックテイル大賞",
+          "description": "2〜10人で遊ぶ頭脳戦ゲームの公募です。無料でオンライン提出でき、大賞は公演化契約の成立後に30万円が支払われます。",
+          "task": "オリジナルの対戦・交渉ゲームのルールPDF、仕掛けの解説（A4・1枚以内）、試遊用データを応募フォームにアップロードします。現物の搬入・郵送は不要で、試遊記録は任意です。二次審査に進むと、オンラインでの質疑を求められる場合があります。",
+          "eligibility": "日本在住者も応募可。国籍やプロ・アマの制限はなく、個人・チームどちらでも応募できます。18歳未満は保護者の同意が必要です。作品は日本語の未発表作。生成AIは補助利用のみで、使った範囲の申告が必要です。",
+          "expenses": "応募無料。提出はデータのみで、作品や商品の購入は応募条件に含まれません。",
+          "reward_terms": "大賞1作品に30万円、特別賞に15万円。どちらも候補に選ばれ、公演化のライセンス契約を締結した時点で受賞・賞金が確定します。著作権は応募者に残ります。主催者は結果発表まで作品の販売・公開・他賞への応募を控えるよう求めています。大賞・特別賞の候補作の公演化・商品化は、協議期間中に主催者が独占的に交渉します。契約上の独占範囲と期間は協議で決まります。",
+          "payment": "受賞者（チームの場合は代表者）が指定した口座へ振込。必要に応じて源泉徴収があります。公演ごとのライセンス料は賞金とは別で、支払条件は契約で決まります。",
+          "organizer": "ハックテイル（運営：株式会社ex Labs）"
+        },
+        "en": {
+          "title": "First Hacktale Game Design Award",
+          "description": "Enter a competitive strategy game for 2–10 players online for free. The ¥300,000 grand prize is paid once the winner signs a production license agreement.",
+          "task": "Upload the rules as a PDF, an explanation of the key mechanics (up to one A4 page), and the files needed to playtest your original competitive or negotiation game. The form takes digital files and requires no physical delivery or mailing. Playtest records are optional. Second-round entrants may be asked to answer questions online.",
+          "eligibility": "Open to residents of Japan. Individuals and teams of any nationality can enter, including professionals and amateurs. Entrants under 18 need parental consent. The work must be unpublished and in Japanese. If you use generative AI for assistance, disclose how you used it.",
+          "expenses": "Entry is free. Submit digital files. No purchase is required to enter.",
+          "reward_terms": "The grand prize is ¥300,000 for one entry. The special prize is ¥150,000. For either prize, a selected candidate must sign a production license agreement to receive the award. Entrants retain copyright. The organizer asks entrants to hold off on selling, publishing or entering the work in other contests until results are announced. Hacktale has exclusive rights during negotiations to discuss production and commercialization with candidates for either prize. The parties negotiate the scope and duration of exclusivity in the agreement.",
+          "payment": "Bank transfer to the account designated by the winner or team representative, with tax withheld where required. Per-show royalties are separate from the cash prize and follow the terms of the agreement.",
+          "organizer": "Hacktale (operated by ex Labs, Inc.)"
+        }
+      }
+    }
+  ],
+  "guides": [
+    {
+      "id": "before-entering-a-creative-contest",
+      "status": "approved",
+      "source_url": "https://korezo.pref.yamanashi.jp/assets/pdf/korezo_requirements.pdf",
+      "last_checked_at": "2026-11-23T02:14:00Z",
+      "copy": {
+        "ja": {
+          "title": "作品公募に応募する前に確認すること",
+          "description": "山梨県の写真・動画コンテストを例に、応募資格、提出方法、AIの申告、賞金の条件を募集要項から確認します。",
+          "source_label": "山梨県「これぞ、やまなし」募集要項（PDF）",
+          "sections": [
+            ["応募できる人と、応募できる作品を確認する", "山梨県の公募では県外在住者も応募できますが、作品は県内で撮影したものに限られます。過去に撮影した作品も使えます。他の公募で受賞した作品は対象外です。手持ちの素材を選ぶ前に、この二つを分けて確認すると手戻りを減らせます。"],
+            ["提出方法と締切を控える", "写真と縦型ショート動画は公開Instagramアカウントでの投稿、横型動画はYouTubeで限定公開したうえでフォームにリンクを入力します。要項は2026年11月30日必着としています。動画の場合はアップロードの時間と、提出するリンクを開けるか確認する時間も見込んでおきます。"],
+            ["AIを使う工程と、提出時に申告する内容を整理する", "公開要項から尺や提出形式をチェックリストにする作業にはAIを使えます。抜き出した条件は原文と照合します。山梨県の例では、AIを使った作品は本人の創作意図に基づくオリジナルであることが条件です。Instagram応募では指定タグを付け、横型動画ではフォームで利用を申告します。人物や楽曲の許諾も提出前に確認します。"],
+            ["賞金と応募費用を別々に見る", "横型動画部門の最優秀賞15万円は1名が対象です。要項には、応募にかかる費用は応募者負担とあります。具体的な賞金の受取方法は確認できませんでした。制作に取りかかる前に、費用、受取条件、主催者による作品利用の範囲を確認します。"]
+          ]
+        },
+        "en": {
+          "title": "What to check before entering a creative contest",
+          "description": "Use Yamanashi Prefecture’s photo and video rules to check eligibility, submission steps, AI disclosure and prize terms before you start.",
+          "source_label": "Yamanashi Prefecture’s official contest rules (Japanese PDF)",
+          "sections": [
+            ["Check who can enter and what work qualifies", "Yamanashi accepts entries from people living outside the prefecture. The work must have been filmed or photographed within Yamanashi. Existing work can qualify as long as it has never won another contest. Check both rules before choosing footage you already have."],
+            ["Write down the submission steps and deadline", "Photos and short vertical videos go through a public Instagram account. For a horizontal video, upload it to YouTube as unlisted and send the link through the form. The rules specify a November 30, 2026 deadline. Leave time for the upload and check that the submitted link opens."],
+            ["Track where you use AI and what you need to disclose", "AI can turn the published rules into a checklist for timing and file formats. Compare the checklist with the original rules. Yamanashi requires AI-assisted work to reflect the entrant’s own creative intent. Instagram entries use a specified tag and horizontal video entries disclose AI use on the form. Check permissions for people and music before submitting."],
+            ["Check prize terms and entry expenses separately", "The ¥150,000 top prize in the horizontal video category goes to one winner. Yamanashi’s rules make entrants responsible for entry-related expenses. The rules we checked give no specific payout method. Before starting work, check your costs, the conditions for receiving a prize and how the organizer may use your submission."]
+          ]
+        }
+      }
+    }
+  ]
+}

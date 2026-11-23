@@ -5,6 +5,7 @@ import {date, expiration, expired, money, ordered, stale, freshness, verifiedJap
 
 import {dateCopy} from './status.mjs';
 import {validatePublic} from './quality.mjs';
+import {publicEditorial} from './editorial.mjs';
 
 verifyLocales();
 const configured = process.env.SITE_ORIGIN;
@@ -36,6 +37,7 @@ const dataset = JSON.parse(await readFile('var/published.json', 'utf8'));
 const now = process.env.QA_NOW ? Date.parse(process.env.QA_NOW) : Date.now();
 if (!Number.isFinite(now)) throw new Error('Invalid QA_NOW');
 validatePublic(dataset,JSON.parse(await readFile('data/taxonomy.json','utf8')),now);
+const editorial = publicEditorial(JSON.parse(await readFile('data/editorial.json','utf8')),now);
 const taskService = row => row.category === 'affiliate' && !row.commission;
 const sponsoredLink = row => row.affiliate_approval_status === 'approved' && row.affiliate_url &&
   Date.parse(row.affiliate_expires_at) > now;
@@ -70,6 +72,9 @@ export const escape = value => String(value).replace(/[&<>"']/g, char => ({
 }[char]));
 const e = escape;
 const url = (lang, page = '') => '/' + lang + '/' + (page ? page + '/' : '');
+const alternates = (page, locales = languages) => locales.length < 2 ? [] : [
+  ...locales.map(lang => [lang, url(lang,page)]), ['x-default', page ? url('en',page) : '/'],
+];
 const detail = (lang, row) => url(lang, 'opportunities/' + row.id);
 const time = (value, lang, full = false, zone) => `<time datetime="${e(value)}">${e(date(value, lang, full, zone))}</time>`;
 const address = `<a href="mailto:${email}">${email}</a>`;
@@ -134,16 +139,17 @@ ${href ? `<a itemprop="item" href="${href}">${text}</a>` : `<span aria-current="
   }).join('')}</ol></nav>`;
 }
 
-function layout(lang, page, title, description, content, indexable = true, mastheadControl = '') {
+function layout(lang, page, title, description, content, indexable, mastheadControl, locales) {
   const t = copy[lang];
   const other = lang === 'ja' ? 'en' : 'ja';
   const current = url(lang, page);
   const consent = analytics ? consentControls(t,lang) : null;
-  const switcher = `<a class="language" aria-label="${other === 'ja' ? '日本語に切り替える' : 'Switch to English'}" href="${url(other, page)}" lang="${other}" hreflang="${other}">${t.otherLanguage}</a>`;
+  const hasTranslation = locales.includes(other);
+  const switcher = `<a class="language" aria-label="${e(hasTranslation ? t.switchLanguage : t.otherHome)}" href="${url(other, hasTranslation ? page : '')}" lang="${other}"${hasTranslation ? ` hreflang="${other}"` : ''}>${t.otherLanguage}</a>`;
   const links = keys => keys.map(key => `<a href="${url(lang, key)}"${key === page ? ' aria-current="page"' : ''}>${e(key === 'opportunities' && lang === 'en' ? 'All listings' : key === 'sweepstakes' && lang === 'en' ? 'Giveaways' : key === 'international' && lang === 'en' ? 'International' : t.pages[key][0])}</a>`).join('');
   const name = e(t.copyright);
   const fullTitle = e(page ? title + ' | ' + t.copyright : t.copyright + ' · ' + title);
-  if (indexable) maps.push({path:current, page});
+  if (indexable) maps.push({path:current, page, locales});
   return `<!doctype html><html lang="${lang}"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>${fullTitle}</title><meta name="description" content="${e(description)}">
@@ -151,11 +157,10 @@ ${adsenseMeta}${impactMeta}
 <meta name="author" content="${name}"><meta name="contact" content="${email}">
 <meta name="robots" content="${configured && indexable ? 'index, follow' : 'noindex, follow'}">
 <link rel="canonical" href="${origin.origin}${current}">
-${languages.map(locale => `<link rel="alternate" hreflang="${locale}" href="${origin.origin}${url(locale, page)}">`).join('\n')}
-<link rel="alternate" hreflang="x-default" href="${origin.origin}${page ? url('en', page) : '/'}">
+${alternates(page,locales).map(([locale,href]) => `<link rel="alternate" hreflang="${locale}" href="${origin.origin}${href}">`).join('\n')}
 <meta property="og:type" content="website"><meta property="og:site_name" content="${name}">
 <meta property="og:title" content="${fullTitle}"><meta property="og:description" content="${e(description)}">
-<meta property="og:locale" content="${lang === 'ja' ? 'ja_JP' : 'en_US'}"><meta property="og:locale:alternate" content="${other === 'ja' ? 'ja_JP' : 'en_US'}">
+<meta property="og:locale" content="${lang === 'ja' ? 'ja_JP' : 'en_US'}">${hasTranslation ? `<meta property="og:locale:alternate" content="${other === 'ja' ? 'ja_JP' : 'en_US'}">` : ''}
 <meta property="og:url" content="${origin.origin}${current}">
 <meta property="og:image" content="${origin.origin}/assets/social.png"><meta property="og:image:width" content="1200"><meta property="og:image:height" content="630"><meta name="twitter:card" content="summary_large_image">
 ${iconLinks}<link rel="stylesheet" href="/assets/style.css">
@@ -171,7 +176,7 @@ ${page === '' ? `<meta itemprop="name" content="${name}"><meta itemprop="url" co
 ${content}</main>
 <footer><div class="wrap foot-inner"><div><a href="${url(lang)}" class="brand">${brand(t.copyright)}</a>
 <p class="muted">${e(t.pages.about[1])}</p><p class="muted">${t.legalContact} · ${address}</p></div>
-<nav aria-label="${e(t.footerNavigation)}">${links(secondary)}${switcher}</nav>
+<nav aria-label="${e(t.footerNavigation)}">${links(['quests','guides',...secondary])}${switcher}</nav>
 ${consent?.settings || ''}<p class="muted">© ${t.copyright}</p></div></footer></body></html>`;
 }
 
@@ -407,10 +412,57 @@ ${related.length ? `<section class="sources" aria-labelledby="related-listings">
 <template id="adsense-slot"></template></article>`;
 }
 
-async function page(lang, key, title, description, content, indexable = true, mastheadControl = '') {
+async function page(lang, key, title, description, content, indexable = true, mastheadControl = '', locales = languages) {
   const folder = url(lang,key).slice(1);
   await mkdir(dist + '/' + folder, {recursive:true});
-  await write(folder + 'index.html', layout(lang,key,title,description,content,indexable,mastheadControl));
+  await write(folder + 'index.html', layout(lang,key,title,description,content,indexable,mastheadControl,locales));
+}
+
+async function editorialPages(lang) {
+  const t = copy[lang];
+  const q = t.quest;
+  const quests = editorial.quests.filter(entry => entry.locales.includes(lang));
+  const guides = editorial.guides.filter(entry => entry.locales.includes(lang));
+  const link = (key, label = t.pages[key][0]) => `<a href="${url(lang,key)}">${e(label)}</a>`;
+  const reward = entry => e(`${q.rewardTypes[entry.reward.kind]} · ${entry.reward.maximum ? q.upTo + ' ' : ''}${format(entry.reward.amount,entry.reward.currency,lang)}`);
+  const expiry = entry => `data-expiring="${expiryValue(entry)}" data-expire-when-stale="${e(entry.last_checked_at)}"`;
+  const deadline = entry => time(entry.deadline,lang,!entry.deadline_date_only,'Asia/Tokyo');
+  const intro = key => `<header class="intro"><h1>${e(t.pages[key][0])}</h1><p class="lead">${e(t.pages[key][1])}</p></header>`;
+  const guideItems = guides.map(entry => `<li><h3>${link('guides/' + entry.id,entry.copy[lang].title)}</h3><p>${e(entry.copy[lang].description)}</p></li>`).join('');
+  const guideLinks = languages.filter(locale => editorial.guides.some(entry => entry.locales.includes(locale)));
+  const questLinks = languages.filter(locale => editorial.quests.some(entry => entry.locales.includes(locale)));
+  await page(lang,'quests',...t.pages.quests,`${intro('quests')}
+<section class="section" aria-labelledby="quest-list-heading"><div class="section-heading"><h2 id="quest-list-heading">${e(q.open)}</h2></div>
+<ul class="giveaway-list" data-expiry-list${quests.length ? '' : ' hidden'}>${quests.map(entry => `<li ${expiry(entry)}>
+<h3>${link('quests/' + entry.id,entry.copy[lang].title)}</h3><p>${e(q.types[entry.type])} · ${reward(entry)}</p>
+<p>${e(t.deadline)} · ${deadline(entry)}</p><p>${e(entry.copy[lang].description)}</p></li>`).join('')}</ul>
+<p data-expiry-empty${quests.length ? ' hidden' : ''}>${e(q.empty)}</p></section>
+<p>${link('guides')}</p>`, quests.length > 0, '', questLinks.length ? questLinks : languages);
+  await page(lang,'guides',...t.pages.guides,`${intro('guides')}<ul class="giveaway-list">${guideItems}</ul><p>${link('quests')}</p>`, guides.length > 0, '', guideLinks.length ? guideLinks : languages);
+
+  for (const entry of quests) {
+    const content = entry.copy[lang];
+    await page(lang,'quests/' + entry.id,content.title,content.description,`<article class="article">
+${breadcrumbs(lang,'quests',content.title)}<h1>${e(content.title)}</h1><p class="lead">${e(content.description)}</p>
+<div ${expiry(entry)} data-quest-listing>${fields([
+      [t.method,e(q.types[entry.type])], [q.task,e(content.task)], [t.eligibility,e(content.eligibility)],
+      [t.expense,`${e(q.noUpfront)}<br>${e(content.expenses)}`], [t.reward,`${reward(entry)}<br>${e(content.reward_terms)}`],
+      [q.payment,e(content.payment)], [t.deadline,deadline(entry)],
+      [t.checked,time(entry.last_checked_at,lang,false,'Asia/Tokyo')],
+      [q.organizer,`<a href="${e(entry.official_url)}" rel="noopener noreferrer">${e(content.organizer)}</a>`],
+    ])}${entry.review.evidence_url === entry.official_url ? '' : `<p><a href="${e(entry.review.evidence_url)}" rel="noopener noreferrer">${e(q.rules)}</a></p>`}</div>
+<p class="notice" data-quest-closed hidden>${e(q.closed)}</p>
+<p>${link('guides')}</p></article>`, true, '', entry.locales);
+  }
+  for (const entry of guides) {
+    const content = entry.copy[lang];
+    await page(lang,'guides/' + entry.id,content.title,content.description,`<article class="article">
+${breadcrumbs(lang,'guides',content.title)}<h1>${e(content.title)}</h1><p class="lead">${e(content.description)}</p>
+${content.sections.map(([heading,body]) => `<section><h2>${e(heading)}</h2><p>${e(body)}</p></section>`).join('')}
+<p class="stamp">${e(t.checked)} · ${time(entry.last_checked_at,lang,false,'Asia/Tokyo')}</p>
+<p><a href="${e(entry.source_url)}" rel="noopener noreferrer">${e(content.source_label)}</a></p>
+<p>${link('quests')}</p></article>`, true, '', entry.locales);
+  }
 }
 
 const consumer = rows.filter(row => row.category !== 'affiliate' || taskService(row));
@@ -431,10 +483,11 @@ ${external(hapitasUrl,t.hapitas.cta,'affiliate_click')}
   const rewardsPreview = `<section class="section"><div class="section-heading"><h2><a href="${url(lang,'rewards')}#rewards-comparison">${t.pages.rewards[0]}</a></h2><p>${t.rewardsLead}</p></div><div class="cards">${['freecash','research-panel','prolific'].map(id => rewardRows.find(row => row.id === id)).filter(Boolean).map(row => card(row,lang)).join('')}</div></section>`;
   await page(lang,'',t.tagline,t.lead,`<section class="hero"><div class="hero-copy"><p class="eyebrow">${t.cap}</p><h1>${t.tagline}</h1><p class="lead">${t.lead}</p>
 <form class="home-search" role="search" action="${url(lang,'opportunities')}" method="get"><label class="sr-only" for="home-query">${t.search}</label><input id="home-query" type="search" name="q" maxlength="150" placeholder="${e(t.placeholder)}"><button type="submit">${t.searchSubmit}</button></form>
-<div class="home-shortcuts"><a href="${url(lang,'sweepstakes')}#no-sns-giveaways">${e(t.sweepstakesGuide.shortcut)}</a><a href="${url(lang,'sweepstakes')}?easyApply=yes">${t.application.easyApply}</a><a href="${url(lang,'international')}">${t.pages.international[0]}</a></div></div></section>
+<div class="home-shortcuts"><a href="${url(lang,'sweepstakes')}#no-sns-giveaways">${e(t.sweepstakesGuide.shortcut)}</a><a href="${url(lang,'sweepstakes')}?easyApply=yes">${t.application.easyApply}</a><a href="${url(lang,'international')}">${t.pages.international[0]}</a><a href="${url(lang,'quests')}">${e(t.pages.quests[0])}</a><a href="${url(lang,'guides')}">${e(t.pages.guides[0])}</a></div></div></section>
 <section class="section featured"><div class="section-heading"><h2>${t.closing}</h2><a href="${url(lang,'sweepstakes')}">${t.browse} →</a></div>
 <div class="cards">${featured.length ? featured.map(row => card(row,lang)).join('') : `<p>${t.empty}</p>`}</div></section>
 ${rewardsPreview}${recentList}${hapitasAd}`);
+  await editorialPages(lang);
   const pages = {
     opportunities: consumer,
     rewards: rewardRows,
@@ -481,8 +534,8 @@ await write('404.html', `<!doctype html><html lang="en"><head><meta charset="utf
 await write('robots.txt', configured ? `User-agent: *\nAllow: /\nSitemap: ${origin.origin}/sitemap.xml\n` : 'User-agent: *\nDisallow: /\n');
 await write('sitemap.xml', `<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:xhtml="http://www.w3.org/1999/xhtml">
-${[{path:'/',page:''}, ...maps].map(({path,page:key}) => `<url><loc>${origin.origin}${path}</loc>${languages.map(lang =>
-  `<xhtml:link rel="alternate" hreflang="${lang}" href="${origin.origin}${url(lang,key)}"/>`).join('')}<xhtml:link rel="alternate" hreflang="x-default" href="${origin.origin}${key ? url('en',key) : '/'}"/></url>`).join('\n')}
+${[{path:'/',page:''}, ...maps].map(({path,page:key,locales}) => `<url><loc>${origin.origin}${path}</loc>${alternates(key,locales).map(([lang,href]) =>
+  `<xhtml:link rel="alternate" hreflang="${lang}" href="${origin.origin}${href}"/>`).join('')}</url>`).join('\n')}
 </urlset>\n`);
 // Complete rendering before updating output. Preserve directories watched by Wrangler dev.
 const generated = new Set(await readdir(dist, {recursive:true}));

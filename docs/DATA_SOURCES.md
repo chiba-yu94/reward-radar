@@ -22,6 +22,14 @@ Free sweepstakes need documented organizer, cost and privacy checks. Cash, gift-
 
 Eight manual campaigns came from official organizer pages. The registry has 23 manual records, of which 20 appear in the revised release. It retains the ended Rakuten app draw, the purchase-required Rebates listing, and the d POINT draw whose entry cost was unconfirmed. The professional GitHub student benefit remains in operational history and is monitored by one official API endpoint; it is excluded from public results. The two RSS endpoints are separate discovery inputs. Their first checked run yielded no candidates.
 
+## Quest board and application guides
+
+Use `data/editorial.json` for quest reviews and site-hosted articles. The existing discovery job writes URLs for review to `var/candidates.json`. Editors can use those URLs or other official public pages to start a quest review. The publisher emits quests from the reviewed registry and has no path from the RSS output to public listings. The Yamanashi candidate uses manual review of the official site and rules.
+
+- Record an unresolved quest with `status: candidate`, its official source and the gaps in the review. Before switching to `approved`, check that the official rules establish current acceptance, eligibility from Japan, no up-front payment or deposit, and how the reward is paid. Record the review date, the official listing and evidence URLs, the closing timestamp, and the task, eligibility, reward conditions and payment method in each available language. Use `completion` for completion fees, `selection` for accepted work and `prize` for competition winners. For a date-only cutoff, follow the opportunity convention of recording the last second of the final local date and setting `deadline_date_only` to true.
+- Change a quest to `closed` when the organizer closes it early. The build excludes candidates, closed quests, expired deadlines and reviews that are 30 days old. An already-open browser page uses the same deadline and review-date rules to hide expired quest actions.
+- Use `status: draft` for unpublished articles. Review sources and text before setting `approved`. Give each actual translation its own entry under `copy`. Check original records before publishing an application account and omit personal information. The initial article uses Yamanashi’s published rules as a worked example.
+
 - [Saitama Prefecture RSS instructions](https://www.pref.saitama.lg.jp/kense/koho/homepage/rss.html)
 - [Asahi Group RSS terms](https://www.asahigroup-holdings.com/newsroom/rss.html)
 - [GitHub REST Contents API](https://docs.github.com/en/rest/repos/contents#get-repository-content)

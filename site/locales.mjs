@@ -37,6 +37,14 @@ export const copy = {
     relatedListings:'条件が近い掲載',
     hapitas:{label:'広告・PR', title:'ハピタス紹介プログラム', body:'日本国内向けのポイントサービスです。11月のキャンペーンでは、期限までに紹介リンクから初めて登録し、メール認証を済ませ、登録日から3日連続でログインすると100ポイントの対象になります。追加特典には別の条件があります。運営者が紹介報酬を受け取る場合があります。', cta:'ハピタスの紹介ページを開く', terms:'公式キャンペーン条件', deadline:'登録・メール認証の締切'},
     language: '日本語', otherLanguage: 'EN', skip: '本文へ移動', home: 'ホーム',
+    switchLanguage:'Switch to English', otherHome:'English home',
+    quest:{
+      open:'受付中の募集', empty:'条件を確認できた受付中の募集は、現在ありません。',
+      task:'取り組む内容', payment:'受取方法', organizer:'公式募集元', rules:'公式の募集要項',
+      noUpfront:'応募時の前払い・入金不要', closed:'現在、この募集は掲載対象外です。', upTo:'最高',
+      types:{interview:'有償インタビュー', 'user-test':'ユーザーテスト', design:'デザイン公募', writing:'執筆公募', 'visual-art':'美術作品公募', 'photo-video':'写真・動画公募'},
+      rewardTypes:{completion:'完了謝礼', selection:'採用報酬', prize:'入賞者のみ賞金'},
+    },
     analytics: {
       title:'任意のアクセス解析', settings:'アクセス解析の設定', accept:'許可する', reject:'拒否する', close:'閉じる',
       summary:'Google Analyticsで閲覧とリンクの利用を計測します。',
@@ -85,6 +93,8 @@ export const copy = {
     compare: '参加方法を比較する', compareLead: '公式資料をもとに、選考や換金条件の違いを確認できます。',
     legalContact: 'お問い合わせ先', copyright: '懸賞さんぽ',
     pages: {
+      quests:['クエスト掲示板','日本から応募できる有償インタビュー、ユーザーテスト、作品公募を探せます。締切と報酬の条件を確認してから公式募集元へ進めます。'],
+      guides:['応募ガイド','募集要項の読み方や、作品を提出する前に確かめたいことをまとめています。'],
       rewards: ['ポイ活・タスク報酬', '日本から参加できるアンケートや有償調査を比較。参加費、ポイント交換・出金の条件と、ゲーム案件の購入や課金の有無を確認できます。'],
       opportunities: ['掲載一覧', '消費者向けの特典を、費用・対象地域・参加方法から絞り込めます。'],
       sweepstakes: ['懸賞・プレゼント', '日本在住者が応募できる、SNS不要・無料のWeb懸賞を探せます。締切、会員登録の要否、公式の応募条件を確認できます。'],
@@ -162,6 +172,14 @@ export const copy = {
     relatedListings:'Similar listings',
     hapitas:{label:'Sponsored', title:'Hapitas referral program', body:'Hapitas is a rewards service for use in Japan. For the November campaign, first-time members qualify for 100 points by registering through the referral link and verifying their email by the deadline, then logging in on three consecutive days starting on the registration date. Additional rewards have separate conditions. The site operator may receive a referral reward.', cta:'Open the Hapitas referral page', terms:'Official campaign terms', deadline:'Registration and email verification deadline'},
     language: 'English', otherLanguage: '日本語', skip: 'Skip to content', home: 'Home',
+    switchLanguage:'日本語に切り替える', otherHome:'日本語ホーム',
+    quest:{
+      open:'Open calls', empty:'There are currently no open calls with verified terms.',
+      task:'What to do', payment:'How payment is made', organizer:'Official organizer', rules:'Official rules',
+      noUpfront:'No upfront payment or deposit to apply', closed:'This opportunity is no longer listed as open.', upTo:'up to',
+      types:{interview:'Paid interview', 'user-test':'User testing', design:'Design call', writing:'Writing call', 'visual-art':'Visual art competition', 'photo-video':'Photo or video contest'},
+      rewardTypes:{completion:'Payment for completion', selection:'Payment for selected work', prize:'Prize for winners only'},
+    },
     analytics: {
       title:'Optional analytics', settings:'Analytics settings', accept:'Accept', reject:'Reject', close:'Close',
       summary:'Google Analytics measures visits and link clicks with your permission.',
@@ -211,6 +229,8 @@ export const copy = {
     compare: 'Compare ways to participate', compareLead: 'Use official-source facts to compare screening and redemption requirements.',
     legalContact: 'Contact', copyright: 'Freebie Trail',
     pages: {
+      quests:['Quest board','Find paid interviews, user tests and creative calls you can apply for from Japan. Check deadlines and reward terms before visiting the organizer.'],
+      guides:['Application guides','Read how to check an organizer’s rules and prepare your work before submitting it.'],
       rewards: ['Rewards', 'Compare surveys and paid research available in Japan. Check entry costs, redemption or cashout terms, and whether game tasks may require spending.'],
       opportunities: ['All opportunities', 'Search giveaways, surveys and task rewards by country and entry requirements.'],
       sweepstakes: ['Sweepstakes and giveaways', 'Find free online giveaways without social media, including listings for Japan residents. Check deadlines, registration requirements and official rules.'],

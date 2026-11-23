@@ -37,9 +37,15 @@ try {
   for (const entry of entries) {
     const path = new URL(entry.url).pathname;
     assert.equal(entry.url,canonical + path);
+    const editorial = /^\/(ja|en)\/(quests|guides)\//.test(path);
+    if (editorial) await page.setViewportSize({width:375,height:850});
     const response = await page.goto(origin + path);
     assert.equal(response.status(),200,path);
     assert.doesNotMatch(response.headers()['x-robots-tag'] || '', /noindex/i, path);
+    if (editorial) {
+      assert.ok(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth),path);
+      await page.setViewportSize({width:1280,height:720});
+    }
     const info = await page.evaluate(() => ({
       h1s:Array.from(document.querySelectorAll('h1'), element => element.textContent),
       canonical:document.querySelector('link[rel=canonical]').href,
@@ -120,7 +126,7 @@ try {
       }
     }
     if (path === `/${lang}/`) assert.equal(info.guideShortcut,`/${lang}/sweepstakes/#no-sns-giveaways`);
-    if (path !== '/') localizedLinks.set(path,[...info.related,...info.guide].map(([href]) => href.slice(3)));
+    if (id || path === `/${lang}/sweepstakes/`) localizedLinks.set(path,[...info.related,...info.guide].map(([href]) => href.slice(3)));
     for (const [href, search] of info.local) {
       const linkedId = /^\/(?:ja|en)\/opportunities\/([^/]+)\/$/.exec(href)?.[1];
       if (linkedId) assert.ok(details.has(linkedId) && !expired(details.get(linkedId),now) && paths.has(href),`${path} → ${href}`);
