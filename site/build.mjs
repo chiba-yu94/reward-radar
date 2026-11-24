@@ -144,6 +144,10 @@ function layout(lang, page, title, description, content, indexable, mastheadCont
   const other = lang === 'ja' ? 'en' : 'ja';
   const current = url(lang, page);
   const consent = analytics ? consentControls(t,lang) : null;
+  const contact = t.quest.organizerContact;
+  const organizerContact = page === 'quests'
+    ? `<p class="muted"><a href="mailto:${email}?subject=${encodeURIComponent(contact.subject)}&amp;body=${encodeURIComponent(contact.fields.map(field => field + ': ').join('\r\n'))}">${e(contact.link)}</a><br>${e(contact.note)}</p>`
+    : '';
   const hasTranslation = locales.includes(other);
   const switcher = `<a class="language" aria-label="${e(hasTranslation ? t.switchLanguage : t.otherHome)}" href="${url(other, hasTranslation ? page : '')}" lang="${other}"${hasTranslation ? ` hreflang="${other}"` : ''}>${t.otherLanguage}</a>`;
   const links = keys => keys.map(key => `<a href="${url(lang, key)}"${key === page ? ' aria-current="page"' : ''}>${e(key === 'opportunities' && lang === 'en' ? 'All listings' : key === 'sweepstakes' && lang === 'en' ? 'Giveaways' : key === 'international' && lang === 'en' ? 'International' : t.pages[key][0])}</a>`).join('');
@@ -175,7 +179,7 @@ ${page === '' ? `<meta itemprop="name" content="${name}"><meta itemprop="url" co
 <div itemprop="publisher" itemscope itemtype="https://schema.org/Organization"><meta itemprop="name" content="${name}"><meta itemprop="email" content="${email}"></div>` : ''}
 ${content}</main>
 <footer><div class="wrap foot-inner"><div><a href="${url(lang)}" class="brand">${brand(t.copyright)}</a>
-<p class="muted">${e(t.pages.about[1])}</p><p class="muted">${t.legalContact} · ${address}</p></div>
+<p class="muted">${e(t.pages.about[1])}</p><p class="muted">${t.legalContact} · ${address}</p>${organizerContact}</div>
 <nav aria-label="${e(t.footerNavigation)}">${links(['quests','guides',...secondary])}${switcher}</nav>
 ${consent?.settings || ''}<p class="muted">© ${t.copyright}</p></div></footer></body></html>`;
 }

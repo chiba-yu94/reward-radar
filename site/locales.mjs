@@ -41,6 +41,12 @@ export const copy = {
     quest:{
       open:'受付中の募集', empty:'条件を確認できた受付中の募集は、現在ありません。',
       task:'取り組む内容', payment:'受取方法', organizer:'公式募集元', rules:'公式の募集要項',
+      organizerContact:{
+        link:'主催者の方へ：掲載を相談する',
+        note:'掲載可否の確認は無料です。掲載を保証するものではありません。',
+        subject:'クエスト掲示板への掲載相談',
+        fields:['企画名','公式URL','応募条件','応募対象の国・地域','居住条件','締切日時とタイムゾーン','賞品','賞品の受け渡し方法'],
+      },
       noUpfront:'応募時の前払い・入金不要', closed:'現在、この募集は掲載対象外です。', upTo:'最高',
       types:{interview:'有償インタビュー', 'user-test':'ユーザーテスト', design:'デザイン公募', writing:'執筆公募', 'visual-art':'美術作品公募', 'photo-video':'写真・動画公募'},
       rewardTypes:{completion:'完了謝礼', selection:'採用報酬', prize:'入賞者のみ賞金'},
@@ -176,6 +182,12 @@ export const copy = {
     quest:{
       open:'Open calls', empty:'There are currently no open calls with verified terms.',
       task:'What to do', payment:'How payment is made', organizer:'Official organizer', rules:'Official rules',
+      organizerContact:{
+        link:'Organizers: Ask about a listing',
+        note:'We review submissions for free. Listing is not guaranteed.',
+        subject:'Quest board listing inquiry',
+        fields:['Campaign name','Official URL','Entry requirements','Eligible countries or regions','Residency requirements','Deadline date, time and time zone','Prizes','How you deliver the prizes'],
+      },
       noUpfront:'No upfront payment or deposit to apply', closed:'This opportunity is no longer listed as open.', upTo:'up to',
       types:{interview:'Paid interview', 'user-test':'User testing', design:'Design call', writing:'Writing call', 'visual-art':'Visual art competition', 'photo-video':'Photo or video contest'},
       rewardTypes:{completion:'Payment for completion', selection:'Payment for selected work', prize:'Prize for winners only'},

@@ -55,6 +55,41 @@ test('locale structure, missing translation and actual HTML', () => {
   }
 });
 
+test('only quest board footers offer a localized organizer email draft', () => {
+  const expected = {
+    ja:{
+      link:'主催者の方へ：掲載を相談する',
+      note:'掲載可否の確認は無料です。掲載を保証するものではありません。',
+      subject:'クエスト掲示板への掲載相談',
+      fields:['企画名','公式URL','応募条件','応募対象の国・地域','居住条件','締切日時とタイムゾーン','賞品','賞品の受け渡し方法'],
+    },
+    en:{
+      link:'Organizers: Ask about a listing',
+      note:'We review submissions for free. Listing is not guaranteed.',
+      subject:'Quest board listing inquiry',
+      fields:['Campaign name','Official URL','Entry requirements','Eligible countries or regions','Residency requirements','Deadline date, time and time zone','Prizes','How you deliver the prizes'],
+    },
+  };
+  const files = readdirSync('dist',{recursive:true}).filter(file => file.endsWith('.html'));
+  const withDraft = files.filter(file => read(file).includes('mailto:' + email + '?'));
+  assert.deepEqual(withDraft.sort(),['en/quests/index.html','ja/quests/index.html']);
+  for (const [lang, text] of Object.entries(expected)) {
+    const html = read(lang + '/quests/index.html');
+    const footer = html.match(/<footer>[\s\S]*?<\/footer>/)[0];
+    const drafts = [...footer.matchAll(/<a href="(mailto:[^"]+\?[^"]+)">([^<]+)<\/a>/g)];
+    assert.equal(drafts.length,1);
+    const [, href, label] = drafts[0];
+    const draft = new URL(href.replaceAll('&amp;','&'));
+    assert.equal(label,text.link);
+    assert.ok(footer.includes(text.note));
+    assert.equal(draft.protocol,'mailto:');
+    assert.equal(draft.pathname,'support@freebietrail.com');
+    assert.deepEqual([...draft.searchParams.keys()],['subject','body']);
+    assert.equal(draft.searchParams.get('subject'),text.subject);
+    assert.deepEqual(draft.searchParams.get('body').split('\r\n'),text.fields.map(field => field + ': '));
+  }
+});
+
 test('canonical, hreflang, language switching and internal links', () => {
   const files = readdirSync('dist',{recursive:true}).filter(file => file.endsWith('index.html'));
   for (const file of files) {
