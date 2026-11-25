@@ -76,6 +76,7 @@ const normalize = text => text.normalize('NFKC').toLowerCase().trim();
 const concepts = {
   sweepstakes:'懸賞 抽選 プレゼント sweepstakes giveaway prize draw',
   survey:'アンケート 調査 survey surveys', research:'調査 research study studies',
+  'user-test':'ユーザーテスト user testing usability testing',
   points:'ポイ活 ポイント rewards points', gift:'特典 ギフト rewards gifts',
   guaranteed:'条件達成 特典 rewards', cashback:'還元 cashback', registration:'登録特典 signup rewards',
   affiliate:'affiliate アフィリエイト',

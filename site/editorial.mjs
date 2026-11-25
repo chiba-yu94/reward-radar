@@ -7,6 +7,7 @@ const rewardTypes = {
   interview:['completion'],
   'user-test':['completion'],
   design:['selection','prize'],
+  'game-design':['selection','prize'],
   writing:['selection','prize'],
   'visual-art':['selection','prize'],
   'photo-video':['selection','prize'],

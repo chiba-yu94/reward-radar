@@ -329,7 +329,7 @@
     "id": "usertesting",
     "source_id": "usertesting",
     "provider": "UserTesting",
-    "category": "research",
+    "category": "user-test",
     "eligible_countries": null,
     "eligibility_verified": false,
     "reward_type": "cash",
@@ -345,7 +345,7 @@
       "currency": null
     },
     "estimated_effort_minutes": null,
-    "participation_method": "study",
+    "participation_method": "user-test",
     "deadline": null,
     "official_url": "https://www.usertesting.com/get-paid-to-test/getting-started",
     "affiliate_url": null,
@@ -834,7 +834,7 @@
     "id": "google-opinion-android",
     "source_id": "google-opinion-android",
     "provider": "Google",
-    "category": "gift",
+    "category": "survey",
     "eligible_countries": [
       "AE",
       "AT",

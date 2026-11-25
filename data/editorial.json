@@ -54,7 +54,7 @@
       "id": "hacktale-award-2027",
       "status": "approved",
       "conditions": {"free": true, "sns": false, "ai": "allowed"},
-      "type": "design",
+      "type": "game-design",
       "deadline": "2027-02-28T14:59:00Z",
       "last_checked_at": "2026-11-23T08:25:37Z",
       "official_url": "https://kabuexlabs.com/hacktale-award/",

@@ -131,13 +131,19 @@ publish(rows, sources, {}, folder / 'published.json', folder / 'operations.sqlit
     build(liveAt);
     assert.match(read('ja/' + path + 'index.html'),/現物の搬入・郵送は不要.*入賞者のみ賞金.*ライセンス契約を締結.*指定した口座へ振込/s);
     assert.match(read('en/' + path + 'index.html'),/no physical delivery or mailing.*Prize for winners only.*sign a production license agreement.*Bank transfer/s);
-    for (const [lang, alternate] of [['ja','en'],['en','ja']]) {
+    for (const [lang, alternate, genre] of [
+      ['ja','en','ゲーム企画・制作'], ['en','ja','Game design and creation'],
+    ]) {
       const localized = lang + '/' + path;
       const html = read(localized + 'index.html');
       assert.ok(html.includes('href="' + newQuest.official_url + '"'));
       assert.ok(html.includes('rel="canonical" href="' + canon + '/' + localized + '"'));
       assert.ok(html.includes('hreflang="' + alternate + '" href="' + canon + '/' + alternate + '/' + path + '"'));
-      assert.ok(read(lang + '/quests/index.html').includes('href="/' + localized + '"'));
+      const board = read(lang + '/quests/index.html');
+      assert.ok(board.includes('href="/' + localized + '"'));
+      assert.ok(board.includes(`<option value="game-design">${genre}</option>`));
+      assert.match(board,/data-type="game-design"[^>]*>[\s\S]*?hacktale-award-2027/);
+      assert.ok(html.includes('<dd>' + genre + '</dd>'));
       assert.ok(read('sitemap.xml').includes('<loc>' + canon + '/' + localized + '</loc>'));
       assert.ok(exists(lang + '/quests/life-design-art-2026/index.html'));
       assert.ok(exists(lang + '/' + guide + 'index.html'));

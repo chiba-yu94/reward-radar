@@ -156,10 +156,42 @@ test('country filtering keeps unknown out and explicitly accepts Japan', () => {
   assert.equal(matches(study,{reward_currency:'unknown'},'en',now),false);
 });
 
+test('paid surveys and user testing follow their own categories while keeping the rewards', () => {
+  const google = rows.find(row => row.id === 'google-opinion-android');
+  const testing = rows.find(row => row.id === 'usertesting');
+  const prolific = rows.find(row => row.id === 'prolific');
+  assert.equal(google.reward_type,'gift-card');
+  assert.equal(google.participation_method,'app');
+  assert.equal(matches(google,{category:'survey',reward_type:'gift-card'},'en',now),true);
+  assert.equal(matches(google,{category:'gift'},'en',now),false);
+  assert.equal(matches(testing,{category:'user-test',participation_method:'user-test'},'en',now),true);
+  assert.equal(matches(testing,{category:'research'},'en',now),false);
+  assert.equal(matches(prolific,{category:'research',participation_method:'study'},'en',now),true);
+  for (const [lang, survey, testLabel] of [
+    ['ja','有償アンケート','ユーザーテスト'], ['en','Paid surveys','User testing'],
+  ]) {
+    for (const page of ['opportunities','rewards']) {
+      const listing = read(`${lang}/${page}/index.html`);
+      assert.ok(listing.includes(`<option value="survey">${survey}</option>`));
+      assert.ok(listing.includes(`<option value="user-test">${testLabel}</option>`));
+      const card = id => listing.match(new RegExp(`<article[^>]*data-record="${id}"[^>]*>[\\s\\S]*?<\/article>`))[0];
+      assert.ok(card(google.id).includes(`<div class="labels"><span>${survey}</span>`));
+      assert.ok(card(testing.id).includes(`<div class="labels"><span>${testLabel}</span>`));
+    }
+    assert.match(read(`${lang}/opportunities/${google.id}/index.html`),/Google Play/);
+    assert.ok(read(`${lang}/opportunities/${testing.id}/index.html`).includes(`<div class="labels"><span>${testLabel}</span>`));
+  }
+});
+
 test('detail links include the closest listed peer and omit the section without a peer', () => {
   for (const lang of ['ja','en']) {
+    const google = read(`${lang}/opportunities/google-opinion-android/index.html`);
+    const related = google.match(/<section[^>]+aria-labelledby="related-listings">([\s\S]+?)<\/section>/)[1];
+    const peerIds = [...related.matchAll(/href="\/[^/]+\/opportunities\/([^/]+)\/"/g)].map(([,id]) => id);
+    assert.ok(peerIds.length);
+    assert.ok(peerIds.every(id => rows.find(row => row.id === id)?.category === 'survey'));
     const prolific = read(`${lang}/opportunities/prolific/index.html`);
-    assert.match(prolific, new RegExp(`aria-labelledby="related-listings".*href="/${lang}/opportunities/usertesting/"`, 's'));
+    assert.doesNotMatch(prolific, /href="[^"]*\/usertesting\//);
     assert.doesNotMatch(read(`${lang}/opportunities/freecash/index.html`), /aria-labelledby="related-listings"/);
     const html = read(`${lang}/sweepstakes/index.html`);
     const guide = html.slice(html.indexOf('id="no-sns-giveaways"'),html.indexOf('rewards-cross-link'));
