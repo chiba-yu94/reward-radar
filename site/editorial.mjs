@@ -10,6 +10,7 @@ const rewardTypes = {
   writing:['selection','prize'],
   'visual-art':['selection','prize'],
   'photo-video':['selection','prize'],
+  'skill-bounty':['completion','selection','prize'],
 };
 
 function https(value) {
@@ -45,9 +46,8 @@ function translations(entry, fields) {
 }
 
 export function publicEditorial(input, now) {
-  const quests = approved(input.quests, ['candidate','closed']).filter(quest => {
+  const reviewedQuests = approved(input.quests, ['candidate','closed']).filter(quest => {
     const end = expiration(quest);
-    if (end <= now) return false;
     const residence = quest.review?.japan_eligible;
     requireEditorial(Object.hasOwn(rewardTypes,quest.type) && rewardTypes[quest.type].includes(quest.reward?.kind) &&
       Number.isFinite(quest.reward.amount) && quest.reward.amount > 0 && /^[A-Z]{3}$/.test(quest.reward.currency) &&
@@ -59,10 +59,28 @@ export function publicEditorial(input, now) {
       quest.review?.no_upfront_cost === true && quest.review?.payment_verified === true &&
       https(quest.official_url) && https(quest.review.evidence_url),
     quest.id + ': open period, eligibility, cost, payment or source');
-    return freshness(quest,now).state === 'fresh';
+    if (quest.type === 'skill-bounty') {
+      const terms = quest.conditions;
+      const reviewedAt = timestamp(quest.last_checked_at);
+      requireEditorial(residence === true && typeof terms?.sns === 'boolean' &&
+        ['allowed','required','prohibited'].includes(terms.ai) &&
+        terms.free === true && text(terms.entry_method) &&
+        Array.isArray(terms.eligible_countries) && terms.eligible_countries.includes('JP') &&
+        terms.eligible_countries.every(code => /^[A-Z]{2}$/.test(code)) &&
+        text(terms.payment_method) && Array.isArray(terms.requirements) && terms.requirements.length > 0 &&
+        terms.requirements.every(text) && quest.review?.no_upfront_cost === true &&
+        quest.review?.safe_non_security === true &&
+        ['Asia/Tokyo','UTC'].includes(quest.deadline_timezone) &&
+        Number.isFinite(reviewedAt) && reviewedAt < end,
+      quest.id + ': skill bounty conditions or editorial review');
+    }
+    return timestamp(quest.last_checked_at) <= now &&
+      (end <= now || freshness(quest,now).state === 'fresh');
   }).map(quest => ({...quest, locales:translations(quest,
     ['title','description','task','eligibility','expenses','reward_terms','payment','organizer'])}))
     .sort((a,b) => expiration(a) - expiration(b) || a.id.localeCompare(b.id));
+  const quests = reviewedQuests.filter(quest => expiration(quest) > now);
+  const endedQuests = reviewedQuests.filter(quest => expiration(quest) <= now).reverse();
 
   const guides = approved(input.guides, ['draft']).map(guide => {
     const locales = translations(guide,['title','description','source_label']);
@@ -74,5 +92,5 @@ export function publicEditorial(input, now) {
       }), guide.id + ': source, date or sections');
     return {...guide, locales};
   });
-  return {quests, guides};
+  return {quests, endedQuests, guides};
 }

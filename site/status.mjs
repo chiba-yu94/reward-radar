@@ -24,7 +24,7 @@ export function updateDates(root, now, lang) {
     const guideStale = element.hasAttribute('data-expire-when-stale') &&
       freshness({last_checked_at:element.dataset.expireWhenStale},now).state !== 'fresh';
     element.hidden = element.hasAttribute('data-unavailable') || end <= now || guideStale || timestamp(element.dataset.affiliateExpires) <= now;
-    if (element.hasAttribute('data-quest-listing')) element.nextElementSibling.hidden = !element.hidden;
+    if (element.hasAttribute('data-quest-listing')) element.nextElementSibling.hidden = !element.hidden || end <= now;
   }
   for (const list of root.querySelectorAll('[data-expiry-list]')) {
     list.hidden = !list.querySelector('li:not([hidden])');
@@ -32,6 +32,8 @@ export function updateDates(root, now, lang) {
     if (empty) empty.hidden = !list.hidden;
     else list.parentElement.hidden = list.hidden;
   }
+  const questEnded = root.querySelector('[data-quest-ended-notice]');
+  if (questEnded) questEnded.hidden = timestamp(questEnded.dataset.questEndedNotice) > now;
   const ended = root.querySelector('[data-ended]');
   if (ended) {
     const action = root.querySelector('.entry-action[data-expiring]');

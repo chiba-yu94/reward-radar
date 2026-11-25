@@ -6,6 +6,8 @@ import {date, expiration, expired, money, ordered, stale, freshness, verifiedJap
 import {dateCopy} from './status.mjs';
 import {validatePublic} from './quality.mjs';
 import {publicEditorial} from './editorial.mjs';
+import {calendarEvent} from './calendar.mjs';
+import {feedPath, feedType, publicationDates, renderFeed} from './feed.mjs';
 
 verifyLocales();
 const configured = process.env.SITE_ORIGIN;
@@ -38,6 +40,7 @@ const now = process.env.QA_NOW ? Date.parse(process.env.QA_NOW) : Date.now();
 if (!Number.isFinite(now)) throw new Error('Invalid QA_NOW');
 validatePublic(dataset,JSON.parse(await readFile('data/taxonomy.json','utf8')),now);
 const editorial = publicEditorial(JSON.parse(await readFile('data/editorial.json','utf8')),now);
+const rssDates = publicationDates(JSON.parse(await readFile('data/rss-publications.json','utf8')));
 const taskService = row => row.category === 'affiliate' && !row.commission;
 const sponsoredLink = row => row.affiliate_approval_status === 'approved' && row.affiliate_url &&
   Date.parse(row.affiliate_expires_at) > now;
@@ -51,7 +54,7 @@ const iconVersion = '5cf2e8207d44';
 const versionedIcon = path => path.replace(/\.([^.]+)$/, `-${iconVersion}.$1`);
 const iconAssets = ['favicon.ico', 'apple-touch-icon.png', 'assets/mark.svg'];
 
-for (const asset of ['style.css', 'client.mjs', 'domain.mjs', 'status.mjs', 'mark.svg', 'social.png', 'chevron.svg']) {
+for (const asset of ['style.css', 'client.mjs', 'quest-board.mjs', 'domain.mjs', 'status.mjs', 'mark.svg', 'social.png', 'chevron.svg']) {
   await copyFile('site/' + asset, dist + '/assets/' + asset);
 }
 for (const asset of ['favicon.ico', 'apple-touch-icon.png']) {
@@ -76,6 +79,10 @@ const alternates = (page, locales = languages) => locales.length < 2 ? [] : [
   ...locales.map(lang => [lang, url(lang,page)]), ['x-default', page ? url('en',page) : '/'],
 ];
 const detail = (lang, row) => url(lang, 'opportunities/' + row.id);
+function eligibilityTranslation(lang,key) {
+  const other = lang === 'ja' ? 'en' : 'ja';
+  return `<a href="${url(other,key)}" hreflang="${other}">${e(copy[lang].eligibilityTranslation)}</a>`;
+}
 const time = (value, lang, full = false, zone) => `<time datetime="${e(value)}">${e(date(value, lang, full, zone))}</time>`;
 const address = `<a href="mailto:${email}">${email}</a>`;
 const iconLinks = `<link rel="icon" href="${versionedIcon('/favicon.ico')}"><link rel="icon" type="image/svg+xml" href="${versionedIcon('/assets/mark.svg')}"><link rel="apple-touch-icon" sizes="180x180" href="${versionedIcon('/apple-touch-icon.png')}">`;
@@ -161,7 +168,7 @@ ${adsenseMeta}${impactMeta}
 <meta name="author" content="${name}"><meta name="contact" content="${email}">
 <meta name="robots" content="${configured && indexable ? 'index, follow' : 'noindex, follow'}">
 <link rel="canonical" href="${origin.origin}${current}">
-${alternates(page,locales).map(([locale,href]) => `<link rel="alternate" hreflang="${locale}" href="${origin.origin}${href}">`).join('\n')}
+${alternates(page,locales).map(([locale,href]) => `<link rel="alternate" hreflang="${locale}" href="${origin.origin}${href}">`).join('\n')}${page === '' ? `\n<link rel="alternate" type="${feedType}" title="${e(t.rss.title)}" href="${feedPath(lang)}">` : ''}
 <meta property="og:type" content="website"><meta property="og:site_name" content="${name}">
 <meta property="og:title" content="${fullTitle}"><meta property="og:description" content="${e(description)}">
 <meta property="og:locale" content="${lang === 'ja' ? 'ja_JP' : 'en_US'}">${hasTranslation ? `<meta property="og:locale:alternate" content="${other === 'ja' ? 'ja_JP' : 'en_US'}">` : ''}
@@ -191,6 +198,16 @@ const elapsed = (row, lang) => `<span data-age data-last-checked="${e(row.last_c
 const deadlineText = (row, lang) => row.deadline
   ? time(row.deadline,lang,!row.deadline_date_only, row.deadline_timezone ||
     (row.language === 'ja' ? 'Asia/Tokyo' : undefined)) : row.availability === 'ongoing' ? copy[lang].ongoing : copy[lang].noDeadline;
+async function calendarLink(scope,row,lang,title,zone) {
+  const path = url(lang,scope + '/' + row.id);
+  const body = calendarEvent(row,{scope,lang,title,zone,detailUrl:origin.origin + path,now});
+  if (!body) return '';
+  await mkdir(dist + path,{recursive:true});
+  await write(path.slice(1) + 'deadline.ics',body);
+  const jst = !row.deadline_date_only && zone !== 'Asia/Tokyo'
+    ? ` · ${time(row.deadline,lang,true,'Asia/Tokyo')}` : '';
+  return `<p class="small" data-expiring="${expiryValue(row)}" data-expire-when-stale="${e(row.last_checked_at)}">${jst ? copy[lang].calendarJst + jst + '<br>' : ''}<a href="${path}deadline.ics" download>${copy[lang].calendarAdd}</a></p>`;
+}
 const promotionText = (row, lang) => (row.promotion_countries || []).map(code => name(lang,code)).join(lang === 'ja' ? '、' : ', ');
 const geoText = (countries, lang) => countries?.length > 4 ? (lang === 'ja' ? countries.length + 'の国・地域（詳細を確認）' : countries.length + ' countries / regions — see details') : countries?.length ? countries.map(code => name(lang,code)).join(lang === 'ja' ? '、' : ', ') : copy[lang].unknown;
 const geography = (row, lang) => [[copy[lang].residency,e(compactCountries(row,lang))], ...(row.category === 'sweepstakes' ? [[copy[lang].shipping,e(geoText(row.shipping_countries,lang))]] : [[copy[lang].serviceCountries,e(geoText(row.service_countries,lang))]])];
@@ -363,7 +380,7 @@ function rewardsGuideLink(lang) {
   return `<p class="small rewards-cross-link"><a href="${url(lang,'rewards')}#rewards-comparison">${e(copy[lang].rewardsGuide.link)}</a></p>`;
 }
 
-function details(lang, row) {
+function details(lang, row, calendar) {
   const t = copy[lang];
   const sponsored = taskService(row);
   const section = row.commission ? 'affiliates' : row.category === 'sweepstakes' ? 'sweepstakes' :
@@ -396,7 +413,7 @@ ${freshnessNotice(row,lang)}<p class="notice" data-ended hidden></p>
     [t.eligibility,e(row['eligibility_' + lang])],
     ...(row.deadline ? [[t.deadline,deadlineText(row,lang)]] : []),
     ...(row.reward_amount !== null ? [[t.amount,e(amount(row,lang))]] : []),
-])}</section>
+])}${calendar}</section>
 <div class="entry-action${sponsored ? ' ad-action' : ''}" data-expiring="${e(expiryValue(row))}"${sponsored ? ` data-affiliate-expires="${e(row.affiliate_expires_at)}"` : ''}>
 ${sponsoredLink(row) ? `<p class="ad-disclosure"><strong>${t.sponsoredLabel}</strong> · ${t.affiliateDisclosure}</p><div class="actions">${external(row.affiliate_url,sponsored ? t.sponsoredVisit : t.sponsored,'affiliate_click')}</div><p class="secondary-official"><a href="${e(row.official_url)}" target="_blank" rel="noopener noreferrer">${t.official}</a></p>` : `<div class="actions">${external(row.official_url,row.category === 'sweepstakes' ? t.officialNewTab : t.visitOfficial,row.commission ? null : 'application_click')}</div>`}
 </div>
@@ -426,40 +443,86 @@ async function editorialPages(lang) {
   const t = copy[lang];
   const q = t.quest;
   const quests = editorial.quests.filter(entry => entry.locales.includes(lang));
+  const ended = editorial.endedQuests.filter(entry => entry.locales.includes(lang));
   const guides = editorial.guides.filter(entry => entry.locales.includes(lang));
   const link = (key, label = t.pages[key][0]) => `<a href="${url(lang,key)}">${e(label)}</a>`;
   const reward = entry => e(`${q.rewardTypes[entry.reward.kind]} · ${entry.reward.maximum ? q.upTo + ' ' : ''}${format(entry.reward.amount,entry.reward.currency,lang)}`);
   const residency = entry => entry.review.japan_eligible === 'not-stated' ? e(q.residencyUnconfirmed) : '';
   const expiry = entry => `data-expiring="${expiryValue(entry)}" data-expire-when-stale="${e(entry.last_checked_at)}"`;
-  const deadline = entry => time(entry.deadline,lang,!entry.deadline_date_only,'Asia/Tokyo');
+  const zone = entry => entry.deadline_timezone || 'Asia/Tokyo';
+  const deadline = entry => time(entry.deadline,lang,!entry.deadline_date_only,zone(entry));
+  const details = q.browse;
+  const entryDay = entry => new Intl.DateTimeFormat('sv-SE',{timeZone:zone(entry),year:'numeric',month:'2-digit',day:'2-digit'}).format(new Date(entry.deadline));
+  const option = ([value,label]) => `<option value="${e(value)}">${e(label)}</option>`;
+  const select = (key,label,values) => `<label>${e(label)}<select name="${key}">${values.map(option).join('')}</select></label>`;
+  const any = ['',details.any];
   const intro = key => `<header class="intro"><h1>${e(t.pages[key][0])}</h1><p class="lead">${e(t.pages[key][1])}</p></header>`;
   const guideItems = guides.map(entry => `<li><h3>${link('guides/' + entry.id,entry.copy[lang].title)}</h3><p>${e(entry.copy[lang].description)}</p></li>`).join('');
   const guideLinks = languages.filter(locale => editorial.guides.some(entry => entry.locales.includes(locale)));
   const questLinks = languages.filter(locale => editorial.quests.some(entry => entry.locales.includes(locale)));
+  const card = entry => {
+    const content = entry.copy[lang];
+    const free = entry.conditions?.free === true;
+    const sns = entry.conditions?.sns;
+    const ai = entry.conditions?.ai;
+    const aiLabel = ai ? details[ai] : null;
+    return `<li data-quest-card data-type="${e(entry.type)}" data-free="${free ? 'yes' : ''}"
+data-sns="${typeof sns === 'boolean' ? String(sns) : ''}" data-ai="${e(ai || '')}"
+data-board-deadline="${expiryValue(entry)}" data-board-checked="${e(entry.last_checked_at)}" data-deadline-day="${e(entryDay(entry))}">
+<h3>${link('quests/' + entry.id,content.title)}</h3>
+<p>${[e(q.types[entry.type]),reward(entry),residency(entry),free ? e(details.free) : '',
+  aiLabel ? e(details.ai + ' · ' + aiLabel) : '',
+  typeof sns === 'boolean' ? e(details.sns + ' · ' + (sns ? details.required : details.optional)) : ''].filter(Boolean).join(' · ')}</p>
+<p>${e(t.deadline)} · ${deadline(entry)}</p><p>${e(content.description)}</p></li>`;
+  };
   await page(lang,'quests',...t.pages.quests,`${intro('quests')}
-<section class="section" aria-labelledby="quest-list-heading"><div class="section-heading"><h2 id="quest-list-heading">${e(q.open)}</h2></div>
-<ul class="giveaway-list" data-expiry-list${quests.length ? '' : ' hidden'}>${quests.map(entry => `<li ${expiry(entry)}>
-<h3>${link('quests/' + entry.id,entry.copy[lang].title)}</h3><p>${[e(q.types[entry.type]),reward(entry),residency(entry)].filter(Boolean).join(' · ')}</p>
-<p>${e(t.deadline)} · ${deadline(entry)}</p><p>${e(entry.copy[lang].description)}</p></li>`).join('')}</ul>
-<p data-expiry-empty${quests.length ? ' hidden' : ''}>${e(q.empty)}</p></section>
+<section class="section" data-quest-board aria-labelledby="quest-list-heading">
+<form id="quest-filters" class="quest-filters" hidden>
+<div class="quest-filter-fields"><label>${e(details.search)}<input type="search" name="q" maxlength="100"></label>
+${select('status',details.status,[['open',q.open],['ended',q.ended],any])}
+${select('genre',details.genre,[any,...Object.entries(q.types)])}</div>
+<details><summary>${e(details.more)}</summary><div class="quest-filter-fields">
+<label><input name="free" type="checkbox" value="yes"> ${e(details.free)}</label>
+${select('sns',details.sns,[any,['false',details.optional],['true',details.required]])}
+${select('ai',details.ai,[any,['allowed',details.allowed],['required',details.required],['prohibited',details.prohibited]])}
+<label>${e(details.deadline)}<input type="date" name="by"></label></div></details>
+<button type="reset">${e(details.clear)}</button></form>
+<p data-quest-count role="status" hidden><span>${quests.length}</span> ${e(details.count)}</p>
+<div data-quest-open><div class="section-heading"><h2 id="quest-list-heading">${e(q.open)}</h2></div>
+<ul class="giveaway-list" data-quest-open-list>${quests.map(card).join('')}</ul>
+<p data-quest-open-empty${quests.length ? ' hidden' : ''}>${e(q.empty)}</p></div>
+<details data-quest-ended${ended.length ? '' : ' hidden'}><summary>${e(q.ended)}</summary>
+<ul class="giveaway-list" data-quest-ended-list>${ended.map(card).join('')}</ul></details>
+<p data-quest-no-match hidden>${e(details.none)}</p></section>
 <p>${link('guides')}</p>`, quests.length > 0, '', questLinks.length ? questLinks : languages);
   await page(lang,'guides',...t.pages.guides,`${intro('guides')}<ul class="giveaway-list">${guideItems}</ul><p>${link('quests')}</p>`, guides.length > 0, '', guideLinks.length ? guideLinks : languages);
 
-  for (const entry of quests) {
+  for (const entry of [...quests,...ended]) {
     const content = entry.copy[lang];
+    const closed = expiration(entry) <= now;
     const residencyNotice = residency(entry);
+    const translated = !residencyNotice && entry.locales.length > 1
+      ? '<br>' + eligibilityTranslation(lang,'quests/' + entry.id) : '';
+    const calendar = closed ? '' : await calendarLink('quests',entry,lang,content.title,zone(entry));
+    const rules = entry.review.evidence_url;
+    const related = quests.filter(other => other.id !== entry.id)
+      .sort((a,b) => Number(b.type === entry.type) - Number(a.type === entry.type)).slice(0,3);
     await page(lang,'quests/' + entry.id,content.title,content.description,`<article class="article">
 ${breadcrumbs(lang,'quests',content.title)}<h1>${e(content.title)}</h1><p class="lead">${e(content.description)}</p>
-<div ${expiry(entry)} data-quest-listing>${fields([
+<p class="notice" data-quest-ended-notice="${expiryValue(entry)}"${closed ? '' : ' hidden'}>${e(q.ended)}</p>
+${fields([
       [t.method,e(q.types[entry.type])], [q.task,e(content.task)],
-      [t.eligibility,`${residencyNotice ? residencyNotice + '<br>' : ''}${e(content.eligibility)}`],
+      [t.eligibility,`${residencyNotice ? residencyNotice + '<br>' : ''}${e(content.eligibility)}${translated}`],
       [t.expense,`${e(q.noUpfront)}<br>${e(content.expenses)}`], [t.reward,`${reward(entry)}<br>${e(content.reward_terms)}`],
       [q.payment,e(content.payment)], [t.deadline,deadline(entry)],
-      [t.checked,time(entry.last_checked_at,lang,false,'Asia/Tokyo')],
-      [q.organizer,`<a href="${e(entry.official_url)}" rel="noopener noreferrer">${e(content.organizer)}</a>`],
-    ])}${entry.review.evidence_url === entry.official_url ? '' : `<p><a href="${e(entry.review.evidence_url)}" rel="noopener noreferrer">${e(q.rules)}</a></p>`}</div>
-<p class="notice" data-quest-closed hidden>${e(q.closed)}</p>
-<p>${link('guides')}</p></article>`, true, '', entry.locales);
+      ...(entry.conditions?.ai ? [[details.ai,e(details[entry.conditions.ai])]] : []),
+      [t.checked,time(entry.last_checked_at,lang,false,zone(entry))],
+    ])}
+${closed ? '' : `<div ${expiry(entry)} data-quest-listing><p><a href="${e(entry.official_url)}" rel="noopener noreferrer">${e(content.organizer)}</a></p>${calendar}</div>
+<p class="notice" data-quest-closed hidden>${e(q.closed)}</p>`}
+<p><a href="${e(rules)}" rel="noopener noreferrer">${e(q.rules)}</a></p>
+${related.length ? `<section data-expiry-section><h2>${e(details.related)}</h2><ul data-expiry-list>${related.map(other => `<li ${expiry(other)}>${link('quests/' + other.id,other.copy[lang].title)}</li>`).join('')}</ul></section>` : ''}
+<p>${link('quests',details.back)} · ${link('guides')}</p></article>`, !closed, '', entry.locales);
   }
   for (const entry of guides) {
     const content = entry.copy[lang];
@@ -484,7 +547,7 @@ ${external(hapitasUrl,t.hapitas.cta,'affiliate_click')}
   const giveaways = consumer.filter(row => row.category === 'sweepstakes');
   const featured = giveaways.filter(row => row.deadline).sort((a,b) => expiration(a) - expiration(b) || a.id.localeCompare(b.id)).slice(0,3);
   const recent = [...consumer].sort((a,b) => b.first_seen_at.localeCompare(a.first_seen_at)).slice(0,4);
-  const recentList = `<section class="section"><div class="section-heading"><h2>${t.recent}</h2></div>
+  const recentList = `<section class="section"><div class="section-heading"><h2>${t.recent}</h2><a href="${feedPath(lang)}">${e(t.rss.subscribe)}</a></div>
 <ul class="recent-list">${recent.map(row => `<li data-expiring="${e(expiryValue(row))}"><a href="${detail(lang,row)}">${e(row['title_' + lang])}</a>
 <span>${e(row.provider)}</span><span>${time(row.first_seen_at,lang)}</span></li>`).join('')}</ul></section>`;
   const rewardsPreview = `<section class="section"><div class="section-heading"><h2><a href="${url(lang,'rewards')}#rewards-comparison">${t.pages.rewards[0]}</a></h2><p>${t.rewardsLead}</p></div><div class="cards">${['freecash','research-panel','prolific'].map(id => rewardRows.find(row => row.id === id)).filter(Boolean).map(row => card(row,lang)).join('')}</div></section>`;
@@ -494,6 +557,8 @@ ${external(hapitasUrl,t.hapitas.cta,'affiliate_click')}
 <section class="section featured"><div class="section-heading"><h2>${t.closing}</h2><a href="${url(lang,'sweepstakes')}">${t.browse} →</a></div>
 <div class="cards">${featured.length ? featured.map(row => card(row,lang)).join('') : `<p>${t.empty}</p>`}</div></section>
 ${rewardsPreview}${recentList}${hapitasAd}`);
+  await write(feedPath(lang).slice(1),renderFeed({lang,origin:origin.origin,now,rows,
+    quests:editorial.quests,dates:rssDates,copy:t.rss,deadlineLabel:t.deadline}));
   await editorialPages(lang);
   const pages = {
     opportunities: consumer,
@@ -518,7 +583,9 @@ ${sections}${key === 'privacy' ? `<p><a href="https://policies.google.com/techno
 ${key === 'privacy' && analytics ? `<p><button type="button" data-analytics-settings>${t.analytics.settings}</button></p>` : ''}${['contact','privacy','disclosure'].includes(key) ? `<p>${t.legalContact} · ${address}</p>` : ''}</article>`);
   }
   for (const row of rows) {
-    await page(lang,'opportunities/' + row.id,row['title_' + lang],row['description_' + lang],details(lang,row));
+    const calendar = row.verification_status === 'verified'
+      ? await calendarLink('opportunities',row,lang,row['title_' + lang],row.deadline_timezone) : '';
+    await page(lang,'opportunities/' + row.id,row['title_' + lang],row['description_' + lang],details(lang,row,calendar));
   }
 }
 await write('index.html', `<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width">

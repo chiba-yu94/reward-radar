@@ -19,7 +19,7 @@ gh run download RUN_ID -n source-observation -D var/observations/RUN_ID
 
 ## 本番の自動更新
 
-本番は [Freebie Trail](https://freebietrail.com/) です。日次実行は収集とテストを通過した静的成果物を Workers Free に配信します。期限を過ぎた案件はブラウザーで非表示になり、次回の成功したデプロイで詳細ページとサイトマップから外れます。
+本番は [Freebie Trail](https://freebietrail.com/) です。日次実行は収集とテストを通過した静的成果物を Workers Free に配信します。期限を過ぎた通常の掲載はブラウザーで非表示になり、次回の成功したデプロイで詳細ページとサイトマップから外れます。承認済みクエストは同じ詳細URLに受付終了と公式出典を表示し、受付中一覧、サイトマップ、新着RSSから外れます。
 
 GitHub の `production` Environment は `main` に制限しています。Cloudflare の対象アカウントに限定した Workers Scripts 編集用トークンを `CLOUDFLARE_API_TOKEN` として登録します。リポジトリ変数は `CLOUDFLARE_ACCOUNT_ID`、`SITE_ORIGIN`、`DEPLOY_ENABLED` です。トークンはデプロイ工程だけが参照します。秘密値はチャット、ログ、リポジトリに貼らないでください。
 

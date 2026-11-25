@@ -9,3 +9,10 @@
   Cross-Origin-Opener-Policy: same-origin
 /opportunities.json
   Cache-Control: no-cache
+/*/deadline.ics
+  Content-Type: text/calendar; charset=utf-8
+  Content-Disposition: attachment; filename="deadline.ics"
+  X-Robots-Tag: noindex
+/*/feed.xml
+  Content-Type: application/rss+xml; charset=utf-8
+  X-Robots-Tag: noindex

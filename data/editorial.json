@@ -13,6 +13,7 @@
     {
       "id": "life-design-art-2026",
       "status": "approved",
+      "conditions": {"free": true},
       "type": "visual-art",
       "deadline": "2026-11-29T14:59:59Z",
       "deadline_date_only": true,
@@ -52,6 +53,7 @@
     {
       "id": "hacktale-award-2027",
       "status": "approved",
+      "conditions": {"free": true, "sns": false, "ai": "allowed"},
       "type": "design",
       "deadline": "2027-02-28T14:59:00Z",
       "last_checked_at": "2026-11-23T08:25:37Z",
@@ -90,6 +92,7 @@
     {
       "id": "timee-note-work-contest-2026",
       "status": "approved",
+      "conditions": {"free": true, "sns": true},
       "type": "writing",
       "deadline": "2026-12-25T14:59:00Z",
       "last_checked_at": "2026-11-25T03:31:13Z",

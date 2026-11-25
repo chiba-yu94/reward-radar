@@ -140,6 +140,34 @@ try {
   }
   for (const path of links) await get(path);
   for (const lang of ['ja','en']) {
+    const feed = `/${lang}/feed.xml`;
+    await page.goto(origin + `/${lang}/`);
+    const discovery = page.locator('head link[rel=alternate][type="application/rss+xml"]');
+    assert.equal(await discovery.getAttribute('href'),feed);
+    const [response] = await Promise.all([
+      page.waitForResponse(origin + feed),
+      page.locator(`main a[href="${feed}"]`).click(),
+    ]);
+    await page.waitForURL(origin + feed);
+    assert.equal(response.status(),200,feed);
+    assert.match(response.headers()['content-type'],/^application\/rss\+xml/);
+    assert.equal(response.headers()['x-robots-tag'],'noindex');
+    const feedInfo = await page.evaluate(text => {
+      const xml = new DOMParser().parseFromString(text,'application/xml');
+      return {
+        root:xml.documentElement.localName,
+        language:xml.querySelector('channel > language')?.textContent,
+        items:Array.from(xml.querySelectorAll('item'),item => ['guid','link','pubDate'].map(key => item.querySelector(key).textContent)),
+      };
+    },await response.text());
+    assert.equal(feedInfo.root,'rss');
+    assert.equal(feedInfo.language,lang);
+    assert.ok(!paths.has(feed),feed);
+    assert.equal(new Set(feedInfo.items.map(([guid]) => guid)).size,feedInfo.items.length);
+    for (const [guid, link, published] of feedInfo.items) {
+      assert.ok(guid.startsWith('urn:freebietrail:' + lang + ':') && link.startsWith(canonical + '/' + lang + '/'));
+      assert.ok(paths.has(new URL(link).pathname) && Number.isFinite(Date.parse(published)),link);
+    }
     for (const retired of ['rakuten-app-draw','does-not-exist'])
       assert.equal((await context.request.get(origin + '/' + lang + '/opportunities/' + retired + '/')).status(),404);
     for (const [route, queryString] of [['opportunities/','q=example'],['opportunities/prolific/','utm_source=review'],['sweepstakes/','webOnly=yes']]) {

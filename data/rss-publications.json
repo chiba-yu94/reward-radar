@@ -1,0 +1,20 @@
+[
+  {
+    "listing": "quests/life-design-art-2026",
+    "languages": ["ja", "en"],
+    "first_published_at": "2026-11-23T08:37:52Z",
+    "evidence_url": "https://github.com/chiba-yu94/reward-radar/actions/runs/45140068624"
+  },
+  {
+    "listing": "quests/hacktale-award-2027",
+    "languages": ["ja", "en"],
+    "first_published_at": "2026-11-23T08:37:52Z",
+    "evidence_url": "https://github.com/chiba-yu94/reward-radar/actions/runs/45140068624"
+  },
+  {
+    "listing": "quests/timee-note-work-contest-2026",
+    "languages": ["ja", "en"],
+    "first_published_at": "2026-11-25T03:35:54Z",
+    "evidence_url": "https://github.com/chiba-yu94/reward-radar/actions/runs/45540955256"
+  }
+]

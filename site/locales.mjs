@@ -4,6 +4,9 @@ export const languages = ['ja', 'en'];
 export const email = 'support@freebietrail.com';
 export const copy = {
   ja: {
+    rss:{title:'懸賞さんぽの新着', description:'懸賞さんぽで新しく公開した募集情報。', subscribe:'新着RSSを購読'},
+    calendarAdd:'締切をカレンダーに追加（.ics）', calendarJst:'日本時間',
+    eligibilityTranslation:'応募条件を英語で読む',
     visitOfficial:'公式ページ', menu:'メニュー', freeEntry:'無料応募', closingSoon:'7日以内に締切', sort:'並び順', recommended:'条件順', deadlineSort:'締切が近い順', newest:'新着順', showResults:'結果に戻る', searchSubmit:'検索',
     regionShort:'対象地域を確認して応募できます。', markets:'掲載時に確認した広告対象地域', countries:'対象の国・地域', entryUnknown:'一部の応募情報は未確認。公式条件をご確認ください。', relatedRewards:'アンケート・タスク報酬も見る',
     sourceTerms:'応募条件・利用規約', sourcePrivacy:'プライバシー方針', sourceGuide:'参加方法', sourcePayout:'出金条件・手数料', sourcePolicy:'広告ガイドライン',
@@ -48,8 +51,12 @@ export const copy = {
         subject:'クエスト掲示板への掲載相談',
         fields:['企画名','公式URL','応募条件','応募対象の国・地域','居住条件','締切日時とタイムゾーン','賞品','賞品の受け渡し方法'],
       },
-      noUpfront:'応募時の前払い・入金不要', closed:'現在、この募集は掲載対象外です。', upTo:'最高',
-      types:{interview:'有償インタビュー', 'user-test':'ユーザーテスト', design:'デザイン公募', writing:'執筆公募', 'visual-art':'美術作品公募', 'photo-video':'写真・動画公募'},
+      noUpfront:'応募時の前払い・入金不要', closed:'現在、この募集は掲載対象外です。', ended:'受付終了', upTo:'最高',
+      types:{interview:'有償インタビュー', 'user-test':'ユーザーテスト', design:'デザイン公募', writing:'執筆公募', 'visual-art':'美術作品公募', 'photo-video':'写真・動画公募', 'skill-bounty':'技能系バウンティ'},
+      browse:{search:'案件を検索', status:'受付状況', genre:'ジャンル', any:'すべて', more:'詳細フィルター',
+        free:'無料で応募可', sns:'SNS・投稿条件', ai:'AI利用', deadline:'締切日まで', clear:'絞り込みを解除',
+        count:'件の案件', none:'条件に合う案件がありません。', required:'必須', optional:'不要', allowed:'可',
+        prohibited:'不可', related:'条件が近い受付中の案件', back:'案件一覧へ戻る'},
       rewardTypes:{completion:'完了謝礼', selection:'採用報酬', prize:'入賞者のみ賞金'},
     },
     analytics: {
@@ -146,6 +153,9 @@ export const copy = {
     },
   },
   en: {
+    rss:{title:'Freebie Trail new listings', description:'Newly published listings on Freebie Trail.', subscribe:'Subscribe via RSS'},
+    calendarAdd:'Add deadline to calendar (.ics)', calendarJst:'Japan time',
+    eligibilityTranslation:'Read the entry requirements in Japanese',
     visitOfficial:'Official page', menu:'Menu', freeEntry:'Free entry', closingSoon:'Closes within 7 days', sort:'Sort by', recommended:'Default', deadlineSort:'Deadline', newest:'Newest', showResults:'Back to results', searchSubmit:'Search',
     regionShort:'Eligibility is listed for each opportunity.', markets:'Reviewed advertising markets', countries:'Countries and regions', entryUnknown:'Some entry information is unverified. Check the official rules.', relatedRewards:'Browse surveys and task rewards',
     sourceTerms:'Entry rules / terms of service', sourcePrivacy:'Privacy policy', sourceGuide:'How to participate', sourcePayout:'Withdrawal limits and fees', sourcePolicy:'Advertising guidelines',
@@ -190,8 +200,12 @@ export const copy = {
         subject:'Quest board listing inquiry',
         fields:['Campaign name','Official URL','Entry requirements','Eligible countries or regions','Residency requirements','Deadline date, time and time zone','Prizes','How you deliver the prizes'],
       },
-      noUpfront:'No upfront payment or deposit to apply', closed:'This opportunity is no longer listed as open.', upTo:'up to',
-      types:{interview:'Paid interview', 'user-test':'User testing', design:'Design call', writing:'Writing call', 'visual-art':'Visual art competition', 'photo-video':'Photo or video contest'},
+      noUpfront:'No upfront payment or deposit to apply', closed:'This opportunity is no longer listed as open.', ended:'Entries closed', upTo:'up to',
+      types:{interview:'Paid interview', 'user-test':'User testing', design:'Design call', writing:'Writing call', 'visual-art':'Visual art competition', 'photo-video':'Photo or video contest', 'skill-bounty':'Skill bounty'},
+      browse:{search:'Search opportunities', status:'Entry status', genre:'Category', any:'All', more:'More filters',
+        free:'Free to enter', sns:'Social or posting requirement', ai:'AI use', deadline:'Deadline by', clear:'Clear filters',
+        count:'opportunities', none:'No opportunities match these filters.', required:'Required', optional:'Not required', allowed:'Allowed',
+        prohibited:'Prohibited', related:'Related open opportunities', back:'Back to opportunities'},
       rewardTypes:{completion:'Payment for completion', selection:'Payment for selected work', prize:'Prize for winners only'},
     },
     analytics: {

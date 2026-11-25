@@ -1,5 +1,6 @@
 import {matches, ordered, allowedFilters, expiration, timestamp} from './domain.mjs';
 import {updateDates} from './status.mjs';
+import {questBoard} from './quest-board.mjs';
 
 const lang = document.documentElement.lang;
 const cards = Array.from(document.querySelectorAll('[data-record]'));
@@ -7,6 +8,7 @@ const deadline = element => expiration({deadline:element.dataset.deadline || ele
 const affiliateExpired = (element, now) => timestamp(element.dataset.affiliateExpires) <= now;
 const form = document.querySelector('#filters');
 let filter = null;
+const refreshQuests = questBoard(document.querySelector('[data-quest-board]'));
 const menu = document.querySelector('.site-menu');
 document.addEventListener('keydown', event => {
   if (event.key === 'Escape' && menu?.open) { menu.open = false; menu.querySelector('summary').focus(); }
@@ -17,6 +19,7 @@ document.addEventListener('click', event => {
 function checkDates() {
   const now = Date.now();
   updateDates(document, now, lang);
+  refreshQuests?.(now);
   if (filter) filter(false);
 }
 checkDates();

@@ -5,6 +5,7 @@ import {tmpdir} from 'node:os';
 import {join, resolve} from 'node:path';
 import test from 'node:test';
 import {publicEditorial} from '../site/editorial.mjs';
+import {fixtureBounty} from './fixtures/bounty-approval.mjs';
 import {updateDates} from '../site/status.mjs';
 
 const checked = '2026-11-08T12:00:00Z';
@@ -43,19 +44,36 @@ test('quest gates require reviewed evidence, a supported reward, and a fresh ope
   }
 });
 
+test('skill bounty approvals require verified free and safe entry, country, conditions and payout', () => {
+  const now = Date.parse(fixtureBounty.last_checked_at);
+  const select = row => publicEditorial({quests:[row],guides:[]},now).quests;
+  assert.equal(select(fixtureBounty).length,1);
+  assert.deepEqual(select({...fixtureBounty,status:'candidate'}),[]);
+  const review = fixtureBounty.review;
+  for (const key of ['japan_eligible','no_upfront_cost','payment_verified','safe_non_security']) {
+    assert.throws(() => select({...fixtureBounty,review:{...review,[key]:false}}),/Invalid editorial data/);
+  }
+  for (const [key,value] of [['ai','unknown'],['sns',null],['eligible_countries',[]],
+    ['free',false],['entry_method',''],['payment_method',''],['requirements',[]]]) {
+    assert.throws(() => select({...fixtureBounty,conditions:{...fixtureBounty.conditions,[key]:value}}),/skill bounty/);
+  }
+  assert.throws(() => select({...fixtureBounty,deadline_timezone:null}),/skill bounty/);
+});
+
 test('cached quest pages hide official actions at the cutoff', () => {
   const notice = {hidden:true};
+  const ended = {hidden:true,dataset:{questEndedNotice:new Date(cutoff).toISOString()}};
   const quest = {dataset:{expiring:new Date(cutoff).toISOString(),expireWhenStale:checked},
     hasAttribute:key => ['data-expire-when-stale','data-quest-listing'].includes(key),
     nextElementSibling:notice};
-  const root = {querySelectorAll:selector => selector === '[data-record], [data-expiring]' ? [quest] : [],querySelector:() => null};
+  const root = {querySelectorAll:selector => selector === '[data-record], [data-expiring]' ? [quest] : [],querySelector:selector => selector === '[data-quest-ended-notice]' ? ended : null};
   updateDates(root,cutoff - 1,'en');
-  assert.deepEqual([quest.hidden,notice.hidden],[false,true]);
+  assert.deepEqual([quest.hidden,notice.hidden,ended.hidden],[false,true,true]);
   updateDates(root,cutoff,'en');
-  assert.deepEqual([quest.hidden,notice.hidden],[true,false]);
+  assert.deepEqual([quest.hidden,notice.hidden,ended.hidden],[true,true,false]);
 });
 
-test('build emits approved translated pages only and removes closed listings on rebuild', () => {
+test('build keeps closed details but suppresses applications, sitemap and new listings', () => {
   const folder = mkdtempSync(join(tmpdir(),'reward-radar-editorial-'));
   const canon = 'https://freebietrail.com';
   const read = path => readFileSync(join(folder,'dist',path),'utf8');
@@ -67,6 +85,7 @@ test('build emits approved translated pages only and removes closed listings on 
     mkdirSync(join(folder,'var'));
     symlinkSync(resolve('site'),join(folder,'site'));
     copyFileSync('data/taxonomy.json',join(folder,'data/taxonomy.json'));
+    copyFileSync('data/rss-publications.json',join(folder,'data/rss-publications.json'));
     execFileSync('python3',['-c',`
 from pathlib import Path
 from sys import argv
@@ -99,9 +118,11 @@ publish(rows, sources, {}, folder / 'published.json', folder / 'operations.sqlit
     assert.equal(exists('ja/guides/private-draft/index.html'),false);
     assert.doesNotMatch(read('ja/quests/index.html'),/korezo-yamanashi-2026|freecash\.pxf\.io/);
     build(cutoff);
-    assert.equal(exists(questPath),false);
+    assert.ok(exists(questPath));
+    assert.match(read(questPath),/受付終了/);
+    assert.doesNotMatch(read(questPath),/data-quest-listing|deadline\.ics/);
     assert.match(read('ja/quests/index.html'),/noindex, follow/);
-    assert.doesNotMatch(read('ja/quests/index.html'),/quests\/sample/);
+    assert.doesNotMatch(read('ja/quests/index.html').split('data-quest-ended')[0],/quests\/sample/);
     assert.doesNotMatch(read('sitemap.xml'),/\/quests\//);
 
     const newQuest = content.quests.find(entry => entry.id === 'hacktale-award-2027');
@@ -133,6 +154,7 @@ publish(rows, sources, {}, folder / 'published.json', folder / 'operations.sqlit
       const base = lang + '/';
       const board = read(base + 'quests/index.html');
       const detail = read(base + timeePath + 'index.html');
+      const feed = read(base + 'feed.xml');
       assert.ok(read(base + 'index.html').includes('href="/' + base + 'quests/"'));
       assert.ok(board.includes('href="/' + base + timeePath + '"'));
       assert.equal(board.split(notice).length,2);
@@ -140,11 +162,15 @@ publish(rows, sources, {}, folder / 'published.json', folder / 'operations.sqlit
       assert.ok(detail.includes('href="https://note.com/info/n/n3cd095e43966"'));
       assert.ok(detail.includes('hreflang="' + alternate + '" href="' + canon + '/' + alternate + '/' + timeePath + '"'));
       assert.ok(detail.includes('datetime="2026-12-25T14:59:00Z"'));
+      assert.match(read(base + timeePath + 'deadline.ics'),/DTSTART:20261225T145900Z/);
       assert.match(detail,/23:59 (JST|GMT\+9)/);
       assert.ok(detail.includes('#あの日の仕事をきっかけに'));
       assert.match(detail,/Amazon\.co\.jp/);
       assert.ok(read('sitemap.xml').includes('<loc>' + canon + '/' + base + timeePath + '</loc>'));
       assert.ok(!read(base + 'sweepstakes/index.html').includes(timee.id));
+      assert.match(feed,/<pubDate>Wed, 25 Nov 2026 03:35:54 GMT<\/pubDate>/);
+      assert.ok(feed.includes('<link>' + canon + '/' + base + timeePath + '</link>'));
+      assert.doesNotMatch(feed,/korezo-yamanashi-2026|published-result-fixture|freecash/);
     }
     // A review close to the deadline keeps the test focused on expiration.
     timee.last_checked_at = '2026-12-24T12:00:00Z';
@@ -155,8 +181,13 @@ publish(rows, sources, {}, folder / 'published.json', folder / 'operations.sqlit
     assert.ok(exists('en/' + timeePath + 'index.html'));
     build(timeeCutoff);
     for (const lang of ['ja','en']) {
-      assert.equal(exists(lang + '/' + timeePath + 'index.html'),false);
-      assert.ok(!read(lang + '/quests/index.html').includes(timeePath));
+      assert.ok(exists(lang + '/' + timeePath + 'index.html'));
+      assert.match(read(lang + '/' + timeePath + 'index.html'),/data-quest-ended-notice[^>]*>(受付終了|Entries closed)/);
+      assert.doesNotMatch(read(lang + '/' + timeePath + 'index.html'),/data-quest-listing|deadline\.ics/);
+      assert.ok(read(lang + '/' + timeePath + 'index.html').includes('href="https://note.com/info/n/n3cd095e43966"'));
+      assert.equal(exists(lang + '/' + timeePath + 'deadline.ics'),false);
+      assert.ok(!read(lang + '/quests/index.html').split('data-quest-ended')[0].includes(timeePath));
+      assert.ok(!read(lang + '/feed.xml').includes(timeePath));
     }
     assert.ok(!read('sitemap.xml').includes(timeePath));
 
@@ -169,8 +200,8 @@ publish(rows, sources, {}, folder / 'published.json', folder / 'operations.sqlit
     assert.ok(exists('en/' + path + 'index.html'));
     build(timedCutoff);
     for (const lang of ['ja','en']) {
-      assert.equal(exists(lang + '/' + path + 'index.html'),false);
-      assert.ok(!read(lang + '/quests/index.html').includes(path));
+      assert.ok(exists(lang + '/' + path + 'index.html'));
+      assert.ok(!read(lang + '/quests/index.html').split('data-quest-ended')[0].includes(path));
     }
     assert.ok(!read('sitemap.xml').includes(path));
   } finally {

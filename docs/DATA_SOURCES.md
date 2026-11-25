@@ -37,3 +37,11 @@ Use `data/editorial.json` for quest reviews and site-hosted articles. The existi
 ## Application effort
 
 Record `application` only after checking official organizer rules. Its source URL must be the approved primary or supporting source. Record the review timestamp, whether entry is web-only, whether an SNS account or free organizer membership is required, supported platforms, and the actions on the shortest verified path. Use null for unresolved flags. The publication pipeline calculates the action count and difficulty from these facts. It prioritizes free, SNS-free web entry, then confirmed SNS-free routes and low-effort social routes. Writing a new or quote post and linking accounts count as more involved. Feed discoveries begin with unknown values and remain in the review queue until the organizer evidence is checked.
+
+## Reader RSS
+
+The site build emits `/ja/feed.xml` and `/en/feed.xml` from the current public opportunities and quests. Each feed keeps up to 20 items first published in the past 30 days. Listings with no recorded first publication, ads, affiliate listings, unpublished or expired listings, guides and archives are excluded.
+
+In `data/rss-publications.json`, record a listing's existing route key (`quests/<id>` or `opportunities/<id>`), the actual languages first published together, the UTC completion timestamp of the first successful production deployment that exposed those details, and its evidence URL. Confirm that the pages were reachable in that release. If another language goes live later, add its own dated entry. A date is optional for the listing to work and required for RSS. If the first release cannot be substantiated, leave it out of this registry.
+
+Keep the route key and first publication timestamp when editing content, updating the review or extending a deadline. The stable GUID uses the route key and language. A new timestamp is reserved for a genuinely new listing. Add the publication evidence after verifying the first release. The next normal site build will update the feed.
