@@ -86,6 +86,44 @@
           "organizer": "Hacktale (operated by ex Labs, Inc.)"
         }
       }
+    },
+    {
+      "id": "timee-note-work-contest-2026",
+      "status": "approved",
+      "type": "writing",
+      "deadline": "2026-12-25T14:59:00Z",
+      "last_checked_at": "2026-11-25T03:31:13Z",
+      "official_url": "https://note.com/info/n/n3cd095e43966",
+      "review": {
+        "accepting": true,
+        "japan_eligible": "not-stated",
+        "no_upfront_cost": true,
+        "payment_verified": true,
+        "evidence_url": "https://note.com/info/n/n3cd095e43966"
+      },
+      "reward": {"kind": "prize", "amount": 100000, "currency": "JPY", "maximum": true},
+      "copy": {
+        "ja": {
+          "title": "タイミー×note「#あの日の仕事をきっかけに」投稿コンテスト",
+          "description": "仕事を引き受けた日や、誰かに仕事を頼んだ日をきっかけに起きた変化をnoteで募集。グランプリはAmazon.co.jpで使えるギフトカード10万円分です。",
+          "task": "2026年11月25日11:00（日本時間）に受付開始。noteにログインしてタイミーの公式noteをフォローし、#あの日の仕事をきっかけに を付けた記事を無料で公開します。エッセイ、マンガ、イラストなど形式は自由。テーマに合う過去の記事も、タグを付けて再投稿できます。作品は主催者のSNSや販促コンテンツなどで紹介される場合があります。",
+          "eligibility": "公式要項に応募者の居住地の記載はありません。通常の賞について、タイミーのサービスを利用する条件は記載されていません。最終選考では本人確認があり、期限までに確認できない場合は選考対象外です。",
+          "expenses": "応募料・購入は不要です。noteアカウントと、タイミーの公式noteのフォローが必要です。Xへの投稿は不要です。",
+          "reward_terms": "受賞は計10名。グランプリ1名に10万円分、審査員特別賞2名とタイミー賞2名に各5万円分、入賞5名に各2万円分。タイミー賞はタイミーに触れた作品が対象です。結果発表は2027年2月下旬の予定です。",
+          "payment": "受賞者のメールアドレスにAmazonギフトカードを送付。賞品はAmazon.co.jpでの購入に利用できます。",
+          "organizer": "note公式（応募方法・募集要項）"
+        },
+        "en": {
+          "title": "Timee × note contest: The Job That Started It All",
+          "description": "Share a story about how taking on a job or asking someone to do a job changed what happened next. The grand prize is a ¥100,000 Amazon.co.jp gift card.",
+          "task": "Entries opened November 25, 2026 at 11:00 JST. Sign in to note, follow Timee’s official note account and publish a free, public post with #あの日の仕事をきっかけに. Essays, comics and illustrations are welcome. You can also republish an older, relevant post with the tag. The organizers may feature entries on social media or in promotional materials.",
+          "eligibility": "The official rules do not specify where entrants must live. They list no requirement to have used Timee for the general awards. Finalists must verify their identity by the organizer’s deadline to stay in consideration.",
+          "expenses": "Entry is free and requires no purchase. You need a note account and must follow Timee’s official note account. You do not need to post on X.",
+          "reward_terms": "Ten winners: one grand prize of ¥100,000, two judges’ prizes and two Timee prizes of ¥50,000 each, and five additional prizes of ¥20,000 each. Only entries that mention Timee qualify for the Timee prizes. Results are expected in late February 2027.",
+          "payment": "Amazon gift cards are emailed to winners. The gift cards are redeemable for purchases on Amazon.co.jp.",
+          "organizer": "Official note contest announcement and entry instructions (Japanese)"
+        }
+      }
     }
   ],
   "guides": [

@@ -31,6 +31,10 @@ test('quest gates require reviewed evidence, a supported reward, and a fresh ope
   for (const key of ['accepting','japan_eligible','no_upfront_cost','payment_verified']) {
     assert.throws(() => select({...quest,review:{...quest.review,[key]:false}}),/Invalid editorial data/);
   }
+  for (const value of [null, undefined, 'unknown']) {
+    assert.throws(() => select({...quest,review:{...quest.review,japan_eligible:value}}),/Invalid editorial data/);
+  }
+  assert.equal(select({...quest,review:{...quest.review,japan_eligible:'not-stated'}})[0].id,'sample');
   assert.throws(() => select({...quest,deadline:null}),/open period/);
   assert.throws(() => select({...quest,official_url:'javascript:alert(1)'}),/source/);
   assert.throws(() => select({...quest,type:'user-test'}),/task or reward/);
@@ -117,6 +121,44 @@ publish(rows, sources, {}, folder / 'published.json', folder / 'operations.sqlit
       assert.ok(exists(lang + '/quests/life-design-art-2026/index.html'));
       assert.ok(exists(lang + '/' + guide + 'index.html'));
     }
+
+    const timee = content.quests.find(entry => entry.id === 'timee-note-work-contest-2026');
+    const timeePath = 'quests/' + timee.id + '/';
+    assert.equal(exists('ja/' + timeePath + 'index.html'),false);
+    build(Date.parse('2026-11-25T04:00:00Z'));
+    for (const [lang, alternate, notice] of [
+      ['ja','en','居住条件は未確認'],
+      ['en','ja','Residency eligibility unconfirmed'],
+    ]) {
+      const base = lang + '/';
+      const board = read(base + 'quests/index.html');
+      const detail = read(base + timeePath + 'index.html');
+      assert.ok(read(base + 'index.html').includes('href="/' + base + 'quests/"'));
+      assert.ok(board.includes('href="/' + base + timeePath + '"'));
+      assert.equal(board.split(notice).length,2);
+      assert.ok(detail.includes(notice));
+      assert.ok(detail.includes('href="https://note.com/info/n/n3cd095e43966"'));
+      assert.ok(detail.includes('hreflang="' + alternate + '" href="' + canon + '/' + alternate + '/' + timeePath + '"'));
+      assert.ok(detail.includes('datetime="2026-12-25T14:59:00Z"'));
+      assert.match(detail,/23:59 (JST|GMT\+9)/);
+      assert.ok(detail.includes('#あの日の仕事をきっかけに'));
+      assert.match(detail,/Amazon\.co\.jp/);
+      assert.ok(read('sitemap.xml').includes('<loc>' + canon + '/' + base + timeePath + '</loc>'));
+      assert.ok(!read(base + 'sweepstakes/index.html').includes(timee.id));
+    }
+    // A review close to the deadline keeps the test focused on expiration.
+    timee.last_checked_at = '2026-12-24T12:00:00Z';
+    writeFileSync(join(folder,'data/editorial.json'),JSON.stringify(content));
+    const timeeCutoff = Date.parse('2026-12-25T14:59:00Z');
+    build(timeeCutoff - 1);
+    assert.ok(exists('ja/' + timeePath + 'index.html'));
+    assert.ok(exists('en/' + timeePath + 'index.html'));
+    build(timeeCutoff);
+    for (const lang of ['ja','en']) {
+      assert.equal(exists(lang + '/' + timeePath + 'index.html'),false);
+      assert.ok(!read(lang + '/quests/index.html').includes(timeePath));
+    }
+    assert.ok(!read('sitemap.xml').includes(timeePath));
 
     const timedCutoff = Date.parse('2027-02-28T14:59:00Z');
     // Recheck in the fixture so the deadline, independent of review freshness, controls removal.

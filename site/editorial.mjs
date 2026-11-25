@@ -48,13 +48,14 @@ export function publicEditorial(input, now) {
   const quests = approved(input.quests, ['candidate','closed']).filter(quest => {
     const end = expiration(quest);
     if (end <= now) return false;
+    const residence = quest.review?.japan_eligible;
     requireEditorial(Object.hasOwn(rewardTypes,quest.type) && rewardTypes[quest.type].includes(quest.reward?.kind) &&
       Number.isFinite(quest.reward.amount) && quest.reward.amount > 0 && /^[A-Z]{3}$/.test(quest.reward.currency) &&
       (quest.reward.maximum === undefined || typeof quest.reward.maximum === 'boolean'),
     quest.id + ': task or reward');
     requireEditorial(Number.isFinite(end) && (quest.deadline_date_only === undefined || typeof quest.deadline_date_only === 'boolean') &&
       Number.isFinite(timestamp(quest.last_checked_at)) &&
-      quest.review?.accepting === true && quest.review?.japan_eligible === true &&
+      quest.review?.accepting === true && (residence === true || residence === 'not-stated') &&
       quest.review?.no_upfront_cost === true && quest.review?.payment_verified === true &&
       https(quest.official_url) && https(quest.review.evidence_url),
     quest.id + ': open period, eligibility, cost, payment or source');

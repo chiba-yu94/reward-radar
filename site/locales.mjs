@@ -41,6 +41,7 @@ export const copy = {
     quest:{
       open:'受付中の募集', empty:'条件を確認できた受付中の募集は、現在ありません。',
       task:'取り組む内容', payment:'受取方法', organizer:'公式募集元', rules:'公式の募集要項',
+      residencyUnconfirmed:'居住条件は未確認',
       organizerContact:{
         link:'主催者の方へ：掲載を相談する',
         note:'掲載可否の確認は無料です。掲載を保証するものではありません。',
@@ -99,7 +100,7 @@ export const copy = {
     compare: '参加方法を比較する', compareLead: '公式資料をもとに、選考や換金条件の違いを確認できます。',
     legalContact: 'お問い合わせ先', copyright: '懸賞さんぽ',
     pages: {
-      quests:['クエスト掲示板','日本から応募できる有償インタビュー、ユーザーテスト、作品公募を探せます。締切と報酬の条件を確認してから公式募集元へ進めます。'],
+      quests:['クエスト掲示板','有償インタビュー、ユーザーテスト、作品公募を探せます。居住条件、締切、報酬を確認してから公式募集元へ進めます。'],
       guides:['応募ガイド','募集要項の読み方や、作品を提出する前に確かめたいことをまとめています。'],
       rewards: ['ポイ活・タスク報酬', '日本から参加できるアンケートや有償調査を比較。参加費、ポイント交換・出金の条件と、ゲーム案件の購入や課金の有無を確認できます。'],
       opportunities: ['掲載一覧', '消費者向けの特典を、費用・対象地域・参加方法から絞り込めます。'],
@@ -182,6 +183,7 @@ export const copy = {
     quest:{
       open:'Open calls', empty:'There are currently no open calls with verified terms.',
       task:'What to do', payment:'How payment is made', organizer:'Official organizer', rules:'Official rules',
+      residencyUnconfirmed:'Residency eligibility unconfirmed',
       organizerContact:{
         link:'Organizers: Ask about a listing',
         note:'We review submissions for free. Listing is not guaranteed.',
@@ -241,7 +243,7 @@ export const copy = {
     compare: 'Compare ways to participate', compareLead: 'Use official-source facts to compare screening and redemption requirements.',
     legalContact: 'Contact', copyright: 'Freebie Trail',
     pages: {
-      quests:['Quest board','Find paid interviews, user tests and creative calls you can apply for from Japan. Check deadlines and reward terms before visiting the organizer.'],
+      quests:['Quest board','Find paid interviews, user tests and creative calls. Check residency eligibility, deadlines and rewards before visiting the organizer.'],
       guides:['Application guides','Read how to check an organizer’s rules and prepare your work before submitting it.'],
       rewards: ['Rewards', 'Compare surveys and paid research available in Japan. Check entry costs, redemption or cashout terms, and whether game tasks may require spending.'],
       opportunities: ['All opportunities', 'Search giveaways, surveys and task rewards by country and entry requirements.'],

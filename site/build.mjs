@@ -429,6 +429,7 @@ async function editorialPages(lang) {
   const guides = editorial.guides.filter(entry => entry.locales.includes(lang));
   const link = (key, label = t.pages[key][0]) => `<a href="${url(lang,key)}">${e(label)}</a>`;
   const reward = entry => e(`${q.rewardTypes[entry.reward.kind]} · ${entry.reward.maximum ? q.upTo + ' ' : ''}${format(entry.reward.amount,entry.reward.currency,lang)}`);
+  const residency = entry => entry.review.japan_eligible === 'not-stated' ? e(q.residencyUnconfirmed) : '';
   const expiry = entry => `data-expiring="${expiryValue(entry)}" data-expire-when-stale="${e(entry.last_checked_at)}"`;
   const deadline = entry => time(entry.deadline,lang,!entry.deadline_date_only,'Asia/Tokyo');
   const intro = key => `<header class="intro"><h1>${e(t.pages[key][0])}</h1><p class="lead">${e(t.pages[key][1])}</p></header>`;
@@ -438,7 +439,7 @@ async function editorialPages(lang) {
   await page(lang,'quests',...t.pages.quests,`${intro('quests')}
 <section class="section" aria-labelledby="quest-list-heading"><div class="section-heading"><h2 id="quest-list-heading">${e(q.open)}</h2></div>
 <ul class="giveaway-list" data-expiry-list${quests.length ? '' : ' hidden'}>${quests.map(entry => `<li ${expiry(entry)}>
-<h3>${link('quests/' + entry.id,entry.copy[lang].title)}</h3><p>${e(q.types[entry.type])} · ${reward(entry)}</p>
+<h3>${link('quests/' + entry.id,entry.copy[lang].title)}</h3><p>${[e(q.types[entry.type]),reward(entry),residency(entry)].filter(Boolean).join(' · ')}</p>
 <p>${e(t.deadline)} · ${deadline(entry)}</p><p>${e(entry.copy[lang].description)}</p></li>`).join('')}</ul>
 <p data-expiry-empty${quests.length ? ' hidden' : ''}>${e(q.empty)}</p></section>
 <p>${link('guides')}</p>`, quests.length > 0, '', questLinks.length ? questLinks : languages);
@@ -446,10 +447,12 @@ async function editorialPages(lang) {
 
   for (const entry of quests) {
     const content = entry.copy[lang];
+    const residencyNotice = residency(entry);
     await page(lang,'quests/' + entry.id,content.title,content.description,`<article class="article">
 ${breadcrumbs(lang,'quests',content.title)}<h1>${e(content.title)}</h1><p class="lead">${e(content.description)}</p>
 <div ${expiry(entry)} data-quest-listing>${fields([
-      [t.method,e(q.types[entry.type])], [q.task,e(content.task)], [t.eligibility,e(content.eligibility)],
+      [t.method,e(q.types[entry.type])], [q.task,e(content.task)],
+      [t.eligibility,`${residencyNotice ? residencyNotice + '<br>' : ''}${e(content.eligibility)}`],
       [t.expense,`${e(q.noUpfront)}<br>${e(content.expenses)}`], [t.reward,`${reward(entry)}<br>${e(content.reward_terms)}`],
       [q.payment,e(content.payment)], [t.deadline,deadline(entry)],
       [t.checked,time(entry.last_checked_at,lang,false,'Asia/Tokyo')],
