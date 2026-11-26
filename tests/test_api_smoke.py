@@ -28,6 +28,31 @@ def response(answer=None):
 
 
 class ApiSmokeTest(unittest.TestCase):
+    def test_genre_request_uses_only_reviewed_listings_and_taxonomy(self):
+        ids = ['club-sunstar-november-2026', 'macromill']
+        wire, selected = api_smoke.genre_request(', '.join(ids))
+        self.assertEqual(selected, ids)
+        request = json.loads(wire)
+        sample = json.loads(request['input'])
+        self.assertEqual([row['id'] for row in sample], ids)
+        self.assertEqual(set(sample[0]), {'id', 'title_ja', 'description_ja', 'participation_method', 'certainty'})
+        self.assertTrue(request['text']['format']['strict'])
+        with self.assertRaisesRegex(api_smoke.SmokeStopped, 'genre-listing-unavailable'):
+            api_smoke.genre_request('missing-listing')
+
+        suggestion = {'id': ids[0], 'category': 'sweepstakes', 'prize_category': 'household'}
+        survey = {'id': ids[1], 'category': 'survey', 'prize_category': None}
+        send = Mock(return_value=response({'results': [survey, suggestion]}))
+        checked = Mock(side_effect=api_smoke.validate_genres)
+        self.assertEqual(api_smoke.run(ENABLED, send=send, sample=lambda: (wire, ids), check=checked)[0], 0)
+        send.assert_called_once()
+        self.assertEqual(api_smoke.validate_genres(send.return_value, ids), {
+            ids[0]: ('sweepstakes', 'household'), ids[1]: ('survey', None),
+        })
+        for rows in ([survey, survey], [survey], [survey, {**suggestion, 'prize_category': 'invented'}]):
+            with self.assertRaisesRegex(api_smoke.SmokeStopped, 'response-contract'):
+                api_smoke.validate_genres(response({'results': rows}), ids)
+
     def test_public_sample_and_structured_request(self):
         send = Mock(return_value=response())
         self.assertEqual(api_smoke.run(ENABLED, send=send),

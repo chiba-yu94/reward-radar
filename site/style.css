@@ -48,6 +48,10 @@ nav a[aria-current] { font-weight:750; text-decoration-thickness:.15em; }
 .home-search button { flex:0 0 auto; background:var(--accent); border-color:var(--accent); color:white; }
 .home-shortcuts { display:flex; flex-wrap:wrap; gap:.1rem 1rem; margin-top:.35rem; font-size:.82rem; }
 .home-shortcuts a { padding-block:.4rem; }
+.genre-links { gap:0 1rem; margin-block:.65rem 1rem; font-size:.88rem; }
+.genre-links strong { flex-basis:100%; }
+.genre-links a { min-height:44px; }
+.genre-return { margin-inline-start:1rem; }
 .actions { display:flex; flex-wrap:wrap; align-items:center; gap:.6rem; }
 .button,button { display:inline-flex; justify-content:center; align-items:center; min-height:44px; border:1px solid var(--accent); border-radius:var(--radius); padding:.55rem 1rem; font:inherit; font-size:.92rem; font-weight:650; line-height:1.4; cursor:pointer; text-decoration:none; }
 .button { background:var(--accent); color:white; }

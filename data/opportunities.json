@@ -1957,5 +1957,290 @@
       "US"
     ],
     "geography_source_url": "https://www.stanleytools.com/en-us/stanley-november-product-review-giveaway-2026"
+  },
+  {
+    "id": "pilkul-aginglife-monitor-2026",
+    "source_id": "pilkul-aginglife-monitor-2026",
+    "provider": "Nissin York",
+    "category": "sweepstakes",
+    "eligible_countries": [
+      "JP"
+    ],
+    "eligibility_verified": true,
+    "reward_type": "prize",
+    "reward_currency": null,
+    "reward_amount": null,
+    "reward_conditions": {
+      "ja": "発送は2027年1月予定。賞品発送を当選発表とします。掲載の締切はWeb応募のものです。",
+      "en": "Prizes are due to ship in January 2027. Shipment serves as winner notification. The listed deadline is for online entries."
+    },
+    "required_expense": {
+      "kind": "free",
+      "amount": 0,
+      "currency": null
+    },
+    "estimated_effort_minutes": null,
+    "participation_method": "form",
+    "deadline": "2026-12-09T08:00:00Z",
+    "official_url": "https://www.pilkul.jp/aginglife/campaign/",
+    "affiliate_url": null,
+    "affiliate_approval_status": "none",
+    "source_url": "https://www.pilkul.jp/aginglife/campaign/",
+    "source_permission_status": "editorial-summary",
+    "first_seen_at": "2026-11-26T07:40:00Z",
+    "last_checked_at": "2026-11-26T07:40:00Z",
+    "verification_status": "verified",
+    "risk_flags": [],
+    "published_status": "approved",
+    "language": "ja",
+    "certainty": "chance",
+    "redemption_difficulty": null,
+    "commission": null,
+    "prize_category": "food",
+    "deadline_timezone": "Asia/Tokyo",
+    "entry": {
+      "registration": "none",
+      "application": null,
+      "winner": null,
+      "steps": {
+        "ja": "公式フォームに必要事項を入力します。アンケートは任意です。はがきとの重複応募は無効です。",
+        "en": "Fill out the official web form. The survey is optional. Entering both online and by postcard invalidates the entry."
+      }
+    },
+    "application": {
+      "web_only": true,
+      "sns_required": false,
+      "platforms": [],
+      "operations": [
+        "form"
+      ],
+      "free_registration": false,
+      "source_url": "https://www.pilkul.jp/aginglife/campaign/",
+      "checked_at": "2026-11-26T07:40:00Z"
+    },
+    "title_ja": "ピルクル エイジングライフ 無料モニター抽選",
+    "title_en": "Pilkul Aginglife sample giveaway",
+    "description_ja": "乳酸菌飲料8本セットが抽選で1,000名に当たります。",
+    "description_en": "One thousand entrants will win a pack of eight probiotic drinks.",
+    "eligibility_ja": "国内のクール便対象地域に住み、国内の連絡先住所と電話番号がある方。乳成分アレルギーがある方と主催者関係者は対象外です。",
+    "eligibility_en": "Applicants must live in a chilled-delivery area in Japan, have a Japanese contact address and phone number, and have no milk allergy. Organizer staff and associates are excluded.",
+    "shipping_countries": [
+      "JP"
+    ],
+    "geography_source_url": "https://www.pilkul.jp/aginglife/campaign/"
+  },
+  {
+    "id": "futaba-dandy-quo-2026",
+    "source_id": "futaba-dandy-quo-2026",
+    "provider": "Futaba Foods",
+    "category": "sweepstakes",
+    "eligible_countries": [
+      "JP"
+    ],
+    "eligibility_verified": true,
+    "reward_type": "gift-card",
+    "reward_currency": "JPY",
+    "reward_amount": 1000,
+    "reward_conditions": {
+      "ja": "賞品は応募時の住所へ2027年1月に発送予定です。当選は1人かつ同一住所につき1回までです。",
+      "en": "Prizes are scheduled to ship to the entry address in January 2027. Each person and address can win at most once."
+    },
+    "required_expense": {
+      "kind": "free",
+      "amount": 0,
+      "currency": null
+    },
+    "estimated_effort_minutes": null,
+    "participation_method": "form",
+    "deadline": "2026-12-13T14:59:00Z",
+    "official_url": "https://www.bakizaku-dandy.jp/",
+    "affiliate_url": null,
+    "affiliate_approval_status": "none",
+    "source_url": "https://www.bakizaku-dandy.jp/",
+    "source_permission_status": "editorial-summary",
+    "first_seen_at": "2026-11-26T07:40:00Z",
+    "last_checked_at": "2026-11-26T07:40:00Z",
+    "verification_status": "verified",
+    "risk_flags": [],
+    "published_status": "approved",
+    "language": "ja",
+    "certainty": "chance",
+    "redemption_difficulty": null,
+    "commission": null,
+    "prize_category": "cash-gift",
+    "deadline_timezone": "Asia/Tokyo",
+    "entry": {
+      "registration": "none",
+      "application": [
+        "name",
+        "address",
+        "phone",
+        "email"
+      ],
+      "winner": [],
+      "steps": {
+        "ja": "公式フォームに連絡先、年齢、性別などを入力します。応募は本人が1回までです。",
+        "en": "Enter your contact information, age and gender in the official form. Each person may enter once on their own behalf."
+      }
+    },
+    "application": {
+      "web_only": true,
+      "sns_required": false,
+      "platforms": [],
+      "operations": [
+        "form"
+      ],
+      "free_registration": false,
+      "source_url": "https://www.bakizaku-dandy.jp/",
+      "checked_at": "2026-11-26T07:40:00Z"
+    },
+    "title_ja": "ダンディー QUOカード1,000円分の抽選",
+    "title_en": "Dandy ¥1,000 QUO Card giveaway",
+    "description_ja": "ダンディーチョコレートのオリジナルQUOカードが500名に当たります。",
+    "description_en": "Five hundred entrants will win a Dandy Chocolate QUO Card.",
+    "eligibility_ja": "日本国内在住で、賞品の届け先も日本国内の方。主催者の社員・関係者を除きます。",
+    "eligibility_en": "Applicants must live in Japan and provide a Japanese shipping address. Organizer staff and associates are excluded.",
+    "shipping_countries": [
+      "JP"
+    ],
+    "geography_source_url": "https://www.bakizaku-dandy.jp/"
+  },
+  {
+    "id": "shinryo-calendar-2026",
+    "source_id": "shinryo-calendar-2026",
+    "provider": "Shinryo Corporation",
+    "category": "sweepstakes",
+    "eligible_countries": [
+      "JP"
+    ],
+    "eligibility_verified": true,
+    "reward_type": "prize",
+    "reward_currency": null,
+    "reward_amount": null,
+    "reward_conditions": {
+      "ja": "12月下旬に順次発送予定。パークチケットの利用には無料のディズニーアカウントとアプリでの事前予約が必要です。",
+      "en": "Prizes are due to ship in late December. Ticket holders need a free Disney account and must reserve a visit in advance through the app."
+    },
+    "required_expense": {
+      "kind": "free",
+      "amount": 0,
+      "currency": null
+    },
+    "estimated_effort_minutes": null,
+    "participation_method": "form",
+    "deadline": "2026-12-04T05:00:00Z",
+    "official_url": "https://www.shinryo.com/sponsor/cp14/",
+    "affiliate_url": null,
+    "affiliate_approval_status": "none",
+    "source_url": "https://www.shinryo.com/sponsor/cp14/",
+    "source_permission_status": "editorial-summary",
+    "first_seen_at": "2026-11-26T07:40:00Z",
+    "last_checked_at": "2026-11-26T07:40:00Z",
+    "verification_status": "verified",
+    "risk_flags": [],
+    "published_status": "approved",
+    "language": "ja",
+    "certainty": "chance",
+    "redemption_difficulty": null,
+    "commission": null,
+    "prize_category": "household",
+    "deadline_timezone": "Asia/Tokyo",
+    "entry": {
+      "registration": "none",
+      "application": null,
+      "winner": null,
+      "steps": {
+        "ja": "公式ページから専用フォームに進み、クイズの答えと必要事項を入力します。応募は1人1回です。",
+        "en": "Open the form from the campaign page and enter the quiz answer and required details. One entry per person."
+      }
+    },
+    "application": {
+      "web_only": true,
+      "sns_required": false,
+      "platforms": [],
+      "operations": [
+        "quiz",
+        "form"
+      ],
+      "free_registration": false,
+      "source_url": "https://www.shinryo.com/sponsor/cp14/",
+      "checked_at": "2026-11-26T07:40:00Z"
+    },
+    "title_ja": "新菱冷熱 ディズニー卓上カレンダー抽選",
+    "title_en": "Shinryo Disney desk calendar giveaway",
+    "description_ja": "卓上カレンダーが2,027名に当たります。当選者のうち10組にはパークチケットも贈られます。",
+    "description_en": "2,027 entrants will win a desk calendar. Ten of those winners will also receive a pair of Tokyo Disney Resort park tickets.",
+    "eligibility_ja": "日本国内在住で、連絡先も日本国内の方。主催者の社員・関係者を除きます。",
+    "eligibility_en": "Applicants must live in Japan and have contact details in Japan. Organizer staff and associates are excluded.",
+    "shipping_countries": [
+      "JP"
+    ],
+    "geography_source_url": "https://www.shinryo.com/sponsor/cp14/"
+  },
+  {
+    "id": "ja-kyosai-harvest-2026",
+    "source_id": "ja-kyosai-harvest-2026",
+    "provider": "JA Kyosai",
+    "category": "sweepstakes",
+    "eligible_countries": null,
+    "eligibility_verified": false,
+    "reward_type": "prize",
+    "reward_currency": null,
+    "reward_amount": null,
+    "reward_conditions": {
+      "ja": "賞品の発送をもって当選発表となります。応募件数に応じた寄付は主催者が負担します。",
+      "en": "Shipment serves as winner notification. The organizer funds the donation linked to the number of eligible entries."
+    },
+    "required_expense": {
+      "kind": "free",
+      "amount": 0,
+      "currency": null
+    },
+    "estimated_effort_minutes": null,
+    "participation_method": "form",
+    "deadline": "2026-12-31T08:00:00Z",
+    "official_url": "https://social.ja-kyosai.or.jp/qa-cp/",
+    "affiliate_url": null,
+    "affiliate_approval_status": "none",
+    "source_url": "https://social.ja-kyosai.or.jp/qa-cp/",
+    "source_permission_status": "editorial-summary",
+    "first_seen_at": "2026-11-26T07:40:00Z",
+    "last_checked_at": "2026-11-26T07:40:00Z",
+    "verification_status": "verified",
+    "risk_flags": [],
+    "published_status": "approved",
+    "language": "ja",
+    "certainty": "chance",
+    "redemption_difficulty": null,
+    "commission": null,
+    "prize_category": "food",
+    "deadline_timezone": "Asia/Tokyo",
+    "entry": {
+      "registration": "none",
+      "application": null,
+      "winner": null,
+      "steps": {
+        "ja": "メールアドレスを認証し、届いたリンクから必要事項と希望賞品を入力します。応募は1人1回です。",
+        "en": "Verify your email address, follow the link and enter the required details and your choice of prize. One entry per person."
+      }
+    },
+    "application": {
+      "web_only": true,
+      "sns_required": false,
+      "platforms": [],
+      "operations": [
+        "email-verify",
+        "form"
+      ],
+      "free_registration": false,
+      "source_url": "https://social.ja-kyosai.or.jp/qa-cp/",
+      "checked_at": "2026-11-26T07:40:00Z"
+    },
+    "title_ja": "JA共済 食の実りプレゼント",
+    "title_en": "JA Kyosai regional produce giveaway",
+    "description_ja": "メロン、宮崎牛、富山米のうち希望の賞品を選んで応募できます。抽選で各100名に当たります。",
+    "description_en": "Choose melon, Miyazaki beef or a Toyama rice set. Each prize goes to 100 randomly selected entrants.",
+    "eligibility_ja": "公式の応募規約に居住国の条件は記載されていません。応募フォームで条件をご確認ください。",
+    "eligibility_en": "The published rules do not specify a country of residence. Check the eligibility terms on the entry form."
   }
 ]

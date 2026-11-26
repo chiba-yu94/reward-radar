@@ -309,6 +309,21 @@ function directory(lang, available, sweepstakes = false) {
 <section class="cards" aria-labelledby="listing-results"><h2 class="sr-only" id="listing-results" tabindex="-1">${e(t.results)}</h2>${available.map(row => card(row,lang)).join('')}</section>`;
 }
 
+function genreHref(lang, field, value) {
+  return `${url(lang, field === 'prize_category' ? 'sweepstakes' : 'opportunities')}?${new URLSearchParams({[field]:value})}`;
+}
+
+function genreLinks(lang, available, prizes = false) {
+  const t = copy[lang];
+  const field = prizes ? 'prize_category' : 'category';
+  const title = prizes ? t.prizeGenres : t.listingGenres;
+  const labels = prizes ? t.prizes : {...t.categories, affiliate:t.taskRewards};
+  const present = new Set(available.map(row => row[field]));
+  const links = Object.entries(labels).filter(([genre]) => present.has(genre))
+    .map(([genre,label]) => `<a href="${e(genreHref(lang,field,genre))}" data-genre-field="${field}" data-genre-value="${e(genre)}">${e(label)}</a>`);
+  return links.length ? `<nav class="genre-links" aria-label="${e(title)}"><strong>${e(title)}</strong>${links.join('')}</nav>` : '';
+}
+
 function relatedListings(row) {
   return rows.filter(candidate => candidate.id !== row.id && candidate.category === row.category &&
       Boolean(candidate.commission) === Boolean(row.commission))
@@ -433,7 +448,8 @@ ${terms}</section></div>
 <ul class="source-links">${links.map(link => `<li><a href="${e(link)}" target="_blank" rel="noopener noreferrer">${e(sourceLabel(link,row,t))}</a></li>`).join('')}</ul></section>
 ${related.length ? `<section class="sources" aria-labelledby="related-listings"><h2 id="related-listings">${e(t.relatedListings)}</h2>
 <ul class="source-links" data-expiry-list>${related.map(candidate => `<li ${listingExpiry(candidate)}><a href="${detail(lang,candidate)}">${e(candidate['title_' + lang])}</a></li>`).join('')}</ul></section>` : ''}
-<p><a class="text-link" href="${url(lang,'opportunities')}">${e(t.back)}</a></p>
+<p><a class="text-link" href="${url(lang,'opportunities')}">${e(t.back)}</a>
+${row.category === 'affiliate' && !taskService(row) ? '' : `<a class="text-link genre-return" href="${e(genreHref(lang,row.prize_category ? 'prize_category' : 'category',row.prize_category || row.category))}">${e(t.sameGenre)}</a>`}</p>
 <template id="adsense-slot"></template></article>`;
 }
 
@@ -560,7 +576,7 @@ ${external(hapitasUrl,t.hapitas.cta,'affiliate_click')}
 <div class="home-shortcuts"><a href="${url(lang,'sweepstakes')}#no-sns-giveaways">${e(t.sweepstakesGuide.shortcut)}</a><a href="${url(lang,'sweepstakes')}?easyApply=yes">${t.application.easyApply}</a><a href="${url(lang,'international')}">${t.pages.international[0]}</a><a href="${url(lang,'quests')}">${e(t.pages.quests[0])}</a><a href="${url(lang,'guides')}">${e(t.pages.guides[0])}</a></div></div></section>
 <section class="section featured"><div class="section-heading"><h2>${t.closing}</h2><a href="${url(lang,'sweepstakes')}">${t.browse} →</a></div>
 <div class="cards">${featured.length ? featured.map(row => card(row,lang)).join('') : `<p>${t.empty}</p>`}</div></section>
-${rewardsPreview}${recentList}${hapitasAd}`);
+${genreLinks(lang,consumer)}${rewardsPreview}${recentList}${hapitasAd}`);
   await write(feedPath(lang).slice(1),renderFeed({lang,origin:origin.origin,now,rows,
     quests:editorial.quests,dates:rssDates,copy:t.rss,deadlineLabel:t.deadline}));
   await editorialPages(lang);
@@ -576,7 +592,7 @@ ${rewardsPreview}${recentList}${hapitasAd}`);
     const [title, description] = t.pages[key];
     const sweepstakes = key === 'sweepstakes';
     await page(lang,key,title,description,`<header class="intro"><h1>${e(title)}</h1>${sweepstakes ? `<a class="text-link" href="${url(lang,'opportunities')}">${e(t.sweepstakesGuide.allListings)}</a>` : `<p class="lead">${e(description)}</p>`}
-${key === 'affiliates' ? `<a href="${url(lang,'rewards')}">${t.pages.rewards[0]} →</a>` : ''}</header>${key === 'rewards' ? rewardsGuide(lang,available) + rewardsSponsorLink(lang,available) : ''}${directory(lang,available,sweepstakes)}${sweepstakes ? sweepstakesGuide(lang,available) + rewardsGuideLink(lang) : ''}`,key === 'rewards' || available.length > 0,
+${key === 'affiliates' ? `<a href="${url(lang,'rewards')}">${t.pages.rewards[0]} →</a>` : ''}</header>${sweepstakes || key === 'opportunities' ? genreLinks(lang,available,sweepstakes) : ''}${key === 'rewards' ? rewardsGuide(lang,available) + rewardsSponsorLink(lang,available) : ''}${directory(lang,available,sweepstakes)}${sweepstakes ? sweepstakesGuide(lang,available) + rewardsGuideLink(lang) : ''}`,key === 'rewards' || available.length > 0,
       sweepstakes && available.length ? mastheadResidence(lang,available) : '');
   }
   for (const key of secondary.filter(key => !['affiliates','guaranteed'].includes(key))) {

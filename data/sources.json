@@ -531,5 +531,92 @@
     "supporting_urls": [
       "https://www.stanleyblackanddecker.com/privacy-policy"
     ]
+  },
+  {
+    "id": "pilkul-aginglife-monitor-2026",
+    "provider": "Nissin York",
+    "official_url": "https://www.pilkul.jp/aginglife/campaign/",
+    "approved_destination": "https://www.pilkul.jp/aginglife/campaign/",
+    "country": "JP",
+    "language": "ja",
+    "method": "manual",
+    "permission": "editorial-summary",
+    "terms_status": "Public organizer rules reviewed for an original factual summary and link. No automated collection or reproduction.",
+    "last_verification_date": "2026-11-26T07:40:00Z",
+    "last_successful_collection": null,
+    "error_status": null,
+    "collection_frequency": "manual; check before upload",
+    "active": true,
+    "organizer_verified": true,
+    "free_entry_reviewed": true,
+    "privacy_reviewed": true,
+    "supporting_urls": []
+  },
+  {
+    "id": "futaba-dandy-quo-2026",
+    "provider": "Futaba Foods",
+    "official_url": "https://www.bakizaku-dandy.jp/",
+    "approved_destination": "https://www.bakizaku-dandy.jp/",
+    "country": "JP",
+    "language": "ja",
+    "method": "manual",
+    "permission": "editorial-summary",
+    "terms_status": "Public organizer rules reviewed for an original factual summary and link. No automated collection or reproduction.",
+    "last_verification_date": "2026-11-26T07:40:00Z",
+    "last_successful_collection": null,
+    "error_status": null,
+    "collection_frequency": "manual; check before upload",
+    "active": true,
+    "organizer_verified": true,
+    "free_entry_reviewed": true,
+    "privacy_reviewed": true,
+    "supporting_urls": [
+      "https://www.futabafoods.co.jp/company/policy/"
+    ],
+    "enhanced_review": true
+  },
+  {
+    "id": "shinryo-calendar-2026",
+    "provider": "Shinryo Corporation",
+    "official_url": "https://www.shinryo.com/sponsor/cp14/",
+    "approved_destination": "https://www.shinryo.com/sponsor/cp14/",
+    "country": "JP",
+    "language": "ja",
+    "method": "manual",
+    "permission": "editorial-summary",
+    "terms_status": "Public organizer rules reviewed for an original factual summary and link. No automated collection or reproduction.",
+    "last_verification_date": "2026-11-26T07:40:00Z",
+    "last_successful_collection": null,
+    "error_status": null,
+    "collection_frequency": "manual; check before upload",
+    "active": true,
+    "organizer_verified": true,
+    "free_entry_reviewed": true,
+    "privacy_reviewed": true,
+    "supporting_urls": [
+      "https://fofa.jp/shinryo/a.p/135/"
+    ]
+  },
+  {
+    "id": "ja-kyosai-harvest-2026",
+    "provider": "JA Kyosai",
+    "official_url": "https://social.ja-kyosai.or.jp/qa-cp/",
+    "approved_destination": "https://social.ja-kyosai.or.jp/qa-cp/",
+    "country": "unknown",
+    "language": "ja",
+    "method": "manual",
+    "permission": "editorial-summary",
+    "terms_status": "Public organizer rules reviewed for an original factual summary and link. No automated collection or reproduction.",
+    "last_verification_date": "2026-11-26T07:40:00Z",
+    "last_successful_collection": null,
+    "error_status": null,
+    "collection_frequency": "manual; check before upload",
+    "active": true,
+    "organizer_verified": true,
+    "free_entry_reviewed": true,
+    "privacy_reviewed": true,
+    "supporting_urls": [
+      "https://www.ja-kyosai.or.jp/news/2026/20261001-2.html"
+    ]
   }
 ]

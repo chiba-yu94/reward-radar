@@ -56,7 +56,7 @@ try {
       alternates:Array.from(document.querySelectorAll('link[rel=alternate][hreflang]')).map(x=>[x.hreflang,x.href]),
       local:Array.from(document.links).filter(a=>a.origin===location.origin).map(a=>[a.pathname,a.search]),
       categories:Array.from(document.querySelectorAll('.detail .breadcrumbs li:nth-child(2) a'), a=>a.pathname),
-      directory:Array.from(document.querySelectorAll('.detail > p > a.text-link'), a=>a.pathname),
+      directory:Array.from(document.querySelectorAll('.detail > p > a.text-link:not(.genre-return)'), a=>a.pathname),
       related:Array.from(document.querySelectorAll('[aria-labelledby="related-listings"] li'), li=>
         [li.querySelector('a').pathname, li.dataset.expiring, li.dataset.affiliateExpires || '']),
       relatedSection:!!document.querySelector('[aria-labelledby="related-listings"]'),

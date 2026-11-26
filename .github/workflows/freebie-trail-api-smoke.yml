@@ -3,6 +3,15 @@ name: Freebie Trail API smoke
 on:
   workflow_dispatch:
     inputs:
+      mode:
+        description: Run the smoke test or suggest genres for reviewed listings
+        type: choice
+        options: [smoke, genres]
+        default: smoke
+      listing_ids:
+        description: Up to six comma-separated listing IDs for genres mode
+        type: string
+        required: false
       confirm_one_editorial_request:
         description: Confirm available API credit and authorize one editorial request
         type: boolean
@@ -73,5 +82,7 @@ jobs:
           FREEBIE_TRAIL_API_SMOKE_CONFIRMED: ${{ inputs.confirm_one_editorial_request }}
           FREEBIE_TRAIL_API_SMOKE_SLOT: ${{ needs.preflight.outputs.approved }}
           FREEBIE_TRAIL_API_SMOKE_JST_DAY: ${{ needs.preflight.outputs.jst_day }}
+          FREEBIE_TRAIL_API_MODE: ${{ inputs.mode }}
+          FREEBIE_TRAIL_API_GENRE_IDS: ${{ inputs.listing_ids }}
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
         run: python3 -m radar.api_smoke

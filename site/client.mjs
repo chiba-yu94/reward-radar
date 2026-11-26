@@ -42,6 +42,7 @@ if (form) {
     const parent = document.querySelector('.cards');
     const active = form.querySelector('.active-filters');
     const unfilteredGuide = document.querySelector('[data-unfiltered-guide]');
+    const genreLinks = document.querySelectorAll('[data-genre-field]');
     const reset = form.querySelector('[type=reset]');
     const mastheadResidence = document.querySelector('.masthead-residence[form=filters]');
     const values = Object.fromEntries(Array.from(form.elements).filter(input => input.name).map(input => [input.name,
@@ -80,6 +81,10 @@ if (form) {
       }));
       active.hidden = !selected.length;
       if (unfilteredGuide) unfilteredGuide.hidden = selected.length !== 0;
+      for (const link of genreLinks) {
+        if (query[link.dataset.genreField] === link.dataset.genreValue) link.setAttribute('aria-current','true');
+        else link.removeAttribute('aria-current');
+      }
       reset.disabled = !selected.length;
       document.querySelector('#result-count').textContent = visible;
       for (const counter of document.querySelectorAll('[data-result-count]')) counter.textContent = visible;
