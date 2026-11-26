@@ -44,7 +44,8 @@ const rssDates = publicationDates(JSON.parse(await readFile('data/rss-publicatio
 const taskService = row => row.category === 'affiliate' && !row.commission;
 const sponsoredLink = row => row.affiliate_approval_status === 'approved' && row.affiliate_url &&
   Date.parse(row.affiliate_expires_at) > now;
-const rows = ordered(dataset.records.filter(row => !expired(row, now) && (!taskService(row) || sponsoredLink(row))), now);
+const rows = ordered(dataset.records.filter(row => !expired(row, now) &&
+  (!(taskService(row) || row.affiliate_url) || sponsoredLink(row))), now);
 const destination = resolve('dist');
 await mkdir('var', {recursive:true});
 const dist = await mkdtemp(resolve('var/site-build-'));
@@ -64,10 +65,13 @@ for (const icon of iconAssets) await copyFile(dist + '/' + icon, dist + '/' + ve
 if (analytics) await copyFile('site/analytics.mjs', dist + '/assets/analytics.mjs');
 const headers = await readFile('site/_headers', 'utf8');
 const collection = 'https://www.google-analytics.com https://region1.google-analytics.com https://analytics.google.com';
-await write('_headers', analytics ? headers
+const imageOrigins = new Set(rows.filter(row=>row.affiliate_banner).map(row=>new URL(row.affiliate_banner.src).origin));
+if (imageOrigins.has('https://hbb.afl.rakuten.co.jp')) imageOrigins.add('https://ba.afl.rakuten.co.jp');
+if (analytics) imageOrigins.add(collection);
+const withImages = headers.replace("img-src 'self';", `img-src 'self'${imageOrigins.size ? ' ' + [...imageOrigins].join(' ') : ''};`);
+await write('_headers', analytics ? withImages
   .replace("script-src 'self';", "script-src 'self' https://www.googletagmanager.com/gtag/;")
-  .replace("img-src 'self';", `img-src 'self' ${collection};`)
-  .replace("connect-src 'self';", `connect-src 'self' ${collection} https://www.googletagmanager.com;`) : headers);
+  .replace("connect-src 'self';", `connect-src 'self' ${collection} https://www.googletagmanager.com;`) : withImages);
 await write('opportunities.json', JSON.stringify({...dataset, records:rows}));
 
 export const escape = value => String(value).replace(/[&<>"']/g, char => ({
@@ -107,13 +111,15 @@ const amount = (row, lang) => {
 const fields = pairs => '<dl class="facts">' + pairs.map(([label, value]) =>
   `<div><dt>${e(label)}</dt><dd>${value}</dd></div>`).join('') + '</dl>';
 
-function external(destination, label, event = null, context = '') {
+function external(destination, label, event = null, context = '', banner = null) {
   const sponsored = event === 'affiliate_click';
   // Keep the listing open while GA4 dispatches a consented outbound click.
   const target = ' target="_blank"';
   const parsed = new URL(destination);
   if (parsed.protocol !== 'https:' || parsed.username || parsed.password) throw new Error('Unsafe destination');
-  return `<a class="button ${sponsored ? 'sponsored-button' : ''}" href="${e(destination)}"${context ? ` aria-label="${e(label + ' · ' + context)}"` : ''}${target} rel="${sponsored ? 'sponsored nofollow ' : ''}noopener noreferrer"${event && analytics ? ` data-analytics-click="${event}"` : ''}>${e(label)}</a>`;
+  const classes = banner ? 'affiliate-banner' : `button ${sponsored ? 'sponsored-button' : ''}`;
+  const content = banner ? `<img src="${e(banner.src)}" width="${banner.width}" height="${banner.height}" alt="${e(label)}" loading="lazy" decoding="async">` : e(label);
+  return `<a class="${classes}" href="${e(destination)}"${context ? ` aria-label="${e(label + ' · ' + context)}"` : ''}${target} rel="${sponsored ? 'sponsored nofollow ' : ''}noopener noreferrer"${event && analytics ? ` data-analytics-click="${event}"` : ''}>${content}</a>`;
 }
 
 function consentControls(t, lang) {
@@ -232,6 +238,7 @@ function card(row, lang, guideSource = '') {
   const t = copy[lang];
   const title = row['title_' + lang];
   const sponsored = taskService(row);
+  const affiliate = sponsoredLink(row);
   const isDraw = row.category === 'sweepstakes';
   const group = sponsored ? t.taskRewards : row.prize_category ? t.prizes[row.prize_category] : t.categories[row.category];
   const heading = guideSource ? 'h4' : 'h3';
@@ -242,8 +249,8 @@ function card(row, lang, guideSource = '') {
   const registration = guideSource ? t.registration : lang === 'ja' ? '登録' : 'Account';
   const entryFact = isDraw ? [registration,e(t.registrations[row.entry.registration])]
     : [t.expense,e(sponsored ? t.freecashCost : t.expenses[row.required_expense.kind])];
-  return `<article class="card${sponsored ? ' sponsored-card' : ''}"${directoryRecord}${sponsored ? ` data-affiliate-expires="${e(row.affiliate_expires_at)}"` : ''}${analytics ? ` data-analytics-entry="${e(row.id)}" data-analytics-category="${e(row.category)}"` : ''}>
-<div class="labels"><span>${e(group)}</span>${sponsored ? `<span class="sponsored-label">${t.sponsoredLabel}</span>` : ''}</div>
+  return `<article class="card${sponsored ? ' sponsored-card' : ''}"${directoryRecord}${affiliate ? ` data-affiliate-expires="${e(row.affiliate_expires_at)}"` : ''}${analytics ? ` data-analytics-entry="${e(row.id)}" data-analytics-category="${e(row.category)}"` : ''}>
+<div class="labels"><span>${e(group)}</span>${affiliate ? `<span class="sponsored-label">${t.sponsoredLabel}</span>` : ''}</div>
 <${heading}><a href="${detail(lang,row)}">${e(title)}</a></${heading}>
 <p class="provider">${e(row.provider)}</p><p class="card-summary">${e(summary)}</p>
 ${fields([
@@ -253,9 +260,9 @@ ${fields([
 ])}
 ${isDraw && row.application?.sns_required === false ? `<p class="small">${t.application.noSns}${row.application.difficulty === 'easy' ? ' · ' + t.application.easyApply : ''}</p>` : ''}
 ${freshnessNotice(row,lang)}
-${sponsored ? `<p class="small">${t.affiliateDisclosure}</p>` : ''}
+${affiliate ? `<p class="small">${t.affiliateDisclosure}</p>` : ''}
 <div class="card-footer"><p class="stamp">${t.checked} · ${time(row.last_checked_at,lang)} · ${elapsed(row,lang)}${guideSource ? ' · ' + guideSource : ''}</p>
-${guideSource ? '' : sponsored ? `<a class="text-link" href="${detail(lang,row)}">${t.details} →</a>` : external(row.official_url,isDraw ? t.officialNewTab : t.visitOfficial,row.commission ? null : 'application_click',title)}</div></article>`;
+${guideSource ? '' : affiliate ? `<a class="text-link" href="${detail(lang,row)}">${t.details} →</a>` : external(row.official_url,isDraw ? t.officialNewTab : t.visitOfficial,row.commission ? null : 'application_click',title)}</div></article>`;
 }
 
 function residenceCountries(lang, available, onlyVerified = false) {
@@ -405,6 +412,7 @@ function details(lang, row, calendar) {
   const section = row.commission ? 'affiliates' : row.category === 'sweepstakes' ? 'sweepstakes' :
     row.certainty === 'guaranteed' ? 'guaranteed' : 'rewards';
   const related = relatedListings(row);
+  const affiliate = sponsoredLink(row);
   const title = row['title_' + lang];
   const personal = values => e(values.length ? values.map(value => t.personal[value]).join(lang === 'ja' ? '、' : ', ') : t.noPersonal);
   const requirements = [
@@ -424,7 +432,7 @@ function details(lang, row, calendar) {
   const links = [...new Set([row.source_url,...row.supporting_urls,app?.source_url].filter(Boolean))];
   return `<article class="article detail"${analytics ? ` data-analytics-opportunity="${e(row.id)}" data-analytics-category="${e(row.category)}"` : ''}>
 ${breadcrumbs(lang,section,title)}
-<header class="detail-heading"><div class="labels"><span>${e(sponsored ? t.taskRewards : t.categories[row.category])}</span>${sponsored ? `<span class="sponsored-label">${t.sponsoredLabel}</span>` : ''}</div>
+<header class="detail-heading"><div class="labels"><span>${e(sponsored ? t.taskRewards : t.categories[row.category])}</span>${affiliate ? `<span class="sponsored-label">${t.sponsoredLabel}</span>` : ''}</div>
 <h1>${e(title)}</h1><p class="provider">${e(row.provider)}</p><p class="lead">${e(row['description_' + lang])}</p></header>
 ${freshnessNotice(row,lang)}<p class="notice" data-ended hidden></p>
 <section class="detail-overview" aria-label="${t.rewardSummary}">${fields([
@@ -433,8 +441,8 @@ ${freshnessNotice(row,lang)}<p class="notice" data-ended hidden></p>
     ...(row.deadline ? [[t.deadline,deadlineText(row,lang)]] : []),
     ...(row.reward_amount !== null ? [[t.amount,e(amount(row,lang))]] : []),
 ])}${calendar}</section>
-<div class="entry-action${sponsored ? ' ad-action' : ''}" data-expiring="${e(expiryValue(row))}"${sponsored ? ` data-affiliate-expires="${e(row.affiliate_expires_at)}"` : ''}>
-${sponsoredLink(row) ? `<p class="ad-disclosure"><strong>${t.sponsoredLabel}</strong> · ${t.affiliateDisclosure}</p><div class="actions">${external(row.affiliate_url,sponsored ? t.sponsoredVisit : t.sponsored,'affiliate_click')}</div><p class="secondary-official"><a href="${e(row.official_url)}" target="_blank" rel="noopener noreferrer">${t.official}</a></p>` : `<div class="actions">${external(row.official_url,row.category === 'sweepstakes' ? t.officialNewTab : t.visitOfficial,row.commission ? null : 'application_click')}</div>`}
+<div class="entry-action${affiliate ? ' ad-action' : ''}" data-expiring="${e(expiryValue(row))}"${affiliate ? ` data-affiliate-expires="${e(row.affiliate_expires_at)}"` : ''}>
+${affiliate ? `<p class="ad-disclosure"><strong>${t.sponsoredLabel}</strong> · ${t.affiliateDisclosure}</p><div class="actions">${external(row.affiliate_url,row.affiliate_banner ? title : sponsored ? t.sponsoredVisit : t.sponsored,'affiliate_click','',row.affiliate_banner)}</div><p class="secondary-official"><a href="${e(row.official_url)}" target="_blank" rel="noopener noreferrer">${t.official}</a></p>` : `<div class="actions">${external(row.official_url,row.category === 'sweepstakes' ? t.officialNewTab : t.visitOfficial,row.commission ? null : 'application_click')}</div>`}
 </div>
 <div class="detail-body"><section><h2>${t.entryRequirements}</h2>
 ${row.entry.steps ? `<p>${e(row.entry.steps[lang])}</p>` : ''}${fields(requirements)}

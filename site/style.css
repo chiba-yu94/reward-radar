@@ -112,6 +112,8 @@ dd { margin:0; overflow-wrap:anywhere; }
 .card dt { font-size:inherit; }
 .entry-action { padding:.45rem 0 1rem; }
 .ad-action { padding:1rem; border:1px solid var(--ad-line); border-radius:var(--radius); background:var(--ad-surface); }
+.affiliate-banner { display:block; max-width:100%; }
+.affiliate-banner img { display:block; max-width:100%; height:auto; }
 .ad-disclosure { font-size:.8rem; color:var(--ad-ink); margin-bottom:.65rem; }
 .secondary-official { margin:.65rem 0 0; font-size:.83rem; }
 .secondary-official a { display:inline-block; padding-block:.25rem; }

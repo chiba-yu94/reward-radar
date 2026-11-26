@@ -379,6 +379,8 @@ def publish(rows, sources, observation, output, database, now):
                 if stamp(expiry) <= now:
                     continue
                 public["affiliate_expires_at"] = expiry
+                if "banner" in row["affiliate_review"]:
+                    public["affiliate_banner"] = row["affiliate_review"]["banner"]
             if row["category"] == "affiliate" and row["commission"] is None and not public["affiliate_url"]:
                 continue
             approved.append(public)

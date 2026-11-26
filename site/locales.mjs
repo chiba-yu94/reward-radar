@@ -145,7 +145,7 @@ export const copy = {
       privacy: [
         ['サイトの利用', '利用者アカウントと広告用 Cookie は使用していません。絞り込みはブラウザー内で行います。ホスティング事業者が配信と安全対策のために接続情報を処理する場合があります。'],
         ['任意のアクセス解析', '計測が設定されている場合、許可を選んだ後に Google Analytics 4 が読み込まれます。ページ、表示言語、参照元の種類、応募・広告リンクのクリックをサイト改善に使います。検索語、氏名、メールアドレス、外部リンク先の URL は送信しません。Google は計測用の Cookie 識別子と接続・端末情報を処理します。選択はブラウザーに保存され、フッターの設定から取り消せます。取り消すとこのサイトの計測用 Cookie を消去し、以降の計測を停止します。'],
-        ['お問い合わせと外部リンク', 'メールでご連絡いただいた場合、返信と掲載の確認に必要な範囲で内容を取り扱います。第三者サイトに移動すると、移動先の規約とプライバシー方針が適用されます。'],
+        ['お問い合わせと外部リンク', 'メールでご連絡いただいた場合、返信と掲載の確認に必要な範囲で内容を取り扱います。第三者サイトに移動すると、移動先の規約とプライバシー方針が適用されます。広告バナーを表示する際は提供元のサーバーから画像を読み込むため、提供元にIPアドレスなどの接続情報が送信されます。'],
       ],
       disclosure: [
         ['紹介リンク', '運営者が提携先の承認を得た場合、広告リンクから対象の申込みや購入が成立すると、手数料を受け取ることがあります。該当リンクのそばに広告と表示し、公式ページへのリンクも掲載します。'],
@@ -296,7 +296,7 @@ export const copy = {
       privacy: [
         ['Using this site', 'The site has no user accounts or advertising cookies. Filtering runs in your browser. Our hosting provider may process connection data to deliver the site and protect it from abuse.'],
         ['Optional analytics', 'When analytics is configured, Google Analytics 4 loads after you choose Accept. We use page visits, site language, broad referral categories and application or affiliate link clicks to improve the site. We do not send search terms, names, email addresses or external link URLs. Google processes analytics cookie identifiers and connection and device information. Your choice is stored in your browser. You can withdraw it in the footer settings. This clears the site’s analytics cookies and stops future measurement.'],
-        ['Email and external links', 'If you email us, we use the message to respond and investigate the listing where needed. External providers apply their own terms and privacy policies when you visit them.'],
+        ['Email and external links', 'If you email us, we use the message to respond and investigate the listing where needed. External providers apply their own terms and privacy policies when you visit them. Ad banners load directly from their providers, who receive connection information such as your IP address.'],
       ],
       disclosure: [
         ['Affiliate links', 'When a provider approves us, we may earn a commission from a qualifying application or purchase. We label the link as advertising and also provide a link to the official page.'],

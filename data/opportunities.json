@@ -66,8 +66,8 @@
     "reward_currency": null,
     "reward_amount": null,
     "reward_conditions": {
-      "ja": "付与額とポイント交換の条件は公式ページで確認してください。",
-      "en": "Check the provider for survey point awards and redemption requirements."
+      "ja": "この紹介リンクから初めて登録し、合計15回以上、かつ登録後3か月目に1回以上アンケートに回答すると、500ポイント（500円分）の対象になります。",
+      "en": "First-time members who use this referral link and complete at least 15 surveys in total, including one in their third month, can qualify for 500 points worth ¥500."
     },
     "required_expense": {
       "kind": "free",
@@ -77,13 +77,13 @@
     "estimated_effort_minutes": null,
     "participation_method": "survey",
     "deadline": null,
-    "official_url": "https://str.infoq.jp/",
-    "affiliate_url": null,
-    "affiliate_approval_status": "pending",
-    "source_url": "https://str.infoq.jp/",
+    "official_url": "https://infoq.jp/",
+    "affiliate_url": "https://infoq.jp/referral/index/3c6b0815f5bcea9/02",
+    "affiliate_approval_status": "approved",
+    "source_url": "https://infoq.jp/p/docs/agreement.html",
     "source_permission_status": "editorial-summary",
     "first_seen_at": "2026-11-05T06:19:00Z",
-    "last_checked_at": "2026-11-05T06:19:00Z",
+    "last_checked_at": "2026-11-26T11:25:00Z",
     "verification_status": "verified",
     "risk_flags": [
       "variable",
@@ -98,13 +98,31 @@
     "title_en": "infoQ survey panel",
     "description_ja": "案内されたアンケートに回答してポイントを貯めるモニター制度です。",
     "description_en": "A panel where invited participants can earn points from eligible surveys.",
-    "eligibility_ja": "日本国内に住む15歳以上。通信費は参加者負担です。",
-    "eligibility_en": "Residents of Japan aged 15 or older. Participants cover their own internet access costs.",
+    "eligibility_ja": "日本国内に住む、義務教育を終えた15歳以上。通信費は参加者負担です。",
+    "eligibility_en": "Residents of Japan aged 15 or older who have completed compulsory education. Participants cover their own internet access costs.",
     "entry": {
       "registration": "organizer",
       "application": null,
       "winner": null,
-      "steps": null
+      "steps": {
+        "ja": "Googleアカウントを使って1アカウントで登録し、届いたアンケートに回答します。",
+        "en": "Register through GMO One Account with a Google account and complete the surveys sent to you."
+      }
+    },
+    "affiliate_review": {
+      "approved_url": "https://infoq.jp/referral/index/3c6b0815f5bcea9/02",
+      "destination_reviewed": "https://infoq.jp/",
+      "channel": "reward-radar-website",
+      "territory_reviewed": true,
+      "disclosure_reviewed": true,
+      "commission_reviewed": true,
+      "review_id": "infoq-20261126-web",
+      "expires_at": "2026-12-26T11:25:00Z",
+      "banner": {
+        "src": "https://infoq.jp/p/img/extends/infoq_banner/introduceBanner300x250I.png",
+        "width": 300,
+        "height": 250
+      }
     }
   },
   {
@@ -185,13 +203,13 @@
     "estimated_effort_minutes": null,
     "participation_method": "survey",
     "deadline": null,
-    "official_url": "https://member.insight.rakuten.co.jp/signup/explain/",
-    "affiliate_url": null,
-    "affiliate_approval_status": "pending",
+    "official_url": "https://member.insight.rakuten.co.jp/",
+    "affiliate_url": "https://hb.afl.rakuten.co.jp/hsc/5a015097.a9097ddd.5a014a60.fdec815b/?link_type=pict&ut=eyJwYWdlIjoic2hvcCIsInR5cGUiOiJwaWN0IiwiY29sIjoxLCJjYXQiOjEsImJhbiI6NTE0MTkzLCJhbXAiOmZhbHNlfQ%3D%3D",
+    "affiliate_approval_status": "approved",
     "source_url": "https://member.insight.rakuten.co.jp/explanation/policies/",
     "source_permission_status": "editorial-summary",
     "first_seen_at": "2026-11-05T06:19:00Z",
-    "last_checked_at": "2026-11-05T06:19:00Z",
+    "last_checked_at": "2026-11-26T11:25:00Z",
     "verification_status": "verified",
     "risk_flags": [
       "variable",
@@ -213,6 +231,21 @@
       "application": null,
       "winner": null,
       "steps": null
+    },
+    "affiliate_review": {
+      "approved_url": "https://hb.afl.rakuten.co.jp/hsc/5a015097.a9097ddd.5a014a60.fdec815b/?link_type=pict&ut=eyJwYWdlIjoic2hvcCIsInR5cGUiOiJwaWN0IiwiY29sIjoxLCJjYXQiOjEsImJhbiI6NTE0MTkzLCJhbXAiOmZhbHNlfQ%3D%3D",
+      "destination_reviewed": "https://member.insight.rakuten.co.jp/",
+      "channel": "reward-radar-website",
+      "territory_reviewed": true,
+      "disclosure_reviewed": true,
+      "commission_reviewed": true,
+      "review_id": "rakuten-insight-20261126-web",
+      "expires_at": "2026-12-26T11:25:00Z",
+      "banner": {
+        "src": "https://hbb.afl.rakuten.co.jp/hsb/5a015097.a9097ddd.5a014a60.fdec815b/?me_id=2101012&me_adv_id=514193&t=pict",
+        "width": 300,
+        "height": 68
+      }
     }
   },
   {

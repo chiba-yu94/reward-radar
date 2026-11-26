@@ -1,5 +1,7 @@
 import {timestamp} from './domain.mjs';
 
+const affiliateBannerHosts = new Set(['hbb.afl.rakuten.co.jp','infoq.jp']);
+
 export function validatePublic(dataset, taxonomy, now) {
   const fail = message => {throw new Error(`Invalid public dataset: ${message}`);};
   if (!Number.isFinite(timestamp(dataset.generated_at)) || !Array.isArray(dataset.records) || !dataset.records.length) fail('generation or records');
@@ -28,5 +30,14 @@ export function validatePublic(dataset, taxonomy, now) {
       if (typeof row[`${key}_${lang}`] !== 'string' || !row[`${key}_${lang}`].trim()) fail(`${row.id}: ${key}_${lang}`);
     }
     if (row.affiliate_url && (!Number.isFinite(timestamp(row.affiliate_expires_at)) || row.affiliate_approval_status !== 'approved')) fail(`${row.id}: affiliate approval`);
+    if (row.affiliate_banner != null) {
+      const {src, width, height} = row.affiliate_banner;
+      let image;
+      try {image = new URL(src);} catch {fail(`${row.id}: affiliate banner`);}
+      if (!row.affiliate_url || image.protocol !== 'https:' || image.port || image.username || image.password ||
+          !affiliateBannerHosts.has(image.hostname) || [width,height].some(value=>!Number.isInteger(value) || value < 1 || value > 1200)) {
+        fail(`${row.id}: affiliate banner`);
+      }
+    }
   }
 }

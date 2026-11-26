@@ -53,6 +53,8 @@ The same approval gate covers Japanese and international partners. Set `affiliat
 
 Copy `data/revenue-example.json` to the Git-ignored `var/` directory or another private owner-controlled location. Run `python3 -m radar.revenue var/revenue-YYYY-MM.json`. Leave unmeasured figures null. Record page views, official-link clicks, affiliate clicks, verified conversions, actual receipts, fees and direct costs separately. Reconcile foreign receipts at the documented settlement rate or actual JPY received, and avoid deducting a fee twice. Track progress toward ¥5,000 per month in net receipts before personal income tax.
 
+For an account-issued image banner, record the original image URL and its dimensions under `affiliate_review.banner`. Use the tracking URL issued for the same image. Each detail page shows the image once beside the disclosure. The listing cards link to the detail page. The build permits only the reviewed image hosts and loads the original image without third-party scripts.
+
 ## AdSense readiness
 
 The canonical site for review is https://freebietrail.com/. The former workers.dev address was rejected during signup. The verification-only publisher ID is a GitHub repository variable, and builds include its meta tag only on the canonical origin. No ad tag is loaded.

@@ -18,18 +18,21 @@
   {
     "id": "infoq",
     "provider": "GMO Research & AI",
-    "official_url": "https://str.infoq.jp/",
-    "approved_destination": "https://str.infoq.jp/",
+    "official_url": "https://infoq.jp/p/docs/agreement.html",
+    "approved_destination": "https://infoq.jp/",
     "country": "JP",
     "language": "ja",
     "method": "manual",
     "permission": "editorial-summary",
-    "terms_status": "Editorial facts summarized independently from the official page. No automated access or republishing authorized.",
-    "last_verification_date": "2026-11-05T06:19:00Z",
+    "terms_status": "Individual terms and official partner material reviewed. Use only account-issued banner and referral link.",
+    "last_verification_date": "2026-11-26T11:25:00Z",
     "last_successful_collection": null,
     "error_status": null,
     "collection_frequency": "manual; review within 30 days",
-    "active": true
+    "active": true,
+    "supporting_urls": [
+      "https://infoq.jp/introduce01/"
+    ]
   },
   {
     "id": "research-panel",
@@ -54,17 +57,20 @@
     "id": "rakuten-insight",
     "provider": "Rakuten Insight",
     "official_url": "https://member.insight.rakuten.co.jp/explanation/policies/",
-    "approved_destination": "https://member.insight.rakuten.co.jp/signup/explain/",
+    "approved_destination": "https://member.insight.rakuten.co.jp/",
     "country": "JP",
     "language": "ja",
     "method": "manual",
     "permission": "editorial-summary",
-    "terms_status": "Editorial facts summarized independently from the official page. No automated access or republishing authorized.",
-    "last_verification_date": "2026-11-05T06:19:00Z",
+    "terms_status": "Individual terms and official partner material reviewed. Use only account-issued banner and referral link.",
+    "last_verification_date": "2026-11-26T11:25:00Z",
     "last_successful_collection": null,
     "error_status": null,
     "collection_frequency": "manual; review within 30 days",
-    "active": true
+    "active": true,
+    "supporting_urls": [
+      "https://affiliate.rakuten.co.jp/group/insight/"
+    ]
   },
   {
     "id": "prolific",
