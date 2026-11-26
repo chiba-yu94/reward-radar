@@ -128,7 +128,7 @@ class TestDiscovery(unittest.TestCase):
                 'https://newhost.org/official/#rules', 'https://www.known.org/',
                 'https://127.0.0.1/private', 'https://other.org/?id=123')]
             return {'status': 'completed', 'output': [
-                {'type': 'web_search_call', 'status': 'completed'},
+                {'type': 'web_search_call', 'status': 'completed', 'action': {'type': 'search'}},
                 {'type': 'message', 'role': 'assistant', 'content': [
                     {'type': 'output_text', 'text': 'https://uncited.org/', 'annotations': citations}]}],
                 'usage': {'input_tokens': 50, 'output_tokens': 10}}

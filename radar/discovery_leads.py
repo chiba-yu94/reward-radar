@@ -19,9 +19,9 @@ def request_body(market, today, known_hosts):
     return json.dumps({
         'model': MODEL,
         'store': False,
-        'max_output_tokens': 900,
+        'max_output_tokens': 1600,
         'max_tool_calls': 1,
-        'reasoning': {'effort': 'low'},
+        'reasoning': {'effort': 'none'},
         'tools': [{'type': 'web_search', 'search_context_size': 'medium', 'external_web_access': True,
                    'user_location': {'type': 'approximate', 'country': market}}],
         'tool_choice': {'type': 'web_search'},
@@ -80,12 +80,16 @@ def discover_leads(token, known_hosts, today, *, send=post_response):
         try:
             data = send(request_body(market, today, hosts), token)
             output = data['output']
-            if data.get('status') != 'completed' or data.get('error') is not None:
-                results[market] = {'status': 'incomplete'}
+            response_status = data.get('status')
+            if response_status not in {'completed', 'incomplete'} or data.get('error') is not None:
+                results[market] = {'status': 'response-failed'}
                 continue
             calls = [item for item in output if item.get('type') == 'web_search_call']
-            if len(calls) != 1 or calls[0].get('status') != 'completed':
-                results[market] = {'status': 'search-not-completed'}
+            searches = [item for item in calls if item.get('status') == 'completed'
+                        and (item.get('action') or {}).get('type') == 'search']
+            if not searches:
+                results[market] = {'status': 'search-not-completed', 'tool_items': len(calls),
+                                   'response_status': response_status}
                 continue
             market_urls = []
             for candidate in citation_urls(output):
@@ -101,7 +105,9 @@ def discover_leads(token, known_hosts, today, *, send=post_response):
                 if len(market_urls) == MAX_LINKS:
                     break
             usage = data.get('usage') or {}
-            results[market] = {'status': 'ok', 'links': len(market_urls), 'search_calls': len(calls),
+            status = 'ok' if response_status == 'completed' or market_urls else 'incomplete'
+            results[market] = {'status': status, 'links': len(market_urls), 'search_calls': len(searches),
+                               'tool_items': len(calls), 'response_status': response_status,
                                **{key: usage[key] for key in ('input_tokens', 'output_tokens')
                                   if type(usage.get(key)) is int and usage[key] >= 0}}
             for url in market_urls:
