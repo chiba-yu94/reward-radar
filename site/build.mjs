@@ -92,7 +92,7 @@ const time = (value, lang, full = false, zone) => `<time datetime="${e(value)}">
 const address = `<a href="mailto:${email}">${email}</a>`;
 const iconLinks = `<link rel="icon" href="${versionedIcon('/favicon.ico')}"><link rel="icon" type="image/svg+xml" href="${versionedIcon('/assets/mark.svg')}"><link rel="apple-touch-icon" sizes="180x180" href="${versionedIcon('/apple-touch-icon.png')}">`;
 const brand = name => `<img src="${versionedIcon('/assets/mark.svg')}" alt="" width="32" height="32"><span>${e(name)}</span>`;
-const primary = ['opportunities', 'sweepstakes', 'rewards', 'international'];
+const primary = ['opportunities', 'recent', 'sweepstakes', 'rewards', 'international'];
 const secondary = ['guaranteed', 'affiliates', 'ranking', 'about', 'contact', 'privacy', 'disclosure'];
 const maps = [];
 const localeFor = lang => lang === 'ja' ? 'ja-JP' : 'en';
@@ -187,10 +187,6 @@ ${consent ? '<script type="module" src="/assets/analytics.mjs"></script>' : ''}<
 <body><a class="skip" href="#main">${t.skip}</a><header class="masthead"><div class="wrap header-inner${mastheadControl ? ' header-inner--residence' : ''}">
 <a href="${url(lang)}" class="brand">${brand(t.copyright)}</a>${switcher}${mastheadControl}
 <nav class="desktop-nav" aria-label="${e(t.navigation)}">${links(primary)}</nav><details class="site-menu"><summary>${t.menu}</summary><nav aria-label="${e(t.navigation)}">${links(primary)}</nav></details></div></header>
-<div class="history-controls" data-history-controls hidden><div class="wrap" role="group" aria-label="${e(t.pageHistory.label)}">
-<button type="button" aria-label="${e(t.pageHistory.back)}" title="${e(t.pageHistory.back)}">◀</button>
-<button type="button" aria-label="${e(t.pageHistory.forward)}" title="${e(t.pageHistory.forward)}">▶</button>
-</div></div>
 ${consent?.panel || ''}
 <main id="main" class="wrap"${page === '' ? ' itemscope itemtype="https://schema.org/WebSite"' : ''}>
 ${page === '' ? `<meta itemprop="name" content="${name}"><meta itemprop="url" content="${origin.origin}${current}"><meta itemprop="inLanguage" content="${lang}">
@@ -199,11 +195,15 @@ ${content}</main>
 <footer><div class="wrap foot-inner"><a href="${url(lang)}" class="brand">${brand(t.copyright)}</a>${organizerContact}
 <nav aria-label="${e(t.footerNavigation)}">${links(['contact','privacy','disclosure'])}</nav>
 <details class="footer-more"><summary>${e(t.footerMore)}</summary><nav aria-label="${e(t.footerMore)}">${links(['quests',...(guideLocales.includes(lang) ? ['guides'] : []),'guaranteed','affiliates','ranking','about'])}${switcher}</nav></details>
-${consent?.settings || ''}<p class="muted">© ${t.copyright}</p></div></footer></body></html>`;
+${consent?.settings || ''}<p class="muted">© ${t.copyright}</p></div></footer>
+<div class="history-controls" data-history-controls hidden><div class="wrap" role="group" aria-label="${e(t.pageHistory.label)}">
+<button type="button" aria-label="${e(t.pageHistory.back)}" title="${e(t.pageHistory.back)}">◀</button>
+<button type="button" aria-label="${e(t.pageHistory.forward)}" title="${e(t.pageHistory.forward)}">▶</button>
+</div></div></body></html>`;
 }
 
 const expiryValue = row => Number.isFinite(expiration(row)) ? new Date(expiration(row)).toISOString() : '';
-const listingExpiry = row => `data-expiring="${e(expiryValue(row))}"${taskService(row) ? ` data-affiliate-expires="${e(row.affiliate_expires_at)}"` : ''}`;
+const listingExpiry = row => `data-expiring="${e(expiryValue(row))}"${sponsoredLink(row) ? ` data-affiliate-expires="${e(row.affiliate_expires_at)}"` : ''}`;
 const freshnessNotice = (row, lang) => `<p class="notice" data-stale="${e(row.stale_at)}" data-last-checked="${e(row.last_checked_at)}"${stale(row,now) ? '' : ' hidden'}>${stale(row,now) ? copy[lang].stale : ''}</p>`;
 const elapsed = (row, lang) => `<span data-age data-last-checked="${e(row.last_checked_at)}">${freshness(row,now).days === null ? '' : dateCopy[lang].age(freshness(row,now).days)}</span>`;
 const deadlineText = (row, lang) => row.deadline
@@ -243,8 +243,7 @@ function sponsoredServiceCard(row, lang) {
 <h3>${e(title)}</h3><p class="card-summary">${e(summary)}</p>
 <p class="small card-conditions">${e(cost)}<br>${e(conditions)}</p>
 ${freshnessNotice(row,lang)}
-<div class="card-footer">${banner ? external(banner.href ?? row.affiliate_url,title,'affiliate_click','',banner) : ''}
-<div class="actions">${external(row.affiliate_url,visit,'affiliate_click',title)}<a class="card-details" href="${detail(lang,row)}" aria-label="${e(details + ' · ' + title)}">${e(details)}</a></div>
+<div class="card-footer"><div class="actions">${external(banner?.href ?? row.affiliate_url,visit,'affiliate_click',title,banner)}<a class="card-details" href="${detail(lang,row)}" aria-label="${e(details + ' · ' + title)}">${e(details)}</a></div>
 <p class="stamp">${t.checked} · ${time(row.last_checked_at,lang)} · ${elapsed(row,lang)}</p><p class="small card-disclosure">${e(disclosure)}</p></div></article>`;
 }
 
@@ -583,6 +582,8 @@ ${content.sections.map(([heading,body]) => `<section><h2>${e(heading)}</h2><p>${
 
 const consumer = rows.filter(row => row.category !== 'affiliate' || taskService(row));
 const rewardRows = consumer.filter(row => row.category !== 'sweepstakes');
+const recent = consumer.filter(row => Date.parse(row.first_seen_at) >= now - 30 * 86_400_000)
+  .sort((a,b) => b.first_seen_at.localeCompare(a.first_seen_at) || a.id.localeCompare(b.id));
 for (const lang of languages) {
   const t = copy[lang];
   const hapitasAd = hapitasUrl && now < Date.parse(hapitasDeadline)
@@ -592,17 +593,18 @@ ${external(hapitasUrl,t.hapitas.cta,'affiliate_click')}
 <p><a href="https://hapitas.jp/special/referral202611" rel="noopener noreferrer">${t.hapitas.terms}</a> · ${t.hapitas.deadline} ${time('2026-11-30T14:59:00Z',lang,true)}</p></aside>` : '';
   const giveaways = consumer.filter(row => row.category === 'sweepstakes');
   const featured = giveaways.filter(row => row.deadline).sort((a,b) => expiration(a) - expiration(b) || a.id.localeCompare(b.id)).slice(0,3);
-  const recent = [...consumer].sort((a,b) => b.first_seen_at.localeCompare(a.first_seen_at)).slice(0,4);
-  const recentList = `<section class="section"><div class="section-heading"><h2>${t.recent}</h2><a href="${feedPath(lang)}">${e(t.rss.subscribe)}</a></div>
-<ul class="recent-list">${recent.map(row => `<li data-expiring="${e(expiryValue(row))}"><a href="${detail(lang,row)}">${e(row['title_' + lang])}</a>
-<span>${e(row.provider)}</span><span>${time(row.first_seen_at,lang)}</span></li>`).join('')}</ul></section>`;
   const rewardsPreview = `<section class="section"><div class="section-heading"><h2><a href="${url(lang,'rewards')}#rewards-comparison">${t.pages.rewards[0]}</a></h2><p>${t.rewardsLead}</p></div><div class="cards">${['freecash','infoq','rakuten-insight','research-panel','prolific'].map(id => rewardRows.find(row => row.id === id)).filter(Boolean).map(row => card(row,lang)).join('')}</div></section>`;
   await page(lang,'',t.tagline,t.lead,`<section class="hero"><div class="hero-copy"><p class="eyebrow">${t.cap}</p><h1>${t.tagline}</h1><p class="lead">${t.lead}</p>
 <form class="home-search" role="search" action="${url(lang,'opportunities')}" method="get"><label class="sr-only" for="home-query">${t.search}</label><input id="home-query" type="search" name="q" maxlength="150" placeholder="${e(t.placeholder)}"><button type="submit">${t.searchSubmit}</button></form>
-<div class="home-shortcuts"><a href="${url(lang,'sweepstakes')}#no-sns-giveaways">${e(t.sweepstakesGuide.shortcut)}</a><a href="${url(lang,'sweepstakes')}?easyApply=yes">${t.application.easyApply}</a><a href="${url(lang,'international')}">${t.pages.international[0]}</a><a href="${url(lang,'quests')}">${e(t.pages.quests[0])}</a>${guideLocales.includes(lang) ? `<a href="${url(lang,'guides')}">${e(t.pages.guides[0])}</a>` : ''}</div></div></section>
+<div class="home-shortcuts"><a href="${url(lang,'sweepstakes')}#no-sns-giveaways">${e(t.sweepstakesGuide.shortcut)}</a><a href="${url(lang,'sweepstakes')}?easyApply=yes">${t.application.easyApply}</a><a href="${url(lang,'international')}">${t.pages.international[0]}</a><a href="${url(lang,'quests')}">${e(t.pages.quests[0])}</a><a href="${url(lang,'recent')}">${e(t.pages.recent[0])}</a>${guideLocales.includes(lang) ? `<a href="${url(lang,'guides')}">${e(t.pages.guides[0])}</a>` : ''}</div></div></section>
 <section class="section featured"><div class="section-heading"><h2>${t.closing}</h2><a href="${url(lang,'sweepstakes')}">${t.browse} →</a></div>
 <div class="cards">${featured.length ? featured.map(row => card(row,lang)).join('') : `<p>${t.empty}</p>`}</div></section>
-${genreLinks(lang,consumer)}${rewardsPreview}${recentList}${hapitasAd}`);
+${genreLinks(lang,consumer)}${rewardsPreview}${hapitasAd}`);
+  await page(lang,'recent',...t.pages.recent,`<header class="intro"><h1>${e(t.pages.recent[0])}</h1><p class="lead">${e(t.pages.recent[1])}</p>
+<a class="text-link" href="${feedPath(lang)}">${e(t.rss.subscribe)}</a></header>
+<ul class="recent-list" data-expiry-list${recent.length ? '' : ' hidden'}>${recent.map(row => `<li ${listingExpiry(row)}><a href="${detail(lang,row)}">${e(row['title_' + lang])}</a>
+<span>${e(row.provider)}</span><span>${time(row.first_seen_at,lang)}</span></li>`).join('')}</ul>
+<p data-expiry-empty${recent.length ? ' hidden' : ''}>${e(t.recentEmpty)}</p>`,recent.length > 0);
   await write(feedPath(lang).slice(1),renderFeed({lang,origin:origin.origin,now,rows,
     quests:editorial.quests,dates:rssDates,copy:t.rss,deadlineLabel:t.deadline}));
   await editorialPages(lang);

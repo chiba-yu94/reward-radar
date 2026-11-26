@@ -158,7 +158,8 @@ try {
     if ((await page.goto(affiliatePage + '?utm_source=review')).status() === 200) {
       const sponsored = page.locator('[data-analytics-click="affiliate_click"]');
       const destination = await sponsored.getAttribute('href');
-      assert.equal(destination,records.find(row => row.id === 'freecash').affiliate_url);
+      const freecash = records.find(row => row.id === 'freecash');
+      assert.equal(destination,freecash.affiliate_banner?.href ?? freecash.affiliate_url);
       assert.equal(await sponsored.getAttribute('target'),'_blank');
       assert.equal(await sponsored.getAttribute('rel'),'sponsored nofollow noopener noreferrer');
       async function openSponsored() {
@@ -197,7 +198,7 @@ try {
       for (const path of ['', 'rewards/', 'opportunities/']) {
         await page.goto(origin + '/' + lang + '/' + path);
         const card = page.locator('[data-record="freecash"]');
-        const cardLink = card.locator('.sponsored-button[data-analytics-click="affiliate_click"]');
+        const cardLink = card.locator('[data-analytics-click="affiliate_click"]');
         assert.equal(await cardLink.getAttribute('href'),destination);
         assert.equal(await cardLink.getAttribute('target'),'_blank');
         assert.equal(await cardLink.getAttribute('rel'),'sponsored nofollow noopener noreferrer');

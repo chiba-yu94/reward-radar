@@ -32,6 +32,7 @@ if (historyControls && (navigator.standalone === true || matchMedia('(display-mo
   window.addEventListener('popstate', updateHistoryControls);
   updateHistoryControls();
   historyControls.hidden = false;
+  document.body.classList.add('has-history-controls');
 }
 
 function checkDates() {

@@ -55,6 +55,20 @@ test('locale structure, missing translation and actual HTML', () => {
   }
 });
 
+test('new listings live on their own page in first-seen order', () => {
+  for (const lang of ['ja','en']) {
+    const home = read(lang + '/index.html');
+    assert.ok(home.includes(`href="/${lang}/recent/"`));
+    assert.doesNotMatch(home,/class="recent-list"/);
+    const page = read(lang + '/recent/index.html');
+    assert.ok(page.includes(`href="/${lang}/feed.xml"`));
+    const list = page.match(/<ul class="recent-list"[^>]*>([\s\S]*?)<\/ul>/)[1];
+    const days = [...list.matchAll(/<time datetime="([^"]+)"/g)].map(([,date]) => date);
+    assert.ok(days.length > 4);
+    assert.deepEqual(days,[...days].sort().reverse());
+  }
+});
+
 test('only quest board footers offer a localized organizer email draft', () => {
   const expected = {
     ja:{
@@ -464,7 +478,7 @@ test('Freecash comparison cards lead with tasks, disclose costs and link through
   }
 });
 
-test('approved service cards show their banner, link and disclosure on home and directory pages', () => {
+test('approved service cards use one sponsored link and disclose it on home and directory pages', () => {
   const ids = ['freecash','infoq','rakuten-insight'];
   const dataset = JSON.parse(readFileSync('var/published.json','utf8'));
   try {
@@ -489,7 +503,7 @@ test('approved service cards show their banner, link and disclosure on home and 
         assert.ok(card,`${lang}/${path}: ${id}`);
         assert.ok(card.includes(`class="affiliate-banner" href="${row.affiliate_banner.href}"`));
         assert.ok(card.includes(`<img src="${row.affiliate_banner.src}"`));
-        assert.ok(card.includes(`href="${row.affiliate_url}"`));
+        assert.equal((card.match(/rel="sponsored nofollow noopener noreferrer"/g) ?? []).length,1);
         assert.ok(card.includes(`href="/${lang}/opportunities/${id}/"`));
         assert.ok(card.includes(copy[lang].sponsoredLabel));
         assert.match(card,/class="small card-disclosure"/);

@@ -39,8 +39,9 @@ nav a[aria-current] { font-weight:750; text-decoration-thickness:.15em; }
 .site-menu nav { position:absolute; top:100%; right:0; z-index:5; width:min(22rem,100%); padding:.6rem 1rem; background:white; border:1px solid var(--line); border-radius:0 0 var(--radius) var(--radius); box-shadow:0 8px 16px #20273310; display:grid; gap:0; }
 .site-menu:not([open]) nav { display:none; }
 .site-menu nav a { min-height:44px; font-size:.94rem; }
-.history-controls { position:sticky; top:0; z-index:4; background:var(--page); border-bottom:1px solid var(--line); }
-.history-controls .wrap { display:flex; gap:.25rem; }
+.has-history-controls { --history-bar-height:calc(45px + env(safe-area-inset-bottom, 0px)); padding-bottom:var(--history-bar-height); }
+.history-controls { position:fixed; inset:auto 0 0; z-index:4; padding-bottom:env(safe-area-inset-bottom, 0px); background:var(--page); border-top:1px solid var(--line); }
+.history-controls .wrap { display:flex; justify-content:center; gap:.75rem; }
 .history-controls button { width:44px; padding:0; border-color:transparent; color:var(--accent); }
 .history-controls button:disabled { color:var(--muted); background:transparent; opacity:.55; }
 .hero { margin-top:clamp(1.25rem,3vw,2.75rem); max-width:49rem; }
@@ -171,6 +172,7 @@ footer { background:var(--surface); border-top:1px solid var(--line); margin-top
 .foot-inner .language { margin:0; }
 .foot-inner>button { justify-self:start; font-size:.8rem; }
 .analytics-notice { position:fixed; inset:auto .75rem .75rem auto; z-index:8; width:min(27rem,calc(100% - 1.5rem)); padding:.75rem; background:white; border:1px solid var(--line); border-radius:var(--radius); box-shadow:0 3px 18px #20273318; }
+.has-history-controls .analytics-notice { bottom:calc(.75rem + var(--history-bar-height)); }
 .analytics-notice p { font-size:.75rem; margin-bottom:.45rem; line-height:1.5; }
 .analytics-notice .actions { gap:.4rem; flex-wrap:nowrap; }
 .analytics-notice button { min-height:44px; padding:.4rem .6rem; font-size:.75rem; flex:1; }
@@ -235,10 +237,11 @@ html[lang="en"] .masthead-residence { width:6.5rem; padding-left:.3rem; }
 /* Service cards share neutral surfaces; the advertising label identifies sponsorship. */
 .card.task-card { background:var(--page); border-color:var(--line); }
 .task-card .card-conditions { margin-bottom:1rem; }
-.task-card .affiliate-banner { max-width:min(100%,200px); margin-bottom:.55rem; }
-.task-card .affiliate-banner img { width:auto; max-height:112px; }
+.task-card .affiliate-banner { max-width:min(100%,180px); }
+.task-card .affiliate-banner img { width:auto; max-height:100px; }
 .task-card .card-footer .button:hover { background:var(--accent-soft); border-color:var(--accent); }
 .task-card .card-details { display:inline-flex; align-items:center; min-height:44px; font-size:.8rem; }
+.task-card .actions { margin-bottom:.45rem; }
 .task-card .card-disclosure { margin:.5rem 0 0; font-size:.8rem; }
 
 .quest-filters { margin: 0 0 1rem; padding: .9rem; border: 1px solid var(--line); border-radius: .65rem; }
