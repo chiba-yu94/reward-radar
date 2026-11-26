@@ -15,7 +15,7 @@ gh run download RUN_ID -n source-observation -D var/observations/RUN_ID
 
 `gh run list --workflow publish.yml --event schedule --limit 5` で自動起動時刻を確認してください。翌朝、予定時刻を過ぎても実行がなければ GitHub の状態とワークフロー有効状態を確認し、手動起動します。
 
-候補収集は **Discover giveaway and skill-competition candidates** が毎日05:23（日本時間）に起動予定です。`gh run list --workflow discovery.yml` で実行を探し、`gh run download RUN_ID -n discovery-candidates -D var/discovery/RUN_ID` で候補を取得します。各媒体の結果は実行概要で見られます。取得失敗、認証未設定、巡回上限到達は、通常の候補0件と区別して確認します。ローカルでは `python3 -m radar.discovery` を使います。GitHub Education のリビジョンが変わった場合は、原文とリンク先を確認し、掲載への影響を判断してからレビュー済み識別子を更新します。手動ソースは30日以内に再確認します。掲載ページは古い確認に警告を表示し、日次の実行概要にも該当案件 ID が出ます。
+候補収集は **Discover giveaway and skill-competition candidates** が毎日0:00と12:00（日本時間）に起動予定です。収集結果は GitHub Actions の成果物に保存され、サイトへの掲載は別の公開処理で行います。`gh run list --workflow discovery.yml` で実行を探し、`gh run download RUN_ID -n discovery-candidates -D var/discovery/RUN_ID` で候補を取得します。各媒体の結果は実行概要で見られます。取得失敗、認証未設定、巡回上限到達は、通常の候補0件と区別して確認します。ローカルでは `python3 -m radar.discovery` を使います。GitHub Education のリビジョンが変わった場合は、原文とリンク先を確認し、掲載への影響を判断してからレビュー済み識別子を更新します。手動ソースは30日以内に再確認します。掲載ページは古い確認に警告を表示し、日次の実行概要にも該当案件 ID が出ます。
 
 ## 本番の自動更新
 
