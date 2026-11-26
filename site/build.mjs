@@ -157,7 +157,7 @@ function layout(lang, page, title, description, content, indexable, mastheadCont
     : '';
   const hasTranslation = locales.includes(other);
   const switcher = `<a class="language" aria-label="${e(hasTranslation ? t.switchLanguage : t.otherHome)}" href="${url(other, hasTranslation ? page : '')}" lang="${other}"${hasTranslation ? ` hreflang="${other}"` : ''}>${t.otherLanguage}</a>`;
-  const links = keys => keys.map(key => `<a href="${url(lang, key)}"${key === page ? ' aria-current="page"' : ''}>${e(key === 'opportunities' && lang === 'en' ? 'All listings' : key === 'sweepstakes' && lang === 'en' ? 'Giveaways' : key === 'international' && lang === 'en' ? 'International' : t.pages[key][0])}</a>`).join('');
+  const links = keys => keys.map(key => `<a href="${url(lang, key)}"${key === page ? ' aria-current="page"' : ''}>${e(key === 'opportunities' ? t.allListings : key === 'sweepstakes' && lang === 'en' ? 'Giveaways' : key === 'international' && lang === 'en' ? 'International' : t.pages[key][0])}</a>`).join('');
   const name = e(t.copyright);
   const fullTitle = e(page ? title + ' | ' + t.copyright : t.copyright + ' · ' + title);
   if (indexable) maps.push({path:current, page, locales});
@@ -185,9 +185,9 @@ ${consent?.panel || ''}
 ${page === '' ? `<meta itemprop="name" content="${name}"><meta itemprop="url" content="${origin.origin}${current}"><meta itemprop="inLanguage" content="${lang}">
 <div itemprop="publisher" itemscope itemtype="https://schema.org/Organization"><meta itemprop="name" content="${name}"><meta itemprop="email" content="${email}"></div>` : ''}
 ${content}</main>
-<footer><div class="wrap foot-inner"><div><a href="${url(lang)}" class="brand">${brand(t.copyright)}</a>
-<p class="muted">${e(t.pages.about[1])}</p><p class="muted">${t.legalContact} · ${address}</p>${organizerContact}</div>
-<nav aria-label="${e(t.footerNavigation)}">${links(['quests','guides',...secondary])}${switcher}</nav>
+<footer><div class="wrap foot-inner"><a href="${url(lang)}" class="brand">${brand(t.copyright)}</a>${organizerContact}
+<nav aria-label="${e(t.footerNavigation)}">${links(['contact','privacy','disclosure'])}</nav>
+<details class="footer-more"><summary>${e(t.footerMore)}</summary><nav aria-label="${e(t.footerMore)}">${links(['quests','guides','guaranteed','affiliates','ranking','about'])}${switcher}</nav></details>
 ${consent?.settings || ''}<p class="muted">© ${t.copyright}</p></div></footer></body></html>`;
 }
 
@@ -227,27 +227,35 @@ ${freshnessNotice(row,lang)}
 <p class="stamp">${t.checked} · ${time(row.last_checked_at,lang)} · ${elapsed(row,lang)}</p><p class="small card-disclosure">${t.freecashCardDisclosure}</p></div></article>`;
 }
 
-function card(row, lang) {
+function card(row, lang, guideSource = '') {
   if (row.id === 'freecash' && sponsoredLink(row)) return freecashCard(row,lang);
   const t = copy[lang];
   const title = row['title_' + lang];
   const sponsored = taskService(row);
   const isDraw = row.category === 'sweepstakes';
   const group = sponsored ? t.taskRewards : row.prize_category ? t.prizes[row.prize_category] : t.categories[row.category];
-  return `<article class="card${sponsored ? ' sponsored-card' : ''}" data-record="${e(row.id)}" data-deadline="${e(expiryValue(row))}"${sponsored ? ` data-affiliate-expires="${e(row.affiliate_expires_at)}"` : ''}${analytics ? ` data-analytics-entry="${e(row.id)}" data-analytics-category="${e(row.category)}"` : ''}>
+  const heading = guideSource ? 'h4' : 'h3';
+  const summary = guideSource
+    ? [row['eligibility_' + lang],row.entry.steps?.[lang]].filter(Boolean).join(' ')
+    : row['description_' + lang];
+  const directoryRecord = guideSource ? '' : ` data-record="${e(row.id)}" data-deadline="${e(expiryValue(row))}"`;
+  const registration = guideSource ? t.registration : lang === 'ja' ? '登録' : 'Account';
+  const entryFact = isDraw ? [registration,e(t.registrations[row.entry.registration])]
+    : [t.expense,e(sponsored ? t.freecashCost : t.expenses[row.required_expense.kind])];
+  return `<article class="card${sponsored ? ' sponsored-card' : ''}"${directoryRecord}${sponsored ? ` data-affiliate-expires="${e(row.affiliate_expires_at)}"` : ''}${analytics ? ` data-analytics-entry="${e(row.id)}" data-analytics-category="${e(row.category)}"` : ''}>
 <div class="labels"><span>${e(group)}</span>${sponsored ? `<span class="sponsored-label">${t.sponsoredLabel}</span>` : ''}</div>
-<h3><a href="${detail(lang,row)}">${e(title)}</a></h3>
-<p class="provider">${e(row.provider)}</p><p class="card-summary">${e(row['description_' + lang])}</p>
+<${heading}><a href="${detail(lang,row)}">${e(title)}</a></${heading}>
+<p class="provider">${e(row.provider)}</p><p class="card-summary">${e(summary)}</p>
 ${fields([
   ...geography(row,lang),
   [t.deadline,deadlineText(row,lang)],
-  ...(isDraw ? row.entry.registration !== 'unknown' ? [[lang === 'ja' ? '登録' : 'Account',e(t.registrations[row.entry.registration])]] : [] : [[t.expense,e(sponsored ? t.freecashCost : t.expenses[row.required_expense.kind])]]),
+  ...(!isDraw || guideSource || row.entry.registration !== 'unknown' ? [entryFact] : []),
 ])}
 ${isDraw && row.application?.sns_required === false ? `<p class="small">${t.application.noSns}${row.application.difficulty === 'easy' ? ' · ' + t.application.easyApply : ''}</p>` : ''}
 ${freshnessNotice(row,lang)}
 ${sponsored ? `<p class="small">${t.affiliateDisclosure}</p>` : ''}
-<div class="card-footer"><p class="stamp">${t.checked} · ${time(row.last_checked_at,lang)} · ${elapsed(row,lang)}</p>
-${sponsored ? `<a class="text-link" href="${detail(lang,row)}">${t.details} →</a>` : external(row.official_url,isDraw ? t.officialNewTab : t.visitOfficial,row.commission ? null : 'application_click',title)}</div></article>`;
+<div class="card-footer"><p class="stamp">${t.checked} · ${time(row.last_checked_at,lang)} · ${elapsed(row,lang)}${guideSource ? ' · ' + guideSource : ''}</p>
+${guideSource ? '' : sponsored ? `<a class="text-link" href="${detail(lang,row)}">${t.details} →</a>` : external(row.official_url,isDraw ? t.officialNewTab : t.visitOfficial,row.commission ? null : 'application_click',title)}</div></article>`;
 }
 
 function residenceCountries(lang, available, onlyVerified = false) {
@@ -327,15 +335,11 @@ function sweepstakesGuide(lang, available) {
   const source = row => row.source_url === row.official_url
     ? `<a href="${detail(lang,row)}#official-sources">${e(guide.source)}</a>`
     : `<a href="${e(row.source_url)}" rel="noopener noreferrer" target="_blank">${e(guide.source)}</a>`;
-  const list = (entries, fresh = false) => `<ul class="giveaway-list" data-expiry-list${entries.length ? '' : ' hidden'}>${entries.map(row => `<li ${listingExpiry(row)}${fresh ? ` data-expire-when-stale="${e(row.last_checked_at)}"` : ''}>
-<h4><a href="${detail(lang,row)}">${e(row['title_' + lang])}</a></h4>
-<p class="small">${e(t.residency)} · ${e(countryText(row,lang))} / ${e(t.deadline)} · ${deadlineText(row,lang)}</p>
-<p>${e(row['eligibility_' + lang])}${row.entry.steps ? ` ${e(row.entry.steps[lang])}` : ''}</p>
-<p class="small">${e(t.registration)} · ${e(t.registrations[row.entry.registration] ?? t.unknown)} / ${e(t.checked)} · ${time(row.last_checked_at,lang)} / ${source(row)}</p>${freshnessNotice(row,lang)}</li>`).join('')}</ul>`;
+  const list = (entries, fresh = false) => `<ul class="cards sweepstakes-guide-cards" data-expiry-list${entries.length ? '' : ' hidden'}>${entries.map(row => `<li ${listingExpiry(row)}${fresh ? ` data-expire-when-stale="${e(row.last_checked_at)}"` : ''}>${card(row,lang,source(row))}</li>`).join('')}</ul>`;
   const japan = matches.filter(row => verifiedJapanGiveaway(row, now));
   const others = matches.filter(row => !japan.includes(row));
   return `<section class="section" id="no-sns-giveaways" aria-labelledby="no-sns-heading" data-unfiltered-guide>
-<div class="section-heading"><h2 id="no-sns-heading">${e(guide.title)}</h2></div>
+<div class="section-heading"><h2 id="no-sns-heading">${e(guide.title)}</h2><p>${e(guide.excerpt)}</p></div>
 <section aria-labelledby="japan-giveaways"><h3 id="japan-giveaways">${e(guide.japan)}</h3>
 ${list(japan, true)}<p data-expiry-empty${japan.length ? ' hidden' : ''}>${e(guide.japanEmpty)}</p></section>
 ${others.length ? `<section aria-labelledby="other-giveaways"><h3 id="other-giveaways">${e(guide.other)}</h3>
@@ -571,7 +575,7 @@ ${rewardsPreview}${recentList}${hapitasAd}`);
   for (const [key, available] of Object.entries(pages)) {
     const [title, description] = t.pages[key];
     const sweepstakes = key === 'sweepstakes';
-    await page(lang,key,title,description,`<header class="intro"><h1>${e(title)}</h1>${sweepstakes ? '' : `<p class="lead">${e(description)}</p>`}
+    await page(lang,key,title,description,`<header class="intro"><h1>${e(title)}</h1>${sweepstakes ? `<a class="text-link" href="${url(lang,'opportunities')}">${e(t.sweepstakesGuide.allListings)}</a>` : `<p class="lead">${e(description)}</p>`}
 ${key === 'affiliates' ? `<a href="${url(lang,'rewards')}">${t.pages.rewards[0]} →</a>` : ''}</header>${key === 'rewards' ? rewardsGuide(lang,available) + rewardsSponsorLink(lang,available) : ''}${directory(lang,available,sweepstakes)}${sweepstakes ? sweepstakesGuide(lang,available) + rewardsGuideLink(lang) : ''}`,key === 'rewards' || available.length > 0,
       sweepstakes && available.length ? mastheadResidence(lang,available) : '');
   }

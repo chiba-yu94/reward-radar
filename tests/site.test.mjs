@@ -132,10 +132,10 @@ test('listing controls expose residence outside of advanced options and a collap
       const verified = new Set(rows.filter(row=>row.category === 'sweepstakes' && row.eligibility_verified &&
         Array.isArray(row.eligible_countries)).flatMap(row=>row.eligible_countries));
       assert.deepEqual(new Set(Array.from(country[2].matchAll(/<option value="([^"]+)">/g),m=>m[1])),verified);
-      assert.match(page, /<header class="intro"><h1>[^<]+<\/h1>\s*<\/header><form class="filter"/);
+      assert.ok(page.includes(`<a class="text-link" href="/${lang}/opportunities/">${copy[lang].sweepstakesGuide.allListings}</a>`));
       assert.ok(page.indexOf('id="listing-results"') < page.indexOf('id="no-sns-giveaways"'));
       assert.match(page, /id="no-sns-giveaways"[^>]*data-unfiltered-guide/);
-      assert.match(page, /<h2 id="no-sns-heading">[^<]+<\/h2><\/div>/);
+      assert.match(page, /<h2 id="no-sns-heading">[^<]+<\/h2><p>[^<]+<\/p><\/div>/);
     }
     assert.doesNotMatch(page.match(/<details class="filter-options">[\s\S]*?<\/details>/)[0], /name="country"/);
     assert.match(page, /<\/form>\s*<details class="home-screen-help"><summary>[^<]+<\/summary><p>Safari|<\/form>\s*<details class="home-screen-help"><summary>[^<]+<\/summary><p>In Safari/);
@@ -195,6 +195,8 @@ test('detail links include the closest listed peer and omit the section without 
     assert.doesNotMatch(read(`${lang}/opportunities/freecash/index.html`), /aria-labelledby="related-listings"/);
     const html = read(`${lang}/sweepstakes/index.html`);
     const guide = html.slice(html.indexOf('id="no-sns-giveaways"'),html.indexOf('rewards-cross-link'));
+    assert.match(guide, /<li[^>]*data-expiring[^>]*><article class="card"[^>]*>[\s\S]*?<h4><a/);
+    assert.doesNotMatch(guide, /data-record=/);
     for (const id of ['club-sunstar-november-2026','obu-city-quiz-november-2026','penguin-white-company-calendar-2026','stanley-review-november-2026']) {
       assert.ok(guide.includes(`href="/${lang}/opportunities/${id}/"`), id);
     }
