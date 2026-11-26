@@ -81,6 +81,26 @@
     }
   },
   {
+    "id": "port-tackle-news",
+    "provider": "Port Tackle",
+    "kind": "feed",
+    "market": "US",
+    "lane": "giveaway",
+    "timezone": "America/New_York",
+    "endpoint": "https://port-tackle.com/feed/",
+    "permission_url": "https://port-tackle.com/robots.txt",
+    "reviewed_on": "2026-11-26",
+    "scope": "Official public RSS and same-host announcements whose titles or summaries identify a promotion. Store only candidate URLs and dates.",
+    "article_path": "/\\d{4}/\\d{2}/\\d{2}/[a-z0-9-]+/",
+    "detail_limit": 3,
+    "inspect_feed_articles": true,
+    "only_matched_details": true,
+    "date_patterns": {
+      "opens_at": "Entry period:\\s*(\\w+ \\d{1,2}, \\d{4})\\s+through",
+      "deadline": "Entry period:\\s*\\w+ \\d{1,2}, \\d{4}\\s+through\\s+(\\w+ \\d{1,2}, \\d{4})"
+    }
+  },
+  {
     "id": "hackathon-raptors",
     "provider": "Hackathon Raptors",
     "kind": "index",
