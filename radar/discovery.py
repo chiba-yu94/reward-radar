@@ -1,86 +1,47 @@
-"""Collect official RSS links for editorial review, independently of publication."""
+"""Run the read-only daily watch and write its queue and resumable snapshot."""
 import argparse
-import re
+import os
 from datetime import datetime, timezone
 from pathlib import Path
-from xml.etree import ElementTree
 
-from .application import application_profile
-from .net import fetch_document, https_url
-from .pipeline import ROOT, dump, inputs, read, require, utc
-
-RSS = "{http://purl.org/rss/1.0/}"
-RDF = "{http://www.w3.org/1999/02/22-rdf-syntax-ns#}"
-ARTICLE_PATH = re.compile(r"/[a-zA-Z0-9_/-]+\.html")
-GIVEAWAY = re.compile(r"プレゼント|懸賞|抽選で.*当た")
-REVIEW_CHECKS = ("organizer", "eligibility", "free-entry", "destination",
-                 "application-and-winner-privacy", "ja-en-copy", "editorial-approval")
+from .discovery_leads import discover_leads
+from .discovery_watch import collect, load_state
+from .net import https_url
+from .pipeline import ROOT, dump, inputs, read
 
 
-def extract(body, origin, reviewed):
-    # UTF-8 only. Reject DTDs, entities, alternate encodings and oversized input.
-    document = body.decode("utf-8-sig")
-    require("\x00" not in document and not re.search(r"<!DOCTYPE|<!ENTITY", document, re.I),
-            "Unsafe feed XML")
-    root = ElementTree.fromstring(document)
-    require(root.tag == RDF + "RDF" and root.find(RSS + "channel") is not None,
-            "Unexpected RSS format")
-    links = set()
-    for item in root.iterfind(RSS + "item"):
-        title = item.findtext(RSS + "title", "")
-        if not GIVEAWAY.search(title):
-            continue
-        link = item.findtext(RSS + "link", "").strip()
-        try:
-            url = https_url(link)
-        except ValueError:
-            continue
-        if (url.hostname == origin and ARTICLE_PATH.fullmatch(url.path)
-                and "//" not in url.path and not url.query and not url.fragment and link not in reviewed):
-            links.add(link)
-    return sorted(links)[:40]
-
-
-def discover(feeds, reviewed, fetch=fetch_document):
-    pending, results = {}, {}
-    for source in feeds:
-        endpoint = https_url(source["endpoint"])
-        permission = https_url(source["permission_url"])
-        require(endpoint.hostname == permission.hostname and endpoint.path.endswith(".xml")
-                and not endpoint.query and not endpoint.fragment, "Unreviewed RSS endpoint")
-        try:
-            body = fetch(source["endpoint"], source["endpoint"],
-                         ("application/rss+xml", "application/rdf+xml", "application/xml", "text/xml"))
-            links = extract(body, endpoint.hostname, reviewed)
-            results[source["id"]] = {"status": "ok", "matches": len(links)}
-            for link in links:
-                pending.setdefault(link, []).append(source["id"])
-        except (OSError, ValueError, ElementTree.ParseError) as error:
-            results[source["id"]] = {"status": "failed", "error_type": type(error).__name__}
-    return {
-        "checked_at": utc(datetime.now(timezone.utc)),
-        "feeds": results,
-        "candidates": [{"url": url, "feeds": ids, "status": "candidate", "pending_checks": (*REVIEW_CHECKS, "application-ease-from-official-rules"),
-                        "application": application_profile(None, False)}
-                       for url, ids in sorted(pending.items())],
-    }
+def kaggle_token():
+    token = os.environ.get('KAGGLE_DISCOVERY_TOKEN') or os.environ.get('KAGGLE_API_TOKEN')
+    if token or os.environ.get('GITHUB_ACTIONS') == 'true':
+        return token
+    token_path = Path.home() / '.kaggle' / 'access_token'
+    return token_path.read_text(encoding='utf-8').strip() if token_path.is_file() else None
 
 
 def main():
     parser = argparse.ArgumentParser()
-    parser.add_argument("--output", type=Path, default=ROOT / "var/candidates.json")
+    parser.add_argument('--output', type=Path, default=ROOT / 'var/candidates.json')
+    parser.add_argument('--state', type=Path, default=ROOT / 'var/discovery-state.json')
     args = parser.parse_args()
     _, sources = inputs()
-    reviewed = {url for source in sources.values()
-                for url in (source["official_url"], source["approved_destination"])}
-    report = discover(read(ROOT / "data/discovery-sources.json"), reviewed)
+    editorial = read(ROOT / 'data/editorial.json')
+    reviewed = {url for source in sources.values() for url in (source['official_url'], source['approved_destination'])}
+    reviewed.update(row['official_url'] for row in editorial['quests'] if row['status'] == 'approved')
+    now = datetime.now(timezone.utc)
+    watch = read(ROOT / 'data/discovery-sources.json')
+    report, state = collect(watch, reviewed, load_state(args.state), now,
+                            kaggle_token=kaggle_token())
+    if os.environ.get('FREEBIE_SOURCE_SEARCH_ENABLED') == 'true':
+        report['source_leads'] = discover_leads(os.environ.get('BRAVE_SEARCH_API_KEY'),
+                                               {https_url(row['endpoint']).hostname for row in watch})
     dump(args.output, report)
-    for key, result in report["feeds"].items():
-        if result["status"] == "failed":
-            print(f"::warning::Discovery feed unavailable or changed: {key} ({result['error_type']})")
+    dump(args.state, state)
+    for key, result in report['feeds'].items():
+        if result['status'] != 'ok':
+            print(f"::warning::Discovery {key}: {result['status']} ({result.get('error_type', 'see queue metadata')})")
     print(f"Discovery: {len(report['candidates'])} candidate(s) awaiting review")
-    return int(any(result["status"] == "failed" for result in report["feeds"].values()))
+    return int(all(source['status'] not in ('ok', 'partial') for source in report['feeds'].values()))
 
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     raise SystemExit(main())

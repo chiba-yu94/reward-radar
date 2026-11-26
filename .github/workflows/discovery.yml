@@ -1,0 +1,70 @@
+name: Discover giveaway and skill-competition candidates
+on:
+  schedule:
+    - cron: '23 20 * * *'
+  workflow_dispatch:
+permissions:
+  contents: read
+  actions: read
+concurrency:
+  group: reward-radar-discovery
+  cancel-in-progress: false
+jobs:
+  discover:
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+        with:
+          persist-credentials: false
+      - name: Restore a recent observation from this workflow
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          mkdir -p var
+          runs=$(gh run list --workflow discovery.yml --branch main --status completed --limit 8 --json databaseId --jq '.[].databaseId')
+          for run in $runs; do
+            if gh run download "$run" -n discovery-state -D var/discovery-previous; then
+              mv var/discovery-previous/discovery-state.json var/discovery-state.json
+              break
+            fi
+          done
+      - name: Install the PDF reader in an isolated environment
+        run: |
+          python3 -m venv "$RUNNER_TEMP/freebietrail-discovery"
+          "$RUNNER_TEMP/freebietrail-discovery/bin/python" -m pip install --require-hashes -r requirements-discovery.txt
+      - name: Collect public candidate metadata
+        env:
+          KAGGLE_DISCOVERY_TOKEN: ${{ secrets.KAGGLE_DISCOVERY_TOKEN }}
+          BRAVE_SEARCH_API_KEY: ${{ secrets.BRAVE_SEARCH_API_KEY }}
+          FREEBIE_SOURCE_SEARCH_ENABLED: ${{ vars.FREEBIE_SOURCE_SEARCH_ENABLED }}
+        run: '"$RUNNER_TEMP/freebietrail-discovery/bin/python" -m radar.discovery'
+      - name: Summarize sources and candidate counts
+        if: always()
+        run: |
+          python3 - <<'PY' >> "$GITHUB_STEP_SUMMARY"
+          import json
+          from pathlib import Path
+          output = Path('var/candidates.json')
+          if output.exists():
+              data = json.loads(output.read_text())
+              print(f"### {len(data['candidates'])} candidates awaiting editorial review\n")
+              print('| Source | Status | Candidates | Bounded scan |\n|---|---|---|---|')
+              for key, row in data['feeds'].items():
+                  print(f"| {key} | {row['status']} | {row.get('matches', '—')} | {'More items available' if row.get('truncated') else '—'} |")
+          PY
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        if: always()
+        with:
+          name: discovery-candidates
+          path: var/candidates.json
+          if-no-files-found: error
+          retention-days: 30
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        if: always()
+        with:
+          name: discovery-state
+          path: var/discovery-state.json
+          if-no-files-found: error
+          retention-days: 30

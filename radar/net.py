@@ -81,7 +81,7 @@ def fetch_json(url, allowed_url, *, token=None):
     return fetch_document(url, allowed_url, ("application/json",), headers)
 
 
-def fetch_document(url, allowed_url, media_types, request_headers=None):
+def fetch_document(url, allowed_url, media_types, request_headers=None, *, max_bytes=LIMIT):
     parts = https_url(url)
     if url != allowed_url or parts.fragment:
         raise ValueError("Unreviewed fetch URL")
@@ -102,8 +102,8 @@ def fetch_document(url, allowed_url, media_types, request_headers=None):
             raise UpstreamHTTPError(response.status)
         if response.getheader("Content-Type", "").partition(";")[0].strip().lower() not in media_types:
             raise ValueError("Unexpected content type")
-        body = response.read(LIMIT + 1)
-        if len(body) > LIMIT:
+        body = response.read(max_bytes + 1)
+        if len(body) > max_bytes:
             raise ValueError("Response too large")
         return body
     finally:

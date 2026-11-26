@@ -5,7 +5,11 @@
     "endpoint": "https://www.pref.saitama.lg.jp/news/news.xml",
     "permission_url": "https://www.pref.saitama.lg.jp/kense/koho/homepage/rss.html",
     "reviewed_on": "2026-11-05",
-    "scope": "Official RSS subscription. Keep only same-host article URLs for editorial review."
+    "scope": "Official RSS subscription. Keep only same-host article URLs for editorial review.",
+    "kind": "feed",
+    "market": "JP",
+    "lane": "giveaway",
+    "timezone": "Asia/Tokyo"
   },
   {
     "id": "saitama-highlights",
@@ -13,6 +17,230 @@
     "endpoint": "https://www.pref.saitama.lg.jp/chumoku/chumoku.xml",
     "permission_url": "https://www.pref.saitama.lg.jp/kense/koho/homepage/rss.html",
     "reviewed_on": "2026-11-05",
-    "scope": "Official RSS subscription. Keep only same-host article URLs for editorial review."
+    "scope": "Official RSS subscription. Keep only same-host article URLs for editorial review.",
+    "kind": "feed",
+    "market": "JP",
+    "lane": "giveaway",
+    "timezone": "Asia/Tokyo"
+  },
+  {
+    "id": "kashiwara-news",
+    "provider": "Kashiwara City",
+    "kind": "feed",
+    "market": "JP",
+    "lane": "giveaway",
+    "timezone": "Asia/Tokyo",
+    "endpoint": "https://www.city.kashiwara.lg.jp/category/kubun/articles/index.rss",
+    "permission_url": "https://www.city.kashiwara.lg.jp/rss.html",
+    "reviewed_on": "2026-11-26",
+    "scope": "Official new-article RSS and a bounded number of same-host public announcements.",
+    "article_path": "/docs/\\d{10,15}/",
+    "detail_limit": 6,
+    "inspect_feed_articles": true,
+    "partial_year": true,
+    "date_patterns": {
+      "official_published_at": "公開日\\s*(\\d{4}年\\d{1,2}月\\d{1,2}日)",
+      "opens_at": "応募期間\\s*(\\d{1,2}月\\d{1,2}日（.）\\d{1,2}時(?:\\d{1,2}分)?)",
+      "deadline": "応募期間\\s*[^～]{1,70}～\\s*(\\d{1,2}月\\d{1,2}日（.）\\d{1,2}時\\d{1,2}分)"
+    }
+  },
+  {
+    "id": "visit-bath-competition",
+    "provider": "Visit Bath",
+    "kind": "page",
+    "market": "GB",
+    "lane": "giveaway",
+    "timezone": "Europe/London",
+    "endpoint": "https://www.visitbath.co.uk/information/competition-terms-and-conditions",
+    "permission_url": "https://www.visitbath.co.uk/information/terms-and-conditions",
+    "reviewed_on": "2026-11-26",
+    "scope": "One public rotating competition rules page. Keep dates and the canonical competition link.",
+    "candidate_url": "https://www.visitbath.co.uk/competition",
+    "always_candidate": true,
+    "date_patterns": {
+      "deadline": "(\\d{1,2}:\\d{2}[ap]m on \\w+ \\d{1,2} \\w+ \\d{4})"
+    },
+    "rotating": true
+  },
+  {
+    "id": "visit-philadelphia-survey",
+    "provider": "Visit Philadelphia",
+    "kind": "page",
+    "market": "US",
+    "lane": "giveaway",
+    "timezone": "America/New_York",
+    "endpoint": "https://www.visitphilly.com/features/positive-note-sweeps/",
+    "permission_url": "https://www.visitphilly.com/terms-of-use/",
+    "reviewed_on": "2026-11-26",
+    "scope": "One public campaign and its exact first-party rules PDF, allowed by the applicable robots policy. Store only URLs and dates.",
+    "rules_pdf": {
+      "https://www.visitphilly.com/features/positive-note-sweeps/": "https://www.visitphilly.com/wp-content/uploads/2026/10/OAPN_Rules_-10_15_26_TB_Clean.docx-1.pdf"
+    },
+    "pdf_date_patterns": {
+      "deadline": "ends on \\w+,\\s*(\\w+ \\d{1,2}, \\d{4} at \\d{1,2}:\\d{2}:\\d{2} [ap]\\.m\\.)"
+    }
+  },
+  {
+    "id": "hackathon-raptors",
+    "provider": "Hackathon Raptors",
+    "kind": "index",
+    "market": "GB",
+    "lane": "skill-competition",
+    "timezone": "UTC",
+    "endpoint": "https://www.raptors.dev/",
+    "permission_url": "https://www.raptors.dev/robots.txt",
+    "reviewed_on": "2026-11-26",
+    "scope": "Organizer project index and same-host project announcements. Capture external registration destinations from organizer evidence.",
+    "article_path": "/project/[a-z0-9-]+",
+    "detail_limit": 5,
+    "linked_devpost": true,
+    "linked_independent": true,
+    "required_path": true
+  },
+  {
+    "id": "agentware-organizer",
+    "provider": "Hackathon Raptors / Agentware",
+    "kind": "page",
+    "market": "GLOBAL",
+    "lane": "skill-competition",
+    "timezone": "UTC",
+    "endpoint": "https://www.raptors.dev/project/agentware-2026-build-an-agent-you-can-walk-away-from",
+    "permission_url": "https://www.raptors.dev/robots.txt",
+    "reviewed_on": "2026-11-26",
+    "scope": "Read the organizer announcement and retain its independently hosted competition URL.",
+    "candidate_url": "https://agentwarehack.com/",
+    "date_patterns": {
+      "event_starts_at": "(\\w+ \\d{1,2}, \\d{4}, \\d{2}:\\d{2}) UTC.{0,8}kickoff",
+      "deadline": "(\\w+ \\d{1,2}, \\d{4}, \\d{2}:\\d{2}) UTC.{0,8}code freeze"
+    }
+  },
+  {
+    "id": "signate-news",
+    "provider": "SIGNATE",
+    "kind": "sitemap",
+    "market": "JP",
+    "lane": "skill-competition",
+    "timezone": "Asia/Tokyo",
+    "endpoint": "https://signate.co.jp/sitemap-dynamic/sitemap-dynamic-bmV3cy86c2x1Zw.xml",
+    "permission_url": "https://signate.co.jp/robots.txt",
+    "reviewed_on": "2026-11-26",
+    "scope": "Latest company announcements from the official news sitemap. Identify competition links in permitted source pages.",
+    "article_path": "/news/[a-zA-Z0-9_-]+/?",
+    "detail_limit": 5,
+    "linked_signate": true,
+    "date_patterns": {
+      "official_published_at": "(\\d{4}(?:\\.\\d{1,2}\\.\\d{1,2}|年\\d{1,2}月\\d{1,2}日))"
+    }
+  },
+  {
+    "id": "makefun-api",
+    "provider": "Make.fun",
+    "kind": "makefun",
+    "market": "GLOBAL",
+    "lane": "skill-competition",
+    "timezone": "UTC",
+    "endpoint": "https://make.fun/api/competitions",
+    "permission_url": "https://make.fun/guide/how-ai-agents-earn-money",
+    "reviewed_on": "2026-11-26",
+    "scope": "Documented public competition list, read-only. Exact API route, up to three pages per run."
+  },
+  {
+    "id": "kaggle-api",
+    "provider": "Kaggle",
+    "kind": "kaggle",
+    "market": "GLOBAL",
+    "lane": "skill-competition",
+    "timezone": "UTC",
+    "endpoint": "https://api.kaggle.com/v1/competitions/list",
+    "permission_url": "https://www.kaggle.com/docs/api",
+    "reviewed_on": "2026-11-26",
+    "scope": "Official authenticated competition list, read-only. Up to three pages per run. Each event has its own eligibility."
+  },
+  {
+    "id": "kiro-events",
+    "provider": "Kiro",
+    "kind": "index",
+    "market": "US",
+    "lane": "skill-competition",
+    "timezone": "America/Los_Angeles",
+    "endpoint": "https://kiro.dev/events/",
+    "permission_url": "https://kiro.dev/robots.txt",
+    "reviewed_on": "2026-11-26",
+    "scope": "One public organizer event index. Record direct Devpost links without reading Devpost.",
+    "linked_devpost": true,
+    "article_path": "/events/[a-z0-9-]+/?",
+    "detail_limit": 3
+  },
+  {
+    "id": "cognizant-ai-lab",
+    "provider": "Cognizant AI Lab",
+    "kind": "page",
+    "market": "US",
+    "lane": "skill-competition",
+    "timezone": "America/New_York",
+    "endpoint": "https://www.cognizant.com/us/en/ai-lab/blog/open-agentic-web-challenge",
+    "permission_url": "https://www.cognizant.com/robots.txt",
+    "reviewed_on": "2026-11-26",
+    "scope": "One organizer-owned challenge announcement. Record outgoing competition links only; do not request Devpost.",
+    "linked_devpost": true,
+    "prefer_linked": true,
+    "date_patterns": {
+      "deadline": "before (\\w+ \\d{1,2}, \\d{4})"
+    }
+  },
+  {
+    "id": "kashiwara-line-announcement",
+    "provider": "Kashiwara City",
+    "kind": "page",
+    "market": "JP",
+    "lane": "giveaway",
+    "timezone": "Asia/Tokyo",
+    "endpoint": "https://www.city.kashiwara.lg.jp/docs/2026111900020/",
+    "permission_url": "https://www.city.kashiwara.lg.jp/rss.html",
+    "reviewed_on": "2026-11-26",
+    "scope": "Exact public city announcement from an additional city channel; keep the announced future entry window.",
+    "article_path": "/docs/\\d{10,15}/",
+    "detail_limit": 6,
+    "inspect_feed_articles": false,
+    "partial_year": true,
+    "date_patterns": {
+      "official_published_at": "公開日\\s*(\\d{4}年\\d{1,2}月\\d{1,2}日)",
+      "opens_at": "応募期間\\s*(\\d{1,2}月\\d{1,2}日（.）\\d{1,2}時(?:\\d{1,2}分)?)",
+      "deadline": "応募期間\\s*[^～]{1,70}～\\s*(\\d{1,2}月\\d{1,2}日（.）\\d{1,2}時\\d{1,2}分)"
+    }
+  },
+  {
+    "provider": "MLIT / SIGNATE",
+    "market": "JP",
+    "lane": "skill-competition",
+    "timezone": "Asia/Tokyo",
+    "permission_url": "https://www.mlit.go.jp/page/rssinfo.html",
+    "reviewed_on": "2026-11-26",
+    "linked_signate": true,
+    "prefer_linked": true,
+    "article_path": "/report/press/[a-zA-Z0-9_-]+\\.html",
+    "id": "mlit-press",
+    "kind": "feed",
+    "endpoint": "https://www.mlit.go.jp/pressrelease.rdf",
+    "encoding": "cp932",
+    "scope": "Official press RSS. Inspect only matching same-host announcement links, up to three per run.",
+    "inspect_feed_articles": true,
+    "only_matched_details": true,
+    "detail_limit": 3
+  },
+  {
+    "provider": "MLIT / SIGNATE",
+    "market": "JP",
+    "lane": "skill-competition",
+    "timezone": "Asia/Tokyo",
+    "permission_url": "https://www.mlit.go.jp/page/rssinfo.html",
+    "reviewed_on": "2026-11-26",
+    "linked_signate": true,
+    "prefer_linked": true,
+    "article_path": "/report/press/[a-zA-Z0-9_-]+\\.html",
+    "id": "mlit-signate-announcement",
+    "kind": "page",
+    "endpoint": "https://www.mlit.go.jp/report/press/tochi_fudousan_kensetsugyo17_hh_000001_00090.html",
+    "scope": "Official organizer announcement explicitly linking the SIGNATE contest."
   }
 ]
