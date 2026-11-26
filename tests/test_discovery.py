@@ -121,21 +121,25 @@ class TestDiscovery(unittest.TestCase):
             request = json.loads(body)
             self.assertFalse(request['store'])
             self.assertEqual(request['max_tool_calls'], 1)
-            self.assertEqual(request['tool_choice'], {'type': 'web_search'})
+            self.assertEqual(request['include'], ['web_search_call.action.sources'])
             self.assertIn(NOW.date().isoformat(), request['input'])
             requests.append(request['tools'][0]['user_location']['country'])
             citations = [{'type': 'url_citation', 'url': url} for url in (
                 'https://newhost.org/official/#rules', 'https://www.known.org/',
                 'https://127.0.0.1/private', 'https://other.org/?id=123')]
             return {'status': 'completed', 'output': [
-                {'type': 'web_search_call', 'status': 'completed', 'action': {'type': 'search'}},
+                {'type': 'web_search_call', 'status': 'completed', 'action': {'type': 'search', 'sources': [
+                    {'url': 'https://other.org/official/'}, {'url': 'https://m.facebook.com/contest/'},
+                    {'url': 'https://newhost.org/official/'}]}},
                 {'type': 'message', 'role': 'assistant', 'content': [
                     {'type': 'output_text', 'text': 'https://uncited.org/', 'annotations': citations}]}],
                 'usage': {'input_tokens': 50, 'output_tokens': 10}}
 
         result = discover_leads('mock-search-key', {'known.org'}, NOW.date(), send=send)
         self.assertEqual(result['status'], 'ok')
-        self.assertEqual(result['links'], [{'url':'https://newhost.org/official/', 'market':'JP', 'status':'review-source'}])
+        self.assertEqual(result['links'], [
+            {'url': 'https://newhost.org/official/', 'market': 'JP', 'status': 'review-source', 'basis': 'citation'},
+            {'url': 'https://other.org/official/', 'market': 'JP', 'status': 'review-source', 'basis': 'search-result'}])
         self.assertEqual(requests, ['JP', 'GB', 'US'])
         self.assertEqual(result['markets']['JP']['input_tokens'], 50)
 
