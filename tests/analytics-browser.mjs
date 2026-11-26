@@ -197,7 +197,7 @@ try {
       for (const path of ['', 'rewards/', 'opportunities/']) {
         await page.goto(origin + '/' + lang + '/' + path);
         const card = page.locator('[data-record="freecash"]');
-        const cardLink = card.locator('[data-analytics-click="affiliate_click"]');
+        const cardLink = card.locator('.sponsored-button[data-analytics-click="affiliate_click"]');
         assert.equal(await cardLink.getAttribute('href'),destination);
         assert.equal(await cardLink.getAttribute('target'),'_blank');
         assert.equal(await cardLink.getAttribute('rel'),'sponsored nofollow noopener noreferrer');

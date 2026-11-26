@@ -105,6 +105,7 @@ export const copy = {
     rate: '料率', duration: '期間（月）', threshold: '最低支払額', structure: '支払方式',
     safer: '申込み前に、提供元の最新条件とプライバシー方針をご確認ください。第三者の安全性、個人情報の取扱い、報酬の支払いを保証することはできません。',
     details: '詳細を見る', back: 'すべての掲載へ戻る', affiliateBack: '広告・提携情報へ戻る',
+    pageHistory: {label:'ページ履歴', back:'戻る', forward:'進む'},
     compare: '参加方法を比較する', compareLead: '公式資料をもとに、選考や換金条件の違いを確認できます。',
     legalContact: 'お問い合わせ先', copyright: '懸賞さんぽ',
     pages: {
@@ -256,6 +257,7 @@ export const copy = {
     commission: 'Published commission terms', rate: 'Rate', duration: 'Duration (months)', threshold: 'Payout threshold',
     structure: 'Structure', safer: 'Read the provider’s current terms and privacy policy before applying. Freebie Trail cannot guarantee a provider’s safety, handling of personal data, or payouts.',
     details: 'View details', back: 'Back to the directory', affiliateBack: 'Back to advertising and affiliate listings',
+    pageHistory: {label:'Page history', back:'Back', forward:'Forward'},
     compare: 'Compare ways to participate', compareLead: 'Use official-source facts to compare screening and redemption requirements.',
     legalContact: 'Contact', copyright: 'Freebie Trail',
     pages: {

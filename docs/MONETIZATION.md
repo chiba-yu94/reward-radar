@@ -53,7 +53,7 @@ The same approval gate covers Japanese and international partners. Set `affiliat
 
 Copy `data/revenue-example.json` to the Git-ignored `var/` directory or another private owner-controlled location. Run `python3 -m radar.revenue var/revenue-YYYY-MM.json`. Leave unmeasured figures null. Record page views, official-link clicks, affiliate clicks, verified conversions, actual receipts, fees and direct costs separately. Reconcile foreign receipts at the documented settlement rate or actual JPY received, and avoid deducting a fee twice. Track progress toward ¥5,000 per month in net receipts before personal income tax.
 
-For an account-issued image banner, record the original image URL and its dimensions under `affiliate_review.banner`. If the banner has a separate tracking URL on the same affiliate host, set it as `href` in the banner configuration. Each detail page shows the image once beside the disclosure. The build permits only the reviewed image hosts and loads the original image without third-party scripts or separate impression pixels.
+For an account-issued image banner, record the original image URL and its dimensions under `affiliate_review.banner`. If the banner has a separate tracking URL on the same affiliate host, set it as `href` in the banner configuration. The image appears beside the advertising disclosure on the listing detail and on sponsored service cards, including the homepage rewards preview. The build permits only the reviewed image hosts and loads the original image without third-party scripts or separate impression pixels.
 
 ## AdSense readiness
 

@@ -187,6 +187,10 @@ ${consent ? '<script type="module" src="/assets/analytics.mjs"></script>' : ''}<
 <body><a class="skip" href="#main">${t.skip}</a><header class="masthead"><div class="wrap header-inner${mastheadControl ? ' header-inner--residence' : ''}">
 <a href="${url(lang)}" class="brand">${brand(t.copyright)}</a>${switcher}${mastheadControl}
 <nav class="desktop-nav" aria-label="${e(t.navigation)}">${links(primary)}</nav><details class="site-menu"><summary>${t.menu}</summary><nav aria-label="${e(t.navigation)}">${links(primary)}</nav></details></div></header>
+<div class="history-controls" data-history-controls hidden><div class="wrap" role="group" aria-label="${e(t.pageHistory.label)}">
+<button type="button" aria-label="${e(t.pageHistory.back)}" title="${e(t.pageHistory.back)}">◀</button>
+<button type="button" aria-label="${e(t.pageHistory.forward)}" title="${e(t.pageHistory.forward)}">▶</button>
+</div></div>
 ${consent?.panel || ''}
 <main id="main" class="wrap"${page === '' ? ' itemscope itemtype="https://schema.org/WebSite"' : ''}>
 ${page === '' ? `<meta itemprop="name" content="${name}"><meta itemprop="url" content="${origin.origin}${current}"><meta itemprop="inLanguage" content="${lang}">
@@ -223,23 +227,33 @@ const compactCountries = (row, lang) => row.eligibility_verified && Array.isArra
 const sourceLabel = (link, row, t) => /withdrawal|cash.?out/.test(link) ? t.sourcePayout : /privacy/.test(link) ? t.sourcePrivacy : /partner-advertiser/.test(link) ? t.sourcePolicy : /terms|rules|kiyaku|about-site|iframeView/.test(link) ? t.sourceTerms : link === row.source_url ? row.provider + (row.category === 'sweepstakes' ? ' · ' + t.sourceTerms : '') : t.sourceGuide + ' · ' + new URL(link).hostname;
 
 
-function freecashCard(row, lang) {
+function sponsoredServiceCard(row, lang) {
   const t = copy[lang];
+  const freecash = row.id === 'freecash';
+  const title = freecash ? 'Freecash' : row['title_' + lang];
+  const summary = freecash ? t.freecashCardSummary : row['description_' + lang];
+  const cost = freecash ? t.freecashCardCost : t.expenses[row.required_expense.kind];
+  const conditions = freecash ? t.freecashCardConditions : row['eligibility_' + lang];
+  const details = freecash ? t.freecashCardDetails : t.details;
+  const disclosure = freecash ? t.freecashCardDisclosure : t.affiliateDisclosure;
+  const visit = freecash ? t.sponsoredVisit : t.visitOfficial;
+  const banner = row.affiliate_banner;
   return `<article class="card sponsored-card task-card" data-record="${e(row.id)}" data-deadline="${e(expiryValue(row))}" data-affiliate-expires="${e(row.affiliate_expires_at)}"${analytics ? ` data-analytics-entry="${e(row.id)}" data-analytics-category="${e(row.category)}"` : ''}>
-<div class="labels"><span>${t.taskRewards}</span><span class="sponsored-label">${t.sponsoredLabel}</span></div>
-<h3>Freecash</h3><p class="card-summary">${t.freecashCardSummary}</p>
-<p class="small card-conditions">${t.freecashCardCost}<br>${t.freecashCardConditions}</p>
+<div class="labels"><span>${e(taskService(row) ? t.taskRewards : t.categories[row.category])}</span><span class="sponsored-label">${t.sponsoredLabel}</span></div>
+<h3>${e(title)}</h3><p class="card-summary">${e(summary)}</p>
+<p class="small card-conditions">${e(cost)}<br>${e(conditions)}</p>
 ${freshnessNotice(row,lang)}
-<div class="card-footer"><div class="actions">${external(row.affiliate_url,t.sponsoredVisit,'affiliate_click','Freecash')}<a class="card-details" href="${detail(lang,row)}" aria-label="${e(t.freecashCardDetails + ' · Freecash')}">${t.freecashCardDetails}</a></div>
-<p class="stamp">${t.checked} · ${time(row.last_checked_at,lang)} · ${elapsed(row,lang)}</p><p class="small card-disclosure">${t.freecashCardDisclosure}</p></div></article>`;
+<div class="card-footer">${banner ? external(banner.href ?? row.affiliate_url,title,'affiliate_click','',banner) : ''}
+<div class="actions">${external(row.affiliate_url,visit,'affiliate_click',title)}<a class="card-details" href="${detail(lang,row)}" aria-label="${e(details + ' · ' + title)}">${e(details)}</a></div>
+<p class="stamp">${t.checked} · ${time(row.last_checked_at,lang)} · ${elapsed(row,lang)}</p><p class="small card-disclosure">${e(disclosure)}</p></div></article>`;
 }
 
 function card(row, lang, guideSource = '') {
-  if (row.id === 'freecash' && sponsoredLink(row)) return freecashCard(row,lang);
+  const affiliate = sponsoredLink(row);
+  if (affiliate && !guideSource && !row.commission) return sponsoredServiceCard(row,lang);
   const t = copy[lang];
   const title = row['title_' + lang];
   const sponsored = taskService(row);
-  const affiliate = sponsoredLink(row);
   const isDraw = row.category === 'sweepstakes';
   const group = sponsored ? t.taskRewards : row.prize_category ? t.prizes[row.prize_category] : t.categories[row.category];
   const heading = guideSource ? 'h4' : 'h3';
@@ -582,7 +596,7 @@ ${external(hapitasUrl,t.hapitas.cta,'affiliate_click')}
   const recentList = `<section class="section"><div class="section-heading"><h2>${t.recent}</h2><a href="${feedPath(lang)}">${e(t.rss.subscribe)}</a></div>
 <ul class="recent-list">${recent.map(row => `<li data-expiring="${e(expiryValue(row))}"><a href="${detail(lang,row)}">${e(row['title_' + lang])}</a>
 <span>${e(row.provider)}</span><span>${time(row.first_seen_at,lang)}</span></li>`).join('')}</ul></section>`;
-  const rewardsPreview = `<section class="section"><div class="section-heading"><h2><a href="${url(lang,'rewards')}#rewards-comparison">${t.pages.rewards[0]}</a></h2><p>${t.rewardsLead}</p></div><div class="cards">${['freecash','research-panel','prolific'].map(id => rewardRows.find(row => row.id === id)).filter(Boolean).map(row => card(row,lang)).join('')}</div></section>`;
+  const rewardsPreview = `<section class="section"><div class="section-heading"><h2><a href="${url(lang,'rewards')}#rewards-comparison">${t.pages.rewards[0]}</a></h2><p>${t.rewardsLead}</p></div><div class="cards">${['freecash','infoq','rakuten-insight','research-panel','prolific'].map(id => rewardRows.find(row => row.id === id)).filter(Boolean).map(row => card(row,lang)).join('')}</div></section>`;
   await page(lang,'',t.tagline,t.lead,`<section class="hero"><div class="hero-copy"><p class="eyebrow">${t.cap}</p><h1>${t.tagline}</h1><p class="lead">${t.lead}</p>
 <form class="home-search" role="search" action="${url(lang,'opportunities')}" method="get"><label class="sr-only" for="home-query">${t.search}</label><input id="home-query" type="search" name="q" maxlength="150" placeholder="${e(t.placeholder)}"><button type="submit">${t.searchSubmit}</button></form>
 <div class="home-shortcuts"><a href="${url(lang,'sweepstakes')}#no-sns-giveaways">${e(t.sweepstakesGuide.shortcut)}</a><a href="${url(lang,'sweepstakes')}?easyApply=yes">${t.application.easyApply}</a><a href="${url(lang,'international')}">${t.pages.international[0]}</a><a href="${url(lang,'quests')}">${e(t.pages.quests[0])}</a>${guideLocales.includes(lang) ? `<a href="${url(lang,'guides')}">${e(t.pages.guides[0])}</a>` : ''}</div></div></section>

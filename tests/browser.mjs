@@ -147,5 +147,25 @@ import assert from 'node:assert/strict';
       console.log(`${lang} at ${width}px: home, directory, details, affiliates, contact, filter and language switch passed`);
       await page.close();
     }
+
+    const app = await browser.newPage({viewport:{width:320,height:720},isMobile:true,hasTouch:true});
+    const toolbar = app.locator('[data-history-controls]');
+    const back = toolbar.getByRole('button',{name:'戻る'});
+    const forward = toolbar.getByRole('button',{name:'進む'});
+    const home = base + '/ja/';
+    const quests = home + 'quests/';
+    await app.goto(home);
+    assert.equal(await toolbar.isVisible(),false);
+    await app.addInitScript(() => Object.defineProperty(navigator,'standalone',{value:true}));
+    await app.reload();
+    await toolbar.waitFor({state:'visible'});
+    assert.equal(await back.isDisabled(),true);
+    assert.equal(await forward.isDisabled(),true);
+    await app.locator('.home-shortcuts a[href="/ja/quests/"]').click();
+    await app.waitForURL(quests);
+    await Promise.all([app.waitForURL(home),back.click()]);
+    await Promise.all([app.waitForURL(quests),forward.click()]);
+    await app.close();
+    console.log('Home Screen navigation: toolbar scope, back and forward passed');
   } finally { await browser.close(); }
 })().catch(error=>{console.error(error);process.exitCode=1;});

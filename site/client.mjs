@@ -16,6 +16,24 @@ document.addEventListener('keydown', event => {
 document.addEventListener('click', event => {
   if (menu?.open && !menu.contains(event.target)) menu.open = false;
 });
+
+const historyControls = document.querySelector('[data-history-controls]');
+if (historyControls && (navigator.standalone === true || matchMedia('(display-mode: standalone)').matches)) {
+  const [back, forward] = historyControls.querySelectorAll('button');
+  const navigation = window.navigation;
+  const updateHistoryControls = () => {
+    back.disabled = !(navigation?.canGoBack ?? (history.length > 1));
+    forward.disabled = !(navigation?.canGoForward ?? (history.length > 1));
+  };
+  back.addEventListener('click', () => history.back());
+  forward.addEventListener('click', () => history.forward());
+  navigation?.addEventListener('currententrychange', updateHistoryControls);
+  window.addEventListener('pageshow', updateHistoryControls);
+  window.addEventListener('popstate', updateHistoryControls);
+  updateHistoryControls();
+  historyControls.hidden = false;
+}
+
 function checkDates() {
   const now = Date.now();
   updateDates(document, now, lang);
