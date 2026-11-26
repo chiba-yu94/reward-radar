@@ -112,7 +112,7 @@ try {
         assert.equal(candidate.category,row.category,href);
         assert.equal(Boolean(candidate.commission),Boolean(row.commission),href);
         assert.equal(end,Number.isFinite(expiration(candidate)) ? new Date(expiration(candidate)).toISOString() : '',href);
-        assert.equal(affiliateEnd,candidate.category === 'affiliate' && !candidate.commission ? candidate.affiliate_expires_at : '',href);
+        assert.equal(affiliateEnd,candidate.affiliate_url ? candidate.affiliate_expires_at : '',href);
       }
     }
     if (path === `/${lang}/sweepstakes/`) {
@@ -145,6 +145,7 @@ try {
     await page.goto(origin + `/${lang}/`);
     const discovery = page.locator('head link[rel=alternate][type="application/rss+xml"]');
     assert.equal(await discovery.getAttribute('href'),feed);
+    await page.goto(origin + `/${lang}/recent/`);
     const [response] = await Promise.all([
       page.waitForResponse(origin + feed),
       page.locator(`main a[href="${feed}"]`).click(),
