@@ -413,6 +413,7 @@ function details(lang, row, calendar) {
     row.certainty === 'guaranteed' ? 'guaranteed' : 'rewards';
   const related = relatedListings(row);
   const affiliate = sponsoredLink(row);
+  const banner = row.affiliate_banner;
   const title = row['title_' + lang];
   const personal = values => e(values.length ? values.map(value => t.personal[value]).join(lang === 'ja' ? '、' : ', ') : t.noPersonal);
   const requirements = [
@@ -442,7 +443,7 @@ ${freshnessNotice(row,lang)}<p class="notice" data-ended hidden></p>
     ...(row.reward_amount !== null ? [[t.amount,e(amount(row,lang))]] : []),
 ])}${calendar}</section>
 <div class="entry-action${affiliate ? ' ad-action' : ''}" data-expiring="${e(expiryValue(row))}"${affiliate ? ` data-affiliate-expires="${e(row.affiliate_expires_at)}"` : ''}>
-${affiliate ? `<p class="ad-disclosure"><strong>${t.sponsoredLabel}</strong> · ${t.affiliateDisclosure}</p><div class="actions">${external(row.affiliate_url,row.affiliate_banner ? title : sponsored ? t.sponsoredVisit : t.sponsored,'affiliate_click','',row.affiliate_banner)}</div><p class="secondary-official"><a href="${e(row.official_url)}" target="_blank" rel="noopener noreferrer">${t.official}</a></p>` : `<div class="actions">${external(row.official_url,row.category === 'sweepstakes' ? t.officialNewTab : t.visitOfficial,row.commission ? null : 'application_click')}</div>`}
+${affiliate ? `<p class="ad-disclosure"><strong>${t.sponsoredLabel}</strong> · ${t.affiliateDisclosure}</p><div class="actions">${external(banner?.href ?? row.affiliate_url,banner ? title : sponsored ? t.sponsoredVisit : t.sponsored,'affiliate_click','',banner)}</div><p class="secondary-official"><a href="${e(row.official_url)}" target="_blank" rel="noopener noreferrer">${t.official}</a></p>` : `<div class="actions">${external(row.official_url,row.category === 'sweepstakes' ? t.officialNewTab : t.visitOfficial,row.commission ? null : 'application_click')}</div>`}
 </div>
 <div class="detail-body"><section><h2>${t.entryRequirements}</h2>
 ${row.entry.steps ? `<p>${e(row.entry.steps[lang])}</p>` : ''}${fields(requirements)}

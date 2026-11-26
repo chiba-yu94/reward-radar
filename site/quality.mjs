@@ -1,6 +1,6 @@
 import {timestamp} from './domain.mjs';
 
-const affiliateBannerHosts = new Set(['hbb.afl.rakuten.co.jp','infoq.jp']);
+const affiliateBannerHosts = new Set(['hbb.afl.rakuten.co.jp','infoq.jp','a.impactradius-go.com']);
 
 export function validatePublic(dataset, taxonomy, now) {
   const fail = message => {throw new Error(`Invalid public dataset: ${message}`);};
@@ -31,10 +31,11 @@ export function validatePublic(dataset, taxonomy, now) {
     }
     if (row.affiliate_url && (!Number.isFinite(timestamp(row.affiliate_expires_at)) || row.affiliate_approval_status !== 'approved')) fail(`${row.id}: affiliate approval`);
     if (row.affiliate_banner != null) {
-      const {src, width, height} = row.affiliate_banner;
-      let image;
-      try {image = new URL(src);} catch {fail(`${row.id}: affiliate banner`);}
+      const {src, width, height, href = row.affiliate_url} = row.affiliate_banner;
+      let image, link;
+      try {image = new URL(src); link = new URL(href);} catch {fail(`${row.id}: affiliate banner`);}
       if (!row.affiliate_url || image.protocol !== 'https:' || image.port || image.username || image.password ||
+          link.protocol !== 'https:' || link.port || link.username || link.password || link.hostname !== new URL(row.affiliate_url).hostname ||
           !affiliateBannerHosts.has(image.hostname) || [width,height].some(value=>!Number.isInteger(value) || value < 1 || value > 1200)) {
         fail(`${row.id}: affiliate banner`);
       }

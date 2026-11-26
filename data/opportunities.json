@@ -1781,6 +1781,12 @@
       "disclosure_reviewed": true,
       "commission_reviewed": true,
       "review_id": "fc-20261107-web",
+      "banner": {
+        "src": "https://a.impactradius-go.com/display-ad/22930-1914468",
+        "href": "https://freecash.pxf.io/c/8133010/1914468/22930",
+        "width": 1080,
+        "height": 900
+      },
       "expires_at": "2026-12-07T00:00:00Z",
       "promotion_countries": [
         "US",
