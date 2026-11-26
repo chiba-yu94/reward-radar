@@ -235,9 +235,9 @@ html[lang="en"] .masthead-residence { width:6.5rem; padding-left:.3rem; }
 /* Service cards share neutral surfaces; the advertising label identifies sponsorship. */
 .card.task-card { background:var(--page); border-color:var(--line); }
 .task-card .card-conditions { margin-bottom:1rem; }
-.task-card .affiliate-banner { margin-bottom:.75rem; }
-.task-card .card-footer .button { background:var(--accent); color:white; border-color:var(--accent); }
-.task-card .card-footer .button:hover { background:var(--accent-hover); }
+.task-card .affiliate-banner { max-width:min(100%,200px); margin-bottom:.55rem; }
+.task-card .affiliate-banner img { width:auto; max-height:112px; }
+.task-card .card-footer .button:hover { background:var(--accent-soft); border-color:var(--accent); }
 .task-card .card-details { display:inline-flex; align-items:center; min-height:44px; font-size:.8rem; }
 .task-card .card-disclosure { margin:.5rem 0 0; font-size:.8rem; }
 
