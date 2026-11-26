@@ -100,7 +100,7 @@ publish(rows, sources, {}, folder / 'published.json', folder / 'operations.sqlit
     writeFileSync(join(folder,'data/editorial.json'),JSON.stringify(content));
     build(cutoff - 1);
     const questPath = 'ja/quests/sample/index.html';
-    assert.match(read(questPath),/入賞者のみ賞金.*JPY.*銀行振込/s);
+    assert.match(read(questPath),/入賞者のみ賞金 · 10,000円.*銀行振込/s);
     assert.ok(read(questPath).includes('href="/ja/guides/"'));
     assert.ok(read('ja/quests/index.html').includes('href="/ja/quests/sample/"'));
     assert.doesNotMatch(read(questPath),/rel="alternate"|hreflang="en"/);
@@ -119,7 +119,7 @@ publish(rows, sources, {}, folder / 'published.json', folder / 'operations.sqlit
     assert.doesNotMatch(read('ja/quests/index.html'),/korezo-yamanashi-2026|freecash\.pxf\.io/);
     build(cutoff);
     assert.ok(exists(questPath));
-    assert.match(read(questPath),/受付終了/);
+    assert.match(read(questPath),/募集終了/);
     assert.doesNotMatch(read(questPath),/data-quest-listing|deadline\.ics/);
     assert.match(read('ja/quests/index.html'),/noindex, follow/);
     assert.doesNotMatch(read('ja/quests/index.html').split('data-quest-ended')[0],/quests\/sample/);
@@ -188,7 +188,7 @@ publish(rows, sources, {}, folder / 'published.json', folder / 'operations.sqlit
     build(timeeCutoff);
     for (const lang of ['ja','en']) {
       assert.ok(exists(lang + '/' + timeePath + 'index.html'));
-      assert.match(read(lang + '/' + timeePath + 'index.html'),/data-quest-ended-notice[^>]*>(受付終了|Entries closed)/);
+      assert.match(read(lang + '/' + timeePath + 'index.html'),/data-quest-ended-notice[^>]*>(募集終了|Entries closed)/);
       assert.doesNotMatch(read(lang + '/' + timeePath + 'index.html'),/data-quest-listing|deadline\.ics/);
       assert.ok(read(lang + '/' + timeePath + 'index.html').includes('href="https://note.com/info/n/n3cd095e43966"'));
       assert.equal(exists(lang + '/' + timeePath + 'deadline.ics'),false);

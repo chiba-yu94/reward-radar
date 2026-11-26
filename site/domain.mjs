@@ -158,7 +158,7 @@ export function money(amount, currency, lang, unknown) {
   if (amount === null) return unknown;
   if (!currency) return new Intl.NumberFormat(lang).format(amount);
   return new Intl.NumberFormat(lang === 'ja' ? 'ja-JP' : 'en', {
-    style: 'currency', currency, currencyDisplay: 'code',
+    style: 'currency', currency, currencyDisplay: lang === 'ja' && currency.toUpperCase() === 'JPY' ? 'name' : 'code',
   }).format(amount);
 }
 

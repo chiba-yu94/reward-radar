@@ -114,7 +114,7 @@ publish(rows, sources, {}, folder / 'published.json', folder / 'operations.sqlit
   const sitemap = await (await fetch(local + '/sitemap.xml')).text();
   for (const lang of ['ja','en']) {
     const archived = await (await fetch(local + href(lang))).text();
-    assert.match(archived,/data-quest-ended-notice[^>]+>(受付終了|Entries closed)/);
+    assert.match(archived,/data-quest-ended-notice[^>]+>(募集終了|Entries closed)/);
     assert.doesNotMatch(archived,/data-quest-listing|deadline\.ics/);
     assert.ok(archived.includes(fixtureBounty.official_url));
     const feed = await (await fetch(local + '/' + lang + '/feed.xml')).text();

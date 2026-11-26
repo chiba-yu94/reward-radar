@@ -60,7 +60,7 @@ test('only quest board footers offer a localized organizer email draft', () => {
     ja:{
       link:'主催者の方へ：掲載を相談する',
       note:'掲載可否の確認は無料です。掲載を保証するものではありません。',
-      subject:'クエスト掲示板への掲載相談',
+      subject:'公募・モニター募集の掲載相談',
       fields:['企画名','公式URL','応募条件','応募対象の国・地域','居住条件','締切日時とタイムゾーン','賞品','賞品の受け渡し方法'],
     },
     en:{
@@ -271,7 +271,8 @@ test('cached Japan guide hides stale items and restores its empty message before
 });
 
 test('currency, null and timezone behavior', () => {
-  assert.match(money(1000,'JPY','ja','unknown'), /1,000/);
+  assert.equal(money(1000,'JPY','ja','unknown'),'1,000円');
+  assert.match(money(1000,'JPY','en','unknown'), /JPY\s+1,000/);
   assert.match(money(7.5,'USD','en','unknown'), /USD.*7\.50/);
   assert.equal(money(null,'JPY','ja','unknown'),'unknown');
   assert.match(date('2026-11-05T18:00:00Z','ja',true), /6日.*03:00.*JST/);
