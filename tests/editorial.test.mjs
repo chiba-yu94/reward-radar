@@ -101,7 +101,7 @@ publish(rows, sources, {}, folder / 'published.json', folder / 'operations.sqlit
     build(cutoff - 1);
     const questPath = 'ja/quests/sample/index.html';
     assert.match(read(questPath),/入賞者のみ賞金 · 10,000円.*銀行振込/s);
-    assert.ok(read(questPath).includes('href="/ja/guides/"'));
+    assert.ok(!read(questPath).includes('href="/ja/guides/"'));
     assert.ok(read('ja/quests/index.html').includes('href="/ja/quests/sample/"'));
     assert.doesNotMatch(read(questPath),/rel="alternate"|hreflang="en"/);
     assert.match(read(questPath),/class="language"[^>]*href="\/en\/"/);
@@ -109,12 +109,13 @@ publish(rows, sources, {}, folder / 'published.json', folder / 'operations.sqlit
     assert.match(read('en/quests/index.html'),/noindex, follow/);
     const guide = 'guides/before-entering-a-creative-contest/';
     for (const lang of ['ja','en']) {
-      assert.ok(read(lang + '/' + guide + 'index.html').includes('href="/' + lang + '/quests/"'));
-      assert.ok(read(lang + '/guides/index.html').includes('href="/' + lang + '/' + guide + '"'));
+      assert.equal(exists(lang + '/' + guide + 'index.html'),false);
+      assert.equal(exists(lang + '/guides/index.html'),false);
+      assert.ok(!read(lang + '/index.html').includes('href="/' + lang + '/guides/"'));
+      assert.ok(!read(lang + '/quests/index.html').includes('href="/' + lang + '/guides/"'));
     }
-    assert.ok(read('ja/' + guide + 'index.html').includes('hreflang="en" href="' + canon + '/en/' + guide + '"'));
     assert.match(read('sitemap.xml'),/<loc>https:\/\/freebietrail\.com\/ja\/quests\/sample\/<\/loc><\/url>/);
-    assert.doesNotMatch(read('sitemap.xml'),/\/en\/quests\/|korezo-yamanashi-2026|private-draft/);
+    assert.doesNotMatch(read('sitemap.xml'),/\/en\/quests\/|\/guides\/|korezo-yamanashi-2026|private-draft/);
     assert.equal(exists('ja/guides/private-draft/index.html'),false);
     assert.doesNotMatch(read('ja/quests/index.html'),/korezo-yamanashi-2026|freecash\.pxf\.io/);
     build(cutoff);
@@ -146,7 +147,7 @@ publish(rows, sources, {}, folder / 'published.json', folder / 'operations.sqlit
       assert.ok(html.includes('<dd>' + genre + '</dd>'));
       assert.ok(read('sitemap.xml').includes('<loc>' + canon + '/' + localized + '</loc>'));
       assert.ok(exists(lang + '/quests/life-design-art-2026/index.html'));
-      assert.ok(exists(lang + '/' + guide + 'index.html'));
+      assert.equal(exists(lang + '/' + guide + 'index.html'),false);
     }
 
     const timee = content.quests.find(entry => entry.id === 'timee-note-work-contest-2026');

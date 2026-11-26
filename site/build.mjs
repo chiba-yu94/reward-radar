@@ -40,6 +40,7 @@ const now = process.env.QA_NOW ? Date.parse(process.env.QA_NOW) : Date.now();
 if (!Number.isFinite(now)) throw new Error('Invalid QA_NOW');
 validatePublic(dataset,JSON.parse(await readFile('data/taxonomy.json','utf8')),now);
 const editorial = publicEditorial(JSON.parse(await readFile('data/editorial.json','utf8')),now);
+const guideLocales = languages.filter(lang => editorial.guides.some(entry => entry.locales.includes(lang)));
 const rssDates = publicationDates(JSON.parse(await readFile('data/rss-publications.json','utf8')));
 const taskService = row => row.category === 'affiliate' && !row.commission;
 const sponsoredLink = row => row.affiliate_approval_status === 'approved' && row.affiliate_url &&
@@ -193,7 +194,7 @@ ${page === '' ? `<meta itemprop="name" content="${name}"><meta itemprop="url" co
 ${content}</main>
 <footer><div class="wrap foot-inner"><a href="${url(lang)}" class="brand">${brand(t.copyright)}</a>${organizerContact}
 <nav aria-label="${e(t.footerNavigation)}">${links(['contact','privacy','disclosure'])}</nav>
-<details class="footer-more"><summary>${e(t.footerMore)}</summary><nav aria-label="${e(t.footerMore)}">${links(['quests','guides','guaranteed','affiliates','ranking','about'])}${switcher}</nav></details>
+<details class="footer-more"><summary>${e(t.footerMore)}</summary><nav aria-label="${e(t.footerMore)}">${links(['quests',...(guideLocales.includes(lang) ? ['guides'] : []),'guaranteed','affiliates','ranking','about'])}${switcher}</nav></details>
 ${consent?.settings || ''}<p class="muted">© ${t.copyright}</p></div></footer></body></html>`;
 }
 
@@ -487,7 +488,7 @@ async function editorialPages(lang) {
   const any = ['',details.any];
   const intro = key => `<header class="intro"><h1>${e(t.pages[key][0])}</h1><p class="lead">${e(t.pages[key][1])}</p></header>`;
   const guideItems = guides.map(entry => `<li><h3>${link('guides/' + entry.id,entry.copy[lang].title)}</h3><p>${e(entry.copy[lang].description)}</p></li>`).join('');
-  const guideLinks = languages.filter(locale => editorial.guides.some(entry => entry.locales.includes(locale)));
+  const guidesLink = guides.length ? link('guides') : '';
   const questLinks = languages.filter(locale => editorial.quests.some(entry => entry.locales.includes(locale)));
   const card = entry => {
     const content = entry.copy[lang];
@@ -523,8 +524,10 @@ ${select('ai',details.ai,[any,['allowed',details.allowed],['required',details.re
 <details data-quest-ended${ended.length ? '' : ' hidden'}><summary>${e(q.ended)}</summary>
 <ul class="giveaway-list" data-quest-ended-list>${ended.map(card).join('')}</ul></details>
 <p data-quest-no-match hidden>${e(details.none)}</p></section>
-<p>${link('guides')}</p>`, quests.length > 0, '', questLinks.length ? questLinks : languages);
-  await page(lang,'guides',...t.pages.guides,`${intro('guides')}<ul class="giveaway-list">${guideItems}</ul><p>${link('quests')}</p>`, guides.length > 0, '', guideLinks.length ? guideLinks : languages);
+${guidesLink ? `<p>${guidesLink}</p>` : ''}`, quests.length > 0, '', questLinks.length ? questLinks : languages);
+  if (guides.length) {
+    await page(lang,'guides',...t.pages.guides,`${intro('guides')}<ul class="giveaway-list">${guideItems}</ul><p>${link('quests')}</p>`, true, '', guideLocales);
+  }
 
   for (const entry of [...quests,...ended]) {
     const content = entry.copy[lang];
@@ -551,7 +554,7 @@ ${closed ? '' : `<div ${expiry(entry)} data-quest-listing><p><a href="${e(entry.
 <p class="notice" data-quest-closed hidden>${e(q.closed)}</p>`}
 <p><a href="${e(rules)}" rel="noopener noreferrer">${e(q.rules)}</a></p>
 ${related.length ? `<section data-expiry-section><h2>${e(details.related)}</h2><ul data-expiry-list>${related.map(other => `<li ${expiry(other)}>${link('quests/' + other.id,other.copy[lang].title)}</li>`).join('')}</ul></section>` : ''}
-<p>${link('quests',details.back)} · ${link('guides')}</p></article>`, !closed, '', entry.locales);
+<p>${[link('quests',details.back),guidesLink].filter(Boolean).join(' · ')}</p></article>`, !closed, '', entry.locales);
   }
   for (const entry of guides) {
     const content = entry.copy[lang];
@@ -582,7 +585,7 @@ ${external(hapitasUrl,t.hapitas.cta,'affiliate_click')}
   const rewardsPreview = `<section class="section"><div class="section-heading"><h2><a href="${url(lang,'rewards')}#rewards-comparison">${t.pages.rewards[0]}</a></h2><p>${t.rewardsLead}</p></div><div class="cards">${['freecash','research-panel','prolific'].map(id => rewardRows.find(row => row.id === id)).filter(Boolean).map(row => card(row,lang)).join('')}</div></section>`;
   await page(lang,'',t.tagline,t.lead,`<section class="hero"><div class="hero-copy"><p class="eyebrow">${t.cap}</p><h1>${t.tagline}</h1><p class="lead">${t.lead}</p>
 <form class="home-search" role="search" action="${url(lang,'opportunities')}" method="get"><label class="sr-only" for="home-query">${t.search}</label><input id="home-query" type="search" name="q" maxlength="150" placeholder="${e(t.placeholder)}"><button type="submit">${t.searchSubmit}</button></form>
-<div class="home-shortcuts"><a href="${url(lang,'sweepstakes')}#no-sns-giveaways">${e(t.sweepstakesGuide.shortcut)}</a><a href="${url(lang,'sweepstakes')}?easyApply=yes">${t.application.easyApply}</a><a href="${url(lang,'international')}">${t.pages.international[0]}</a><a href="${url(lang,'quests')}">${e(t.pages.quests[0])}</a><a href="${url(lang,'guides')}">${e(t.pages.guides[0])}</a></div></div></section>
+<div class="home-shortcuts"><a href="${url(lang,'sweepstakes')}#no-sns-giveaways">${e(t.sweepstakesGuide.shortcut)}</a><a href="${url(lang,'sweepstakes')}?easyApply=yes">${t.application.easyApply}</a><a href="${url(lang,'international')}">${t.pages.international[0]}</a><a href="${url(lang,'quests')}">${e(t.pages.quests[0])}</a>${guideLocales.includes(lang) ? `<a href="${url(lang,'guides')}">${e(t.pages.guides[0])}</a>` : ''}</div></div></section>
 <section class="section featured"><div class="section-heading"><h2>${t.closing}</h2><a href="${url(lang,'sweepstakes')}">${t.browse} →</a></div>
 <div class="cards">${featured.length ? featured.map(row => card(row,lang)).join('') : `<p>${t.empty}</p>`}</div></section>
 ${genreLinks(lang,consumer)}${rewardsPreview}${recentList}${hapitasAd}`);

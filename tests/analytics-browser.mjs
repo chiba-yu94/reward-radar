@@ -148,13 +148,11 @@ try {
     await page.goto(guide + '?utm_source=review#no-sns-giveaways');
     await page.waitForFunction(() => window.analyticsTestTagLoaded === true);
     assert.equal((await queued()).find(args => args[1] === 'page_view')[2].page_location,guide);
-    for (const path of ['quests/','guides/before-entering-a-creative-contest/']) {
-      const editorial = `${origin}/${lang}/${path}`;
-      await page.goto(editorial);
-      await page.waitForFunction(() => window.analyticsTestTagLoaded === true);
-      assert.deepEqual((await queued()).filter(args => args[1] === 'page_view').map(args => args[2].page_location),[editorial]);
-      assert.equal(await page.locator('main [data-analytics-click]').count(),0);
-    }
+    const editorial = `${origin}/${lang}/quests/`;
+    await page.goto(editorial);
+    await page.waitForFunction(() => window.analyticsTestTagLoaded === true);
+    assert.deepEqual((await queued()).filter(args => args[1] === 'page_view').map(args => args[2].page_location),[editorial]);
+    assert.equal(await page.locator('main [data-analytics-click]').count(),0);
 
     const affiliatePage = origin + '/' + lang + '/opportunities/freecash/';
     if ((await page.goto(affiliatePage + '?utm_source=review')).status() === 200) {

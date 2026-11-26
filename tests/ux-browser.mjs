@@ -21,7 +21,7 @@ try {
     page.on('pageerror',error=>errors.push(error.message));
     page.on('console',message=>{if(message.type()==='error')errors.push(message.text())});
     const paths = [['home',''],['directory','opportunities/'],['sweepstakes','sweepstakes/'],['detail',`opportunities/${sampleDetail.id}/`],...(hasFreecash ? [['freecash','opportunities/freecash/']] : []),['rewards',phase==='before'?'affiliates/':'rewards/'],['contact','contact/'],['about','about/']];
-    if (phase !== 'before') paths.push(['quests','quests/'],['guides','guides/'],['guide','guides/before-entering-a-creative-contest/']);
+    if (phase !== 'before') paths.push(['quests','quests/']);
     for (const [name,path] of paths) {
       assert.equal((await page.goto(`${base}/${lang}/${path}`)).status(),200);
       if (name==='home' && await page.locator('.analytics-notice').isVisible()) {
@@ -43,15 +43,9 @@ try {
       await page.screenshot({path:`${out}/${phase}-${lang}-${width}-${name}.png`,fullPage:['detail','freecash','contact','about'].includes(name)});
     }
     if(phase!=='before') {
-      const guidePath = `${base}/${lang}/guides/before-entering-a-creative-contest/`;
       const questPath = `${base}/${lang}/quests/`;
       await page.goto(`${base}/${lang}/`);
       await page.locator(`.home-shortcuts a[href="/${lang}/quests/"]`).click();
-      assert.equal(page.url(),questPath);
-      await page.locator(`main a[href="/${lang}/guides/"]`).click();
-      await page.locator('main li a').first().click();
-      assert.equal(page.url(),guidePath);
-      await page.locator(`main a[href="/${lang}/quests/"]`).click();
       assert.equal(page.url(),questPath);
       await page.goto(`${base}/${lang}/`);
       const homeQuery = hasFreecash ? 'Freecash' : 'Prolific';
