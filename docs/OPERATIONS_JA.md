@@ -17,6 +17,8 @@ gh run download RUN_ID -n source-observation -D var/observations/RUN_ID
 
 候補収集は **Discover giveaway and skill-competition candidates** が毎日06:00（日本時間）に起動予定です。収集結果は GitHub Actions の成果物に保存されます。候補を掲載するには、応募条件を確認して掲載データに反映する必要があります。`gh run list --workflow discovery.yml` で実行を探し、`gh run download RUN_ID -n discovery-candidates -D var/discovery/RUN_ID` で候補を取得します。各媒体の結果は実行概要で見られます。取得失敗、認証未設定、巡回上限到達は、通常の候補0件と区別して確認します。ローカルでは `python3 -m radar.discovery` を使います。GitHub Education のリビジョンが変わった場合は、原文とリンク先を確認し、掲載への影響を判断してからレビュー済み識別子を更新します。手動ソースは30日以内に再確認します。掲載ページは古い確認に警告を表示し、日次の実行概要にも該当案件 ID が出ます。
 
+OpenAI検索の結果は同じ成果物の `source_leads` に入ります。定期検索を止めるにはリポジトリ変数 `FREEBIE_SOURCE_SEARCH_ENABLED` を `false` にします。手動で検索も実行するときは `gh workflow run discovery.yml --ref main -f include_source_search=true` を使います。日米英それぞれ1回まで検索し、再実行ボタンからの起動では検索を省きます。検索料とモデル料金の実績はOpenAIの専用プロジェクトで確認します。
+
 ## 本番の自動更新
 
 本番は [Freebie Trail](https://freebietrail.com/) です。日次実行は収集とテストを通過した静的成果物を Workers Free に配信します。期限を過ぎた通常の掲載はブラウザーで非表示になり、次回の成功したデプロイで詳細ページとサイトマップから外れます。承認済みクエストは同じ詳細URLに受付終了と公式出典を表示し、受付中一覧、サイトマップ、新着RSSから外れます。

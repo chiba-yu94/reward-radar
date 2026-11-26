@@ -3,6 +3,7 @@ import argparse
 import os
 from datetime import datetime, timezone
 from pathlib import Path
+from zoneinfo import ZoneInfo
 
 from .discovery_leads import discover_leads
 from .discovery_watch import collect, load_state
@@ -32,8 +33,9 @@ def main():
     report, state = collect(watch, reviewed, load_state(args.state), now,
                             kaggle_token=kaggle_token())
     if os.environ.get('FREEBIE_SOURCE_SEARCH_ENABLED') == 'true':
-        report['source_leads'] = discover_leads(os.environ.get('BRAVE_SEARCH_API_KEY'),
-                                               {https_url(row['endpoint']).hostname for row in watch})
+        report['source_leads'] = discover_leads(os.environ.get('OPENAI_API_KEY'),
+                                               {https_url(row['endpoint']).hostname for row in watch},
+                                               now.astimezone(ZoneInfo('Asia/Tokyo')).date())
     dump(args.output, report)
     dump(args.state, state)
     for key, result in report['feeds'].items():

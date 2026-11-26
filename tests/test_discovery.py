@@ -3,8 +3,9 @@ import unittest
 from datetime import datetime, timezone
 from unittest.mock import patch
 
-from radar.discovery_leads import ENDPOINT, discover_leads
+from radar.discovery_leads import discover_leads
 from radar.discovery_watch import KAGGLE, MAKEFUN, collect, feed_rows
+from radar.net import UpstreamHTTPError
 
 NOW = datetime(2026, 11, 26, 9, tzinfo=timezone.utc)
 HOST = 'www.pref.saitama.lg.jp'
@@ -115,18 +116,40 @@ class TestDiscovery(unittest.TestCase):
     def test_search_returns_review_leads_without_fetching_result_urls(self):
         requests = []
 
-        def fetch(url, allowed, types, headers):
-            self.assertEqual(url, allowed)
-            self.assertTrue(url.startswith(ENDPOINT + '?'))
-            self.assertEqual(headers, {'X-Subscription-Token': 'mock-search-key'})
-            requests.append(url)
-            return json.dumps({'web': {'results': [{'url':'https://newhost.org/official/'},
-                {'url':'https://known.org/'}, {'url':'https://127.0.0.1/private'},
-                {'url':'https://other.org/?id=123'}]}}).encode()
+        def send(body, token):
+            self.assertEqual(token, 'mock-search-key')
+            request = json.loads(body)
+            self.assertFalse(request['store'])
+            self.assertEqual(request['max_tool_calls'], 1)
+            self.assertEqual(request['tool_choice'], {'type': 'web_search'})
+            self.assertIn(NOW.date().isoformat(), request['input'])
+            requests.append(request['tools'][0]['user_location']['country'])
+            citations = [{'type': 'url_citation', 'url': url} for url in (
+                'https://newhost.org/official/#rules', 'https://www.known.org/',
+                'https://127.0.0.1/private', 'https://other.org/?id=123')]
+            return {'status': 'completed', 'output': [
+                {'type': 'web_search_call', 'status': 'completed'},
+                {'type': 'message', 'role': 'assistant', 'content': [
+                    {'type': 'output_text', 'text': 'https://uncited.org/', 'annotations': citations}]}],
+                'usage': {'input_tokens': 50, 'output_tokens': 10}}
 
-        result = discover_leads('mock-search-key', {'known.org'}, fetch=fetch)
+        result = discover_leads('mock-search-key', {'known.org'}, NOW.date(), send=send)
+        self.assertEqual(result['status'], 'ok')
         self.assertEqual(result['links'], [{'url':'https://newhost.org/official/', 'market':'JP', 'status':'review-source'}])
-        self.assertEqual(len(requests), 4)
+        self.assertEqual(requests, ['JP', 'GB', 'US'])
+        self.assertEqual(result['markets']['JP']['input_tokens'], 50)
+
+    def test_search_quota_failure_stops_before_other_markets(self):
+        calls = []
+
+        def send(body, token):
+            calls.append(token)
+            raise UpstreamHTTPError(429)
+
+        result = discover_leads('mock-search-key', set(), NOW.date(), send=send)
+        self.assertEqual(result['status'], 'failed')
+        self.assertEqual(result['markets'], {'JP': {'status': 'http-error', 'http_status': 429}})
+        self.assertEqual(calls, ['mock-search-key'])
 
     def test_platforms_exclude_closed_and_unrewarded_rows_and_do_not_leak_auth(self):
         sources = [source('make', 'makefun', MAKEFUN), source('kaggle', 'kaggle', KAGGLE)]

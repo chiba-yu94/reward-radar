@@ -3,6 +3,11 @@ on:
   schedule:
     - cron: '0 21 * * *' # 06:00 JST (UTC+9)
   workflow_dispatch:
+    inputs:
+      include_source_search:
+        description: Run OpenAI web search as well as the usual source checks
+        type: boolean
+        default: false
 permissions:
   contents: read
   actions: read
@@ -12,6 +17,7 @@ concurrency:
 jobs:
   discover:
     if: github.ref == 'refs/heads/main'
+    environment: freebie-trail-api
     runs-on: ubuntu-24.04
     timeout-minutes: 10
     steps:
@@ -37,8 +43,8 @@ jobs:
       - name: Collect public candidate metadata
         env:
           KAGGLE_DISCOVERY_TOKEN: ${{ secrets.KAGGLE_DISCOVERY_TOKEN }}
-          BRAVE_SEARCH_API_KEY: ${{ secrets.BRAVE_SEARCH_API_KEY }}
-          FREEBIE_SOURCE_SEARCH_ENABLED: ${{ vars.FREEBIE_SOURCE_SEARCH_ENABLED }}
+          FREEBIE_SOURCE_SEARCH_ENABLED: ${{ vars.FREEBIE_SOURCE_SEARCH_ENABLED == 'true' && github.run_attempt == 1 && (github.event_name == 'schedule' || inputs.include_source_search == true) }}
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
         run: '"$RUNNER_TEMP/freebietrail-discovery/bin/python" -m radar.discovery'
       - name: Summarize sources and candidate counts
         if: always()
@@ -53,6 +59,11 @@ jobs:
               print('| Source | Status | Candidates | Bounded scan |\n|---|---|---|---|')
               for key, row in data['feeds'].items():
                   print(f"| {key} | {row['status']} | {row.get('matches', '—')} | {'More items available' if row.get('truncated') else '—'} |")
+              if 'source_leads' in data:
+                  search = data['source_leads']
+                  print(f"\n### OpenAI web search · {search['status']} · {len(search['links'])} links")
+                  for market, result in search.get('markets', {}).items():
+                      print(f"- {market}: {result['status']} ({result.get('http_status', result.get('links', '—'))})")
           PY
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
         if: always()
