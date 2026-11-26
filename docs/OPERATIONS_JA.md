@@ -2,7 +2,7 @@
 
 ## 日次確認
 
-GitHub Actions の **Collect and publish** は UTC 20:23（日本時間 05:23）に予定しています。既定ブランチ main のコードを GitHub ホストの Ubuntu で実行します。混雑で遅延・省略される場合があります。公開リポジトリは活動がない期間が続くと予定実行が停止する場合があります。リポジトリに不要なコミットを入れず、Actions の実行日時と有効状態を確認してください。
+GitHub Actions の **Collect and publish** は毎日07:30（日本時間、UTC 22:30）に起動予定です。サイトとRSSはビルドと検証の後に公開します。既定ブランチ main のコードを GitHub ホストの Ubuntu で実行します。混雑で遅延・省略される場合があります。公開リポジトリは活動がない期間が続くと予定実行が停止する場合があります。リポジトリに不要なコミットを入れず、Actions の実行日時と有効状態を確認してください。
 
 ```sh
 gh run list --workflow publish.yml --limit 10

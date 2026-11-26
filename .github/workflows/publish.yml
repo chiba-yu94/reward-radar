@@ -1,7 +1,7 @@
 name: Collect and publish
 on:
   schedule:
-    - cron: '23 20 * * *'
+    - cron: '30 22 * * *' # 07:30 JST (UTC+9)
   workflow_dispatch:
 permissions:
   contents: read
