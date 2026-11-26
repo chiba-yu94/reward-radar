@@ -833,7 +833,7 @@
     "deadline": null,
     "official_url": "https://www.cue-monitor.jp/entry/pre_agree.html?kr=29&sc=169721",
     "affiliate_url": null,
-    "affiliate_approval_status": "pending",
+    "affiliate_approval_status": "none",
     "source_url": "https://www.cue-monitor.jp/entry/pre_agree.html?kr=29&sc=169721",
     "source_permission_status": "editorial-summary",
     "first_seen_at": "2026-11-05T06:19:00Z",
@@ -843,7 +843,7 @@
       "third-party-id",
       "account"
     ],
-    "published_status": "approved",
+    "published_status": "withdrawn",
     "language": "ja",
     "certainty": "guaranteed",
     "redemption_difficulty": null,
