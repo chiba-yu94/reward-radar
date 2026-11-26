@@ -354,7 +354,8 @@ def publish(rows, sources, observation, output, database, now):
             db.execute("INSERT OR REPLACE INTO opportunities VALUES (?, ?)",
                        (row["id"], json.dumps(row, ensure_ascii=False)))
             if not (source["active"] and row["published_status"] == "approved"
-                    and row["verification_status"] == "verified"):
+                    and row["verification_status"] == "verified"
+                    and row["affiliate_approval_status"] in {"none", "approved"}):
                 continue
             expired = row.get("availability") == "ended" or (deadline_end(row) is not None and deadline_end(row) <= now)
             if expired or (row["category"] != "affiliate" and not consumer_public(row)):
@@ -376,10 +377,8 @@ def publish(rows, sources, observation, output, database, now):
             if row["affiliate_approval_status"] == "approved":
                 expiry = row["affiliate_review"]["expires_at"]
                 if stamp(expiry) <= now:
-                    public["affiliate_url"] = None
-                    public["affiliate_approval_status"] = "revoked"
-                else:
-                    public["affiliate_expires_at"] = expiry
+                    continue
+                public["affiliate_expires_at"] = expiry
             if row["category"] == "affiliate" and row["commission"] is None and not public["affiliate_url"]:
                 continue
             approved.append(public)

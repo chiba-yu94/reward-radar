@@ -156,6 +156,23 @@ class TestPipeline(unittest.TestCase):
         record["affiliate_approval_status"] = "pending"
         self.assertNotIn("freecash", self.run_publish())
 
+    def test_survey_does_not_publish_without_active_affiliate_approval(self):
+        self.assertIn(self.record["id"], self.run_publish())
+        for status in ("pending", "revoked"):
+            with self.subTest(status=status):
+                self.record["affiliate_approval_status"] = status
+                self.assertNotIn(self.record["id"], self.run_publish())
+        link = "https://example.com/partner-link"
+        expiry = self.now + timedelta(days=1)
+        self.record.update(affiliate_approval_status="approved", affiliate_url=link, affiliate_review={
+            "approved_url": link, "channel": "reward-radar-website", "destination_reviewed": self.record["official_url"],
+            "territory_reviewed": True, "disclosure_reviewed": True, "commission_reviewed": True,
+            "review_id": "fixture-review", "expires_at": utc(expiry),
+        })
+        self.assertIn(self.record["id"], self.run_publish())
+        self.now = expiry
+        self.assertNotIn(self.record["id"], self.run_publish())
+
     def test_redirect_rejected_without_a_second_connection(self):
         with patch("radar.net.PinnedHTTPS") as tls:
             tls.return_value.getresponse.return_value.status = 302

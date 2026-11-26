@@ -19,6 +19,7 @@ try {
   assert.equal(robot,`User-agent: *\nAllow: /\nSitemap: ${canonical}/sitemap.xml\n`);
   const {records, generated_at} = await (await get('/opportunities.json')).json();
   const now = Date.parse(generated_at);
+  const sampleRecord = records.find(row => row.category !== 'affiliate');
   const details = new Map(records.map(row => [row.id,row]));
   const entries = await page.evaluate(sitemap => Array.from(new DOMParser().parseFromString(sitemap,'application/xml').querySelectorAll('url'))
     .map(entry => ({url:entry.querySelector('loc').textContent,
@@ -170,7 +171,7 @@ try {
     }
     for (const retired of ['rakuten-app-draw','does-not-exist'])
       assert.equal((await context.request.get(origin + '/' + lang + '/opportunities/' + retired + '/')).status(),404);
-    for (const [route, queryString] of [['opportunities/','q=example'],['opportunities/prolific/','utm_source=review'],['sweepstakes/','webOnly=yes']]) {
+    for (const [route, queryString] of [['opportunities/','q=example'],[`opportunities/${sampleRecord.id}/`,'utm_source=review'],['sweepstakes/','webOnly=yes']]) {
       const path = `/${lang}/${route}`;
       const query = await get(path + '?' + queryString);
       assert.equal(query.headers()['x-robots-tag'],'noindex, follow',path);
