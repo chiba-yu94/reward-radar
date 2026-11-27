@@ -52,7 +52,7 @@ export function renderFeed({lang, origin, now, rows, quests, dates, copy, deadli
     .filter(({published}) => Number.isFinite(published) && published <= now && published >= now - maxAge)
     .sort((a,b) => b.published - a.published || a.key.localeCompare(b.key))
     .slice(0,maxItems).map(({key,row,title,eligibility,steps,zone,published}) => {
-      const link = `${origin}/${lang}/${key}/`;
+      const link = `${origin}/${lang}/opportunities/${row.id}/`;
       const description = [summary(eligibility,145),summary(steps,135)];
       if (row.deadline) {
         description.push(deadlineLabel + ' · ' + date(row.deadline,lang,!row.deadline_date_only,zone));

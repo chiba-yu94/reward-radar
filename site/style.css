@@ -244,14 +244,4 @@ html[lang="en"] .masthead-residence { width:6.5rem; padding-left:.3rem; }
 .task-card .actions { margin-bottom:.45rem; }
 .task-card .card-disclosure { margin:.5rem 0 0; font-size:.8rem; }
 
-.quest-filters { margin: 0 0 1rem; padding: .9rem; border: 1px solid var(--line); border-radius: .65rem; }
-.quest-filter-fields { display: grid; grid-template-columns: 1fr; gap: .65rem; align-items: end; }
-.quest-filter-fields label { display: grid; gap: .25rem; min-width: 0; }
-.quest-filter-fields label:has([type="checkbox"]) { display: flex; align-items: center; }
-.quest-filter-fields :is(select, input:not([type="checkbox"])) { width: 100%; min-height: 2.75rem; min-width: 0; }
-.quest-filters details { margin: .65rem 0; }
-.quest-filters details .quest-filter-fields { margin-top: .55rem; }
-[data-quest-ended] { margin-top: 1rem; }
-@media (min-width: 40rem) {
-  .quest-filter-fields { grid-template-columns: repeat(auto-fit, minmax(10rem, 1fr)); }
-}
+[data-archive] { margin-top: 1rem; }

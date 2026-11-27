@@ -69,26 +69,26 @@ test('new listings live on their own page in first-seen order', () => {
   }
 });
 
-test('only quest board footers offer a localized organizer email draft', () => {
+test('only main directory footers offer a localized organizer email draft', () => {
   const expected = {
     ja:{
       link:'主催者の方へ：掲載を相談する',
       note:'掲載可否の確認は無料です。掲載を保証するものではありません。',
-      subject:'公募・モニター募集の掲載相談',
+      subject:'案件の掲載相談',
       fields:['企画名','公式URL','応募条件','応募対象の国・地域','居住条件','締切日時とタイムゾーン','賞品','賞品の受け渡し方法'],
     },
     en:{
       link:'Organizers: Ask about a listing',
       note:'We review submissions for free. Listing is not guaranteed.',
-      subject:'Quest board listing inquiry',
+      subject:'Opportunity listing inquiry',
       fields:['Campaign name','Official URL','Entry requirements','Eligible countries or regions','Residency requirements','Deadline date, time and time zone','Prizes','How you deliver the prizes'],
     },
   };
   const files = readdirSync('dist',{recursive:true}).filter(file => file.endsWith('.html'));
   const withDraft = files.filter(file => read(file).includes('mailto:' + email + '?'));
-  assert.deepEqual(withDraft.sort(),['en/quests/index.html','ja/quests/index.html']);
+  assert.deepEqual(withDraft.sort(),['en/opportunities/index.html','ja/opportunities/index.html']);
   for (const [lang, text] of Object.entries(expected)) {
-    const html = read(lang + '/quests/index.html');
+    const html = read(lang + '/opportunities/index.html');
     const footer = html.match(/<footer>[\s\S]*?<\/footer>/)[0];
     const drafts = [...footer.matchAll(/<a href="(mailto:[^"]+\?[^"]+)">([^<]+)<\/a>/g)];
     assert.equal(drafts.length,1);

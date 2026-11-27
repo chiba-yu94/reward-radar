@@ -46,8 +46,14 @@ function translations(entry, fields) {
   return languages.filter(lang => locales.includes(lang));
 }
 
-export function publicEditorial(input, now) {
-  const reviewedQuests = approved(input.quests, ['candidate','closed']).filter(quest => {
+export function publicEditorial(input, now, wasPublished = () => false) {
+  requireEditorial(Array.isArray(input.quests), 'expected a list');
+  const historic = input.quests.map(quest => {
+    if (!quest) return quest;
+    const closed = quest.status === 'closed' && wasPublished(quest.id);
+    return {...quest, status:closed ? 'approved' : quest.status, closed};
+  });
+  const reviewedQuests = approved(historic, ['candidate','closed']).filter(quest => {
     const end = expiration(quest);
     const residence = quest.review?.japan_eligible;
     requireEditorial(Object.hasOwn(rewardTypes,quest.type) && rewardTypes[quest.type].includes(quest.reward?.kind) &&
@@ -56,7 +62,7 @@ export function publicEditorial(input, now) {
     quest.id + ': task or reward');
     requireEditorial(Number.isFinite(end) && (quest.deadline_date_only === undefined || typeof quest.deadline_date_only === 'boolean') &&
       Number.isFinite(timestamp(quest.last_checked_at)) &&
-      quest.review?.accepting === true && (residence === true || residence === 'not-stated') &&
+      (quest.closed || quest.review?.accepting === true) && (residence === true || residence === 'not-stated') &&
       quest.review?.no_upfront_cost === true && quest.review?.payment_verified === true &&
       https(quest.official_url) && https(quest.review.evidence_url),
     quest.id + ': open period, eligibility, cost, payment or source');
@@ -75,13 +81,15 @@ export function publicEditorial(input, now) {
         Number.isFinite(reviewedAt) && reviewedAt < end,
       quest.id + ': skill bounty conditions or editorial review');
     }
-    return timestamp(quest.last_checked_at) <= now &&
-      (end <= now || freshness(quest,now).state === 'fresh');
+    return timestamp(quest.last_checked_at) <= now;
   }).map(quest => ({...quest, locales:translations(quest,
     ['title','description','task','eligibility','expenses','reward_terms','payment','organizer'])}))
     .sort((a,b) => expiration(a) - expiration(b) || a.id.localeCompare(b.id));
-  const quests = reviewedQuests.filter(quest => expiration(quest) > now);
-  const endedQuests = reviewedQuests.filter(quest => expiration(quest) <= now).reverse();
+  const ended = quest => quest.closed || expiration(quest) <= now;
+  const quests = reviewedQuests.filter(quest => !ended(quest) && freshness(quest,now).state === 'fresh');
+  const endedQuests = reviewedQuests.filter(ended).reverse();
+  const staleQuests = reviewedQuests.filter(quest => !ended(quest) && freshness(quest,now).state === 'stale'
+    && wasPublished(quest.id));
 
   const guides = approved(input.guides, ['draft']).map(guide => {
     const locales = translations(guide,['title','description','source_label']);
@@ -93,5 +101,5 @@ export function publicEditorial(input, now) {
       }), guide.id + ': source, date or sections');
     return {...guide, locales};
   });
-  return {quests, endedQuests, guides};
+  return {quests, endedQuests, staleQuests, guides};
 }

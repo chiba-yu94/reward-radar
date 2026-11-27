@@ -50,7 +50,7 @@ publish(rows, sources, {}, folder / 'published.json', folder / 'operations.sqlit
   await once(server,'listening');
   const local = 'http://127.0.0.1:' + server.address().port;
   browser = await chromium.launch({channel:'chrome',headless:true});
-  const href = lang => '/' + lang + '/quests/' + fixtureBounty.id + '/';
+  const href = lang => '/' + lang + '/opportunities/' + fixtureBounty.id + '/';
   const feedItem = lang => 'https://freebietrail.com' + href(lang);
   const rssIdentities = new Map();
   const identity = async lang => {
@@ -72,24 +72,24 @@ publish(rows, sources, {}, folder / 'published.json', folder / 'operations.sqlit
     page.on('pageerror',error => errors.push(error.message));
     await page.clock.install({time:new Date(now)});
     await page.goto(local + '/' + lang + '/');
-    await page.locator('.home-shortcuts a[href="/' + lang + '/quests/"]').click();
-    const form = page.locator('#quest-filters');
+    await page.locator('.home-shortcuts a[href="/' + lang + '/opportunities/"]').click();
+    const form = page.locator('#filters[aria-busy=false]');
     await form.waitFor({state:'visible'});
-    const card = page.locator('[data-quest-card]').filter({has:page.locator('a[href="' + href(lang) + '"]')});
+    const card = page.locator('[data-editorial]').filter({has:page.locator('a[href="' + href(lang) + '"]')});
     assert.ok(await card.isVisible());
     assert.match(await card.textContent(), lang === 'ja' ? /入賞者のみ賞金/ : /Prize for winners only/);
     await form.locator('[name=q]').fill('absent-result-1024');
-    assert.ok(await page.locator('[data-quest-no-match]').isVisible());
-    assert.equal(await page.locator('[data-quest-count] span').textContent(),'0');
+    assert.ok(await page.locator('[data-empty]').isVisible());
+    assert.equal(await page.locator('#result-count').textContent(),'0');
     await form.locator('[type=reset]').click();
-    await form.locator('[name=genre]').selectOption('skill-bounty');
     await form.locator('summary').click();
-    await form.locator('[name=free]').check();
+    await form.locator('[name=category]').selectOption('skill-bounty');
+    await form.locator('[name=freeEntry]').check();
     await form.locator('[name=sns]').selectOption('false');
     await form.locator('[name=ai]').selectOption('allowed');
     await form.locator('[name=by]').fill('2026-11-26');
     assert.ok(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth));
-    assert.equal(await page.locator('[data-quest-count] span').textContent(),'1');
+    assert.equal(await page.locator('#result-count').textContent(),'1');
     await card.getByRole('link').click();
     assert.equal(new URL(page.url()).pathname,href(lang));
     assert.ok(await page.locator('link[rel=canonical]').getAttribute('href') === 'https://freebietrail.com' + href(lang));
@@ -104,11 +104,16 @@ publish(rows, sources, {}, folder / 'published.json', folder / 'operations.sqlit
     assert.equal(await page.locator('a[href$="deadline.ics"]').isVisible(),false);
     assert.ok(await page.locator('main a[href="' + fixtureBounty.official_url + '"]').last().isVisible());
     await page.goBack();
+    await form.waitFor({state:'visible'});
+    const advanced = form.locator('details');
+    if (!await form.locator('[name=status]').isVisible()) {
+      await advanced.locator('summary').click();
+    }
     await form.locator('[name=status]').selectOption('ended');
     assert.ok(await card.isVisible());
     assert.deepEqual(errors,[]);
     await page.close();
-    console.log(`quest board: ${lang}, ${width}px, search, open and ended details, filters and no overflow`);
+    console.log(`opportunity directory: ${lang}, ${width}px, search, open and ended details, filters and no overflow`);
   }
   build(cutoff);
   const sitemap = await (await fetch(local + '/sitemap.xml')).text();

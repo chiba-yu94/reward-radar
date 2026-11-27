@@ -32,7 +32,7 @@ export const copy = {
       names:{review:'商品レビューを書く', form:'フォーム入力', 'read-issue':'広報誌を確認', quiz:'クイズに回答', survey:'アンケートに回答', email:'メール送信', 'email-verify':'メール認証', register:'登録', follow:'フォロー', repost:'リポスト', like:'いいね', comment:'コメント', 'create-post':'新規投稿', 'quote-post':'引用投稿', 'link-accounts':'アカウント連携'}},
     sweepstakesGuide: {
       title:'SNS不要・無料でWeb応募できる懸賞', shortcut:'SNS不要・無料で応募できる懸賞',
-      excerpt:'上の懸賞一覧から、この条件に合う掲載を抜粋しています。', allListings:'全件表示（ポイ活なども含む）',
+      excerpt:'上の懸賞一覧から、この条件に合う掲載を抜粋しています。', allListings:'すべての掲載（公募・ポイ活など）',
       residence:'居住国', anyResidence:'居住国',
       japan:'日本在住者が応募できる懸賞', japanEmpty:'現在、日本在住者の応募条件と受付中であることを確認できる掲載はありません。',
       other:'そのほかの懸賞（応募条件を確認）', source:'公式の確認元',
@@ -49,7 +49,7 @@ export const copy = {
       organizerContact:{
         link:'主催者の方へ：掲載を相談する',
         note:'掲載可否の確認は無料です。掲載を保証するものではありません。',
-        subject:'公募・モニター募集の掲載相談',
+        subject:'案件の掲載相談',
         fields:['企画名','公式URL','応募条件','応募対象の国・地域','居住条件','締切日時とタイムゾーン','賞品','賞品の受け渡し方法'],
       },
       noUpfront:'応募時の前払い・入金不要', closed:'現在、この募集は掲載対象外です。', ended:'募集終了', upTo:'最高',
@@ -109,10 +109,9 @@ export const copy = {
     compare: '参加方法を比較する', compareLead: '公式資料をもとに、選考や換金条件の違いを確認できます。',
     legalContact: 'お問い合わせ先', copyright: '懸賞さんぽ',
     pages: {
-      quests:['公募・モニター募集','作品公募、有償インタビュー、ユーザーテストの募集情報を掲載しています。応募は各主催者の公式ページから行います。'],
       guides:['応募ガイド','募集要項の読み方や、作品を提出する前に確かめたいことをまとめています。'],
       rewards: ['ポイ活・タスク報酬', '日本から参加できるアンケートや有償調査を比較。参加費、ポイント交換・出金の条件と、ゲーム案件の購入や課金の有無を確認できます。'],
-      opportunities: ['すべての掲載', '懸賞・プレゼント、アンケート、ポイ活・タスク報酬をまとめて探せます。'],
+      opportunities: ['すべての掲載', '懸賞・プレゼント、作品公募、アンケートや有償調査をまとめて探せます。応募条件、報酬、締切は各詳細で確認できます。'],
       recent: ['新着', '直近30日間に初めて確認した掲載を、新しい順に表示します。'],
       sweepstakes: ['懸賞・プレゼント', '日本在住者が応募できる、SNS不要・無料のWeb懸賞を探せます。締切、会員登録の要否、公式の応募条件を確認できます。'],
       guaranteed: ['条件達成の特典', '条件を満たすと付与される特典です。金額、交換方法、必要な費用は詳細ページに記載します。'],
@@ -184,7 +183,7 @@ export const copy = {
       names:{review:'Write a product review', form:'Fill out a form', 'read-issue':'Read the newsletter', quiz:'Answer the quiz', survey:'Complete the survey', email:'Send an email', 'email-verify':'Verify your email', register:'Register', follow:'Follow', repost:'Repost', like:'Like', comment:'Comment', 'create-post':'Create a post', 'quote-post':'Quote-post', 'link-accounts':'Link accounts'}},
     sweepstakesGuide: {
       title:'Free online giveaways with no social media required', shortcut:'Online giveaways without social media',
-      excerpt:'These listings from the directory above match those entry requirements.', allListings:'All listings, including surveys and rewards',
+      excerpt:'These listings from the directory above match those entry requirements.', allListings:'All listings, including competitions, surveys and rewards',
       residence:'Country of residence', anyResidence:'Residence',
       japan:'Giveaways open to Japan residents', japanEmpty:'No listings currently have both Japan residency eligibility and open entry confirmed.',
       other:'Other giveaways: check the entry rules', source:'Official source',
@@ -201,7 +200,7 @@ export const copy = {
       organizerContact:{
         link:'Organizers: Ask about a listing',
         note:'We review submissions for free. Listing is not guaranteed.',
-        subject:'Quest board listing inquiry',
+        subject:'Opportunity listing inquiry',
         fields:['Campaign name','Official URL','Entry requirements','Eligible countries or regions','Residency requirements','Deadline date, time and time zone','Prizes','How you deliver the prizes'],
       },
       noUpfront:'No upfront payment or deposit to apply', closed:'This opportunity is no longer listed as open.', ended:'Entries closed', upTo:'up to',
@@ -262,10 +261,9 @@ export const copy = {
     compare: 'Compare ways to participate', compareLead: 'Use official-source facts to compare screening and redemption requirements.',
     legalContact: 'Contact', copyright: 'Freebie Trail',
     pages: {
-      quests:['Quest board','Find paid interviews, user tests and creative calls. Check residency eligibility, deadlines and rewards before visiting the organizer.'],
       guides:['Application guides','Read how to check an organizer’s rules and prepare your work before submitting it.'],
       rewards: ['Rewards', 'Compare surveys and paid research available in Japan. Check entry costs, redemption or cashout terms, and whether game tasks may require spending.'],
-      opportunities: ['All opportunities', 'Search giveaways, surveys and task rewards by country and entry requirements.'],
+      opportunities: ['All opportunities', 'Find giveaways, creative competitions, surveys and paid studies. Check who can enter, how rewards are awarded and when entries close.'],
       recent: ['New listings', 'Browse listings first verified in the last 30 days, newest first.'],
       sweepstakes: ['Sweepstakes and giveaways', 'Find free online giveaways without social media, including listings for Japan residents. Check deadlines, registration requirements and official rules.'],
       guaranteed: ['Rewards on completion', 'These rewards are granted once the listed conditions are met. See each listing for value, redemption and any required spending.'],

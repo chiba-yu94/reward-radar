@@ -99,35 +99,44 @@ publish(rows, sources, {}, folder / 'published.json', folder / 'operations.sqlit
     content.guides.push({id:'private-draft',status:'draft'});
     writeFileSync(join(folder,'data/editorial.json'),JSON.stringify(content));
     build(cutoff - 1);
-    const questPath = 'ja/quests/sample/index.html';
+    const questPath = 'ja/opportunities/sample/index.html';
     assert.match(read(questPath),/入賞者のみ賞金 · 10,000円.*銀行振込/s);
     assert.ok(!read(questPath).includes('href="/ja/guides/"'));
-    assert.ok(read('ja/quests/index.html').includes('href="/ja/quests/sample/"'));
+    assert.ok(read('ja/opportunities/index.html').includes('href="/ja/opportunities/sample/"'));
     assert.doesNotMatch(read(questPath),/rel="alternate"|hreflang="en"/);
     assert.match(read(questPath),/class="language"[^>]*href="\/en\/"/);
-    assert.equal(exists('en/quests/sample/index.html'),false);
-    assert.match(read('en/quests/index.html'),/noindex, follow/);
+    assert.equal(exists('en/opportunities/sample/index.html'),false);
+    assert.doesNotMatch(read('en/opportunities/index.html'),/opportunities\/sample\//);
+    assert.ok(!exists('ja/quests/index.html'));
+    assert.ok(!exists('ja/quests/sample/index.html'));
+    const redirects = read('_redirects');
+    assert.match(redirects,/\/ja\/quests\/ \/ja\/opportunities\/ 301/);
+    assert.match(redirects,/\/en\/quests\/ \/en\/opportunities\/ 301/);
+    assert.match(redirects,/\/ja\/quests\/sample\/ \/ja\/opportunities\/sample\/ 301/);
+    assert.doesNotMatch(redirects,/\/en\/quests\/sample|korezo-yamanashi-2026/);
     const guide = 'guides/before-entering-a-creative-contest/';
     for (const lang of ['ja','en']) {
       assert.equal(exists(lang + '/' + guide + 'index.html'),false);
       assert.equal(exists(lang + '/guides/index.html'),false);
       assert.ok(!read(lang + '/index.html').includes('href="/' + lang + '/guides/"'));
-      assert.ok(!read(lang + '/quests/index.html').includes('href="/' + lang + '/guides/"'));
+      assert.ok(!read(lang + '/opportunities/index.html').includes('href="/' + lang + '/guides/"'));
     }
-    assert.match(read('sitemap.xml'),/<loc>https:\/\/freebietrail\.com\/ja\/quests\/sample\/<\/loc><\/url>/);
+    assert.match(read('sitemap.xml'),/<loc>https:\/\/freebietrail\.com\/ja\/opportunities\/sample\/<\/loc><\/url>/);
     assert.doesNotMatch(read('sitemap.xml'),/\/en\/quests\/|\/guides\/|korezo-yamanashi-2026|private-draft/);
     assert.equal(exists('ja/guides/private-draft/index.html'),false);
-    assert.doesNotMatch(read('ja/quests/index.html'),/korezo-yamanashi-2026|freecash\.pxf\.io/);
+    assert.doesNotMatch(read('ja/opportunities/index.html'),/korezo-yamanashi-2026/);
     build(cutoff);
     assert.ok(exists(questPath));
     assert.match(read(questPath),/募集終了/);
     assert.doesNotMatch(read(questPath),/data-quest-listing|deadline\.ics/);
-    assert.match(read('ja/quests/index.html'),/noindex, follow/);
-    assert.doesNotMatch(read('ja/quests/index.html').split('data-quest-ended')[0],/quests\/sample/);
+    assert.match(read(questPath),/noindex, follow/);
+    assert.match(read('_redirects'),/\/ja\/quests\/sample\/deadline\.ics \/ja\/opportunities\/sample\/ 301/);
+    assert.match(read('ja/opportunities/index.html').split('data-archive-list>')[1],/opportunities\/sample\//);
+    assert.doesNotMatch(read('ja/opportunities/index.html').split('data-archive')[0],/opportunities\/sample/);
     assert.doesNotMatch(read('sitemap.xml'),/\/quests\//);
 
     const newQuest = content.quests.find(entry => entry.id === 'hacktale-award-2027');
-    const path = 'quests/hacktale-award-2027/';
+    const path = 'opportunities/hacktale-award-2027/';
     const liveAt = Date.parse('2026-11-23T09:00:00Z');
     build(liveAt);
     assert.match(read('ja/' + path + 'index.html'),/現物の搬入・郵送は不要.*入賞者のみ賞金.*ライセンス契約を締結.*指定した口座へ振込/s);
@@ -140,18 +149,18 @@ publish(rows, sources, {}, folder / 'published.json', folder / 'operations.sqlit
       assert.ok(html.includes('href="' + newQuest.official_url + '"'));
       assert.ok(html.includes('rel="canonical" href="' + canon + '/' + localized + '"'));
       assert.ok(html.includes('hreflang="' + alternate + '" href="' + canon + '/' + alternate + '/' + path + '"'));
-      const board = read(lang + '/quests/index.html');
+      const board = read(lang + '/opportunities/index.html');
       assert.ok(board.includes('href="/' + localized + '"'));
       assert.ok(board.includes(`<option value="game-design">${genre}</option>`));
-      assert.match(board,/data-type="game-design"[^>]*>[\s\S]*?hacktale-award-2027/);
+      assert.match(board,/data-editorial="[^"<>]*&quot;category&quot;:&quot;game-design&quot;/);
       assert.ok(html.includes('<dd>' + genre + '</dd>'));
       assert.ok(read('sitemap.xml').includes('<loc>' + canon + '/' + localized + '</loc>'));
-      assert.ok(exists(lang + '/quests/life-design-art-2026/index.html'));
+      assert.ok(exists(lang + '/opportunities/life-design-art-2026/index.html'));
       assert.equal(exists(lang + '/' + guide + 'index.html'),false);
     }
 
     const timee = content.quests.find(entry => entry.id === 'timee-note-work-contest-2026');
-    const timeePath = 'quests/' + timee.id + '/';
+    const timeePath = 'opportunities/' + timee.id + '/';
     assert.equal(exists('ja/' + timeePath + 'index.html'),false);
     build(Date.parse('2026-11-25T04:00:00Z'));
     for (const [lang, alternate, notice] of [
@@ -159,10 +168,10 @@ publish(rows, sources, {}, folder / 'published.json', folder / 'operations.sqlit
       ['en','ja','Residency eligibility unconfirmed'],
     ]) {
       const base = lang + '/';
-      const board = read(base + 'quests/index.html');
+      const board = read(base + 'opportunities/index.html');
       const detail = read(base + timeePath + 'index.html');
       const feed = read(base + 'feed.xml');
-      assert.ok(read(base + 'index.html').includes('href="/' + base + 'quests/"'));
+      assert.ok(read(base + 'index.html').includes('href="/' + base + 'opportunities/"'));
       assert.ok(board.includes('href="/' + base + timeePath + '"'));
       assert.equal(board.split(notice).length,2);
       assert.ok(detail.includes(notice));
@@ -170,6 +179,9 @@ publish(rows, sources, {}, folder / 'published.json', folder / 'operations.sqlit
       assert.ok(detail.includes('hreflang="' + alternate + '" href="' + canon + '/' + alternate + '/' + timeePath + '"'));
       assert.ok(detail.includes('datetime="2026-12-25T14:59:00Z"'));
       assert.match(read(base + timeePath + 'deadline.ics'),/DTSTART:20261225T145900Z/);
+      assert.match(read(base + timeePath + 'deadline.ics'),/UID:quests-timee-note-work-contest-2026@freebietrail\.com/);
+      assert.ok(read('_redirects').includes('/' + base + 'quests/' + timee.id + '/deadline.ics /' + base + timeePath + 'deadline.ics 301'));
+      assert.ok(feed.includes('<guid isPermaLink="false">urn:freebietrail:' + lang + ':quests/' + timee.id + '</guid>'));
       assert.match(detail,/23:59 (JST|GMT\+9)/);
       assert.ok(detail.includes('#あの日の仕事をきっかけに'));
       assert.match(detail,/Amazon\.co\.jp/);
@@ -193,10 +205,19 @@ publish(rows, sources, {}, folder / 'published.json', folder / 'operations.sqlit
       assert.doesNotMatch(read(lang + '/' + timeePath + 'index.html'),/data-quest-listing|deadline\.ics/);
       assert.ok(read(lang + '/' + timeePath + 'index.html').includes('href="https://note.com/info/n/n3cd095e43966"'));
       assert.equal(exists(lang + '/' + timeePath + 'deadline.ics'),false);
-      assert.ok(!read(lang + '/quests/index.html').split('data-quest-ended')[0].includes(timeePath));
+      assert.ok(!read(lang + '/opportunities/index.html').split('data-archive')[0].includes(timeePath));
       assert.ok(!read(lang + '/feed.xml').includes(timeePath));
     }
     assert.ok(!read('sitemap.xml').includes(timeePath));
+
+    build(Date.parse('2027-01-02T00:00:00Z'));
+    for (const lang of ['ja','en']) {
+      const stale = read(lang + '/' + path + 'index.html');
+      assert.match(stale,/noindex, follow/);
+      assert.doesNotMatch(stale,/data-quest-listing|deadline\.ics/);
+      assert.ok(!read(lang + '/opportunities/index.html').includes(path));
+      assert.ok(read('_redirects').includes('/' + lang + '/quests/' + newQuest.id + '/ /' + lang + '/' + path + ' 301'));
+    }
 
     const timedCutoff = Date.parse('2027-02-28T14:59:00Z');
     // Recheck in the fixture so the deadline, independent of review freshness, controls removal.
@@ -208,9 +229,25 @@ publish(rows, sources, {}, folder / 'published.json', folder / 'operations.sqlit
     build(timedCutoff);
     for (const lang of ['ja','en']) {
       assert.ok(exists(lang + '/' + path + 'index.html'));
-      assert.ok(!read(lang + '/quests/index.html').split('data-quest-ended')[0].includes(path));
+      assert.ok(!read(lang + '/opportunities/index.html').split('data-archive')[0].includes(path));
     }
     assert.ok(!read('sitemap.xml').includes(path));
+
+    const guideEntry = content.guides.find(entry => entry.id === 'before-entering-a-creative-contest');
+    guideEntry.status = 'approved';
+    timee.status = 'closed';
+    timee.review.accepting = false;
+    timee.last_checked_at = '2026-11-25T03:31:13Z';
+    writeFileSync(join(folder,'data/editorial.json'),JSON.stringify(content));
+    build(Date.parse('2026-11-27T01:05:00Z'));
+    for (const lang of ['ja','en']) {
+      const main = read(lang + '/opportunities/index.html');
+      assert.ok(main.includes('href="/' + lang + '/guides/"'));
+      assert.ok(read(lang + '/' + guide + 'index.html').includes('href="/' + lang + '/opportunities/"'));
+      assert.ok(!main.split('data-archive')[0].includes(timeePath));
+      assert.match(read(lang + '/' + timeePath + 'index.html'),/<p class="notice">(募集終了|Entries closed)<\/p>/);
+      assert.doesNotMatch(read(lang + '/' + timeePath + 'index.html'),/data-quest-listing|deadline\.ics/);
+    }
   } finally {
     rmSync(folder,{recursive:true,force:true});
   }

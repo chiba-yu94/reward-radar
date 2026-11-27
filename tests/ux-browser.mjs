@@ -21,7 +21,6 @@ try {
     page.on('pageerror',error=>errors.push(error.message));
     page.on('console',message=>{if(message.type()==='error')errors.push(message.text())});
     const paths = [['home',''],['directory','opportunities/'],['sweepstakes','sweepstakes/'],['detail',`opportunities/${sampleDetail.id}/`],...(hasFreecash ? [['freecash','opportunities/freecash/']] : []),['rewards',phase==='before'?'affiliates/':'rewards/'],['contact','contact/'],['about','about/']];
-    if (phase !== 'before') paths.push(['quests','quests/']);
     for (const [name,path] of paths) {
       assert.equal((await page.goto(`${base}/${lang}/${path}`)).status(),200);
       if (name==='home' && await page.locator('.analytics-notice').isVisible()) {
@@ -43,10 +42,10 @@ try {
       await page.screenshot({path:`${out}/${phase}-${lang}-${width}-${name}.png`,fullPage:['detail','freecash','contact','about'].includes(name)});
     }
     if(phase!=='before') {
-      const questPath = `${base}/${lang}/quests/`;
+      const directoryPath = `${base}/${lang}/opportunities/`;
       await page.goto(`${base}/${lang}/`);
-      await page.locator(`.home-shortcuts a[href="/${lang}/quests/"]`).click();
-      assert.equal(page.url(),questPath);
+      await page.locator(`.home-shortcuts a[href="/${lang}/opportunities/"]`).click();
+      assert.equal(page.url(),directoryPath);
       await page.goto(`${base}/${lang}/`);
       const homeQuery = hasFreecash ? 'Freecash' : 'Prolific';
       await page.locator('#home-query').fill(homeQuery);
@@ -54,10 +53,12 @@ try {
       await page.locator('#filters').waitFor({state:'visible'}); if(phase!=='before') await page.waitForFunction(()=>document.querySelector('#filters').getAttribute('aria-busy')==='false');
       assert.equal(await page.locator('[name=q]').inputValue(),homeQuery);
       assert.deepEqual(await page.locator('[data-record]:visible').evaluateAll(items=>items.map(x=>x.dataset.record)),[hasFreecash ? 'freecash' : 'prolific']);
+      const editorial = await page.locator('[data-editorial]').evaluateAll(cards => cards.map(card => JSON.parse(card.dataset.editorial)));
+      const searchable = [...records.filter(row => row.category !== 'affiliate' || !row.commission),...editorial];
       const cases=lang==='ja'?['懸賞','お米','米','Freecash','SNS不要','タスク報酬']:['sweepstakes','rice','United States','Freecash','no social media'];
       for(const q of cases) {
         await page.locator('[name=q]').fill(q);
-        const expected = records.filter(row => (row.category !== 'affiliate' || !row.commission) && matches(row,{q},lang,Date.parse(dataset.generated_at))).length;
+        const expected = searchable.filter(row => matches(row,{q},lang,Date.parse(dataset.generated_at))).length;
         assert.equal(Number(await page.locator('#result-count').textContent()),expected,q);
       }
       await page.locator('[type=reset]').click();

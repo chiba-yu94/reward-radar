@@ -1,4 +1,7 @@
 const DAY = 86_400_000;
+const calendarDay = row => new Intl.DateTimeFormat('sv-SE',{
+  timeZone:row.deadline_timezone || (row.language === 'ja' ? 'Asia/Tokyo' : 'UTC'),year:'numeric',month:'2-digit',day:'2-digit',
+}).format(new Date(timestamp(row.deadline)));
 // Public timestamps must include an explicit zone. Reject rollover dates and naive values.
 export function timestamp(value) {
   if (typeof value !== 'string') return NaN;
@@ -41,7 +44,15 @@ export function verifiedJapanGiveaway(row, now) {
 }
 
 export function matches(row, query, lang, now) {
-  if (expired(row, now)) return false;
+  const ended = expired(row, now);
+  if (row.editorial) {
+    if (ended ? !['ended','all'].includes(query.status)
+      : query.status === 'ended' || freshness(row,now).state !== 'fresh') return false;
+  } else if (ended || query.status === 'ended') return false;
+  if (query.sns && String(row.application?.sns_required) !== query.sns) return false;
+  if (query.ai && query.ai !== row.editorial?.ai &&
+      !(query.ai === 'allowed' && row.editorial?.ai === 'required')) return false;
+  if (query.by && (!row.deadline || calendarDay(row) > query.by)) return false;
   if (query.explicitJapan && !(Array.isArray(row.eligible_countries) && eligible(row, 'JP'))) return false;
   if (query.country === 'unknown' ? row.eligibility_verified : query.country && !eligible(row, query.country)) return false;
   for (const field of ['category', 'prize_category', 'language', 'reward_type', 'participation_method', 'certainty']) {
@@ -58,9 +69,9 @@ export function matches(row, query, lang, now) {
       row.entry.application?.length !== 1 || row.entry.application[0] !== 'email')) return false;
   if (query.expense && row.required_expense.kind !== query.expense) return false;
   if (query.effort && (row.estimated_effort_minutes === null || row.estimated_effort_minutes > Number(query.effort))) return false;
-  if (query.deadline && (!row.deadline || (query.deadline !== 'any' && expiration(row) > now + Number(query.deadline) * DAY))) return false;
+  if (query.deadline && (!row.deadline || (query.deadline !== 'any' && (ended || expiration(row) > now + Number(query.deadline) * DAY)))) return false;
   if (query.freeEntry && row.required_expense.kind !== 'free') return false;
-  if (query.closingSoon && (!row.deadline || expiration(row) > now + 7 * DAY)) return false;
+  if (query.closingSoon && (ended || !row.deadline || expiration(row) > now + 7 * DAY)) return false;
   const q = normalize(query.q || '');
   if (/sns不要|no social (?:media|account)/.test(q) && row.application?.sns_required !== false) return false;
   const text = searchText(row);
@@ -83,7 +94,7 @@ const concepts = {
 };
 export function searchText(row) {
   const parts = [row.provider, row.title_ja, row.title_en, row.description_ja, row.description_en,
-    row.reward_conditions.ja, row.reward_conditions.en, concepts[row.category], row.reward_type,
+    row.reward_conditions.ja, row.reward_conditions.en, row.editorial?.search, concepts[row.category], row.reward_type,
     ({collectibles:'カード フィギュア cards collectibles', food:'食品 飲料 food drinks', 'cash-gift':'現金 ギフトカード cash gift card', household:'日用品 household', electronics:'家電 ゲーム electronics games', digital:'デジタル digital'})[row.prize_category]];
   if (row.category === 'affiliate' && !row.commission) parts.push('ポイ活 タスク報酬 タスク型報酬 rewards tasks');
   if (row.application?.sns_required === false) parts.push('SNS不要 no social media no social account required');
@@ -108,6 +119,8 @@ export function allowedFilters(params, formValues) {
   for (const [key, values] of Object.entries(formValues)) {
     const value = params.get(key);
     if (key === 'q' && value) query.q = value.slice(0,150);
+    else if (key === 'by' && /^\d{4}-\d{2}-\d{2}$/.test(value) &&
+      Number.isFinite(timestamp(value + 'T00:00:00Z'))) query.by = value;
     else if (value && values.includes(value)) query[key] = value;
   }
   return query;

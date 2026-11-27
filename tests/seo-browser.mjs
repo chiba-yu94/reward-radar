@@ -38,7 +38,8 @@ try {
   for (const entry of entries) {
     const path = new URL(entry.url).pathname;
     assert.equal(entry.url,canonical + path);
-    const editorial = /^\/(ja|en)\/(quests|guides)\//.test(path);
+    const editorial = /^\/(ja|en)\/guides\//.test(path) || /\/opportunities\/$/.test(path) ||
+      (/\/opportunities\/[^/]+\/$/.test(path) && !details.has(path.split('/')[3]));
     if (editorial) await page.setViewportSize({width:375,height:850});
     const response = await page.goto(origin + path);
     assert.equal(response.status(),200,path);
@@ -55,7 +56,7 @@ try {
       og:document.querySelector('meta[property="og:description"]').content,
       title:document.title, language:document.documentElement.lang,
       alternates:Array.from(document.querySelectorAll('link[rel=alternate][hreflang]')).map(x=>[x.hreflang,x.href]),
-      local:Array.from(document.links).filter(a=>a.origin===location.origin).map(a=>[a.pathname,a.search]),
+      local:Array.from(document.links).filter(a=>a.origin===location.origin).map(a=>[a.pathname,a.search,!!a.closest('[data-archive]')]),
       categories:Array.from(document.querySelectorAll('.detail .breadcrumbs li:nth-child(2) a'), a=>a.pathname),
       directory:Array.from(document.querySelectorAll('.detail > p > a.text-link:not(.genre-return)'), a=>a.pathname),
       related:Array.from(document.querySelectorAll('[aria-labelledby="related-listings"] li'), li=>
@@ -95,7 +96,7 @@ try {
     }
     const lang = info.language;
     const id = /^\/(?:ja|en)\/opportunities\/([^/]+)\/$/.exec(path)?.[1];
-    if (id) {
+    if (id && details.has(id)) {
       const row = details.get(id);
       assert.ok(row && !expired(row,now),path);
       const category = row.commission ? 'affiliates' : row.category === 'sweepstakes' ? 'sweepstakes' :
@@ -127,10 +128,12 @@ try {
       }
     }
     if (path === `/${lang}/`) assert.equal(info.guideShortcut,`/${lang}/sweepstakes/#no-sns-giveaways`);
-    if (id || path === `/${lang}/sweepstakes/`) localizedLinks.set(path,[...info.related,...info.guide].map(([href]) => href.slice(3)));
-    for (const [href, search] of info.local) {
+    if (details.has(id) || path === `/${lang}/sweepstakes/`) localizedLinks.set(path,[...info.related,...info.guide].map(([href]) => href.slice(3)));
+    for (const [href, search, archived] of info.local) {
       const linkedId = /^\/(?:ja|en)\/opportunities\/([^/]+)\/$/.exec(href)?.[1];
-      if (linkedId) assert.ok(details.has(linkedId) && !expired(details.get(linkedId),now) && paths.has(href),`${path} → ${href}`);
+      assert.doesNotMatch(href,/^\/(ja|en)\/quests\//);
+      if (linkedId) assert.ok((archived || paths.has(href)) &&
+        (!details.has(linkedId) || !expired(details.get(linkedId),now)),`${path} → ${href}`);
       links.add(href + search);
     }
     for (const link of info.outbound) outbound.add(link);

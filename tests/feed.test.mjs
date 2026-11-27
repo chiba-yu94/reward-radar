@@ -40,6 +40,8 @@ test('RSS orders confirmed first publications and keeps canonical same-language 
   assert.match(feed,/<pubDate>Mon, 23 Nov 2026 08:37:52 GMT<\/pubDate>/);
   assert.match(feed,/Japan residents Submit the form Deadline · 30 Nov 2026<\/description>/);
   assert.match(feed,/Deadline · 25 Dec 2026, 23:59 GMT\+9/);
+  assert.match(feed,/<link>https:\/\/freebietrail\.com\/en\/opportunities\/contest\/<\/link>/);
+  assert.match(feed,/<guid isPermaLink="false">urn:freebietrail:en:quests\/contest<\/guid>/);
   assert.ok(feed.indexOf('Work contest') < feed.indexOf('Rice &amp; entry'));
 });
 

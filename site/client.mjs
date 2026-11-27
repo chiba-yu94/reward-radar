@@ -1,14 +1,15 @@
-import {matches, ordered, allowedFilters, expiration, timestamp} from './domain.mjs';
+import {matches, ordered, allowedFilters, expiration, expired, timestamp} from './domain.mjs';
 import {updateDates} from './status.mjs';
-import {questBoard} from './quest-board.mjs';
 
 const lang = document.documentElement.lang;
 const cards = Array.from(document.querySelectorAll('[data-record]'));
+const archive = document.querySelector('[data-archive]');
+const archiveList = archive?.querySelector('[data-archive-list]');
+const editorialCards = Array.from(document.querySelectorAll('[data-editorial]'));
 const deadline = element => expiration({deadline:element.dataset.deadline || element.dataset.expiring});
 const affiliateExpired = (element, now) => timestamp(element.dataset.affiliateExpires) <= now;
 const form = document.querySelector('#filters');
 let filter = null;
-const refreshQuests = questBoard(document.querySelector('[data-quest-board]'));
 const menu = document.querySelector('.site-menu');
 document.addEventListener('keydown', event => {
   if (event.key === 'Escape' && menu?.open) { menu.open = false; menu.querySelector('summary').focus(); }
@@ -38,7 +39,6 @@ if (historyControls && (navigator.standalone === true || matchMedia('(display-mo
 function checkDates() {
   const now = Date.now();
   updateDates(document, now, lang);
-  refreshQuests?.(now);
   if (filter) filter(false);
 }
 checkDates();
@@ -58,6 +58,11 @@ if (form) {
       card.hidden = true;
     }
     const byId = new Map(cards.map(card => [card.dataset.record,card]));
+    for (const card of editorialCards) {
+      const row = JSON.parse(card.dataset.editorial);
+      byId.set(row.id,card);
+      records.set(row.id,row);
+    }
     const parent = document.querySelector('.cards');
     const active = form.querySelector('.active-filters');
     const unfilteredGuide = document.querySelector('[data-unfiltered-guide]');
@@ -67,7 +72,13 @@ if (form) {
     const values = Object.fromEntries(Array.from(form.elements).filter(input => input.name).map(input => [input.name,
       input instanceof HTMLSelectElement ? Array.from(input.options).map(option => option.value) : input.type === 'checkbox' ? ['yes'] : []]));
     function restore() {
-      const query = allowedFilters(new URLSearchParams(location.search),values);
+      const params = new URLSearchParams(location.search);
+      if (archive) {
+        // Bookmarked filters from the former listing use these two names.
+        if (!params.has('category') && params.has('genre')) params.set('category',params.get('genre'));
+        if (!params.has('freeEntry') && params.has('free')) params.set('freeEntry',params.get('free'));
+      }
+      const query = allowedFilters(params,values);
       form.reset();
       for (const [key,value] of Object.entries(query)) {
         const input = form.elements.namedItem(key);
@@ -79,19 +90,34 @@ if (form) {
     filter = (updateURL = true) => {
       const query = allowedFilters(new URLSearchParams(new FormData(form)),values);
       const now = Date.now();
-      const sorted = ordered(cards.map(card => records.get(card.dataset.record)).filter(Boolean),now);
+      const sorted = ordered([...byId.keys()].map(id => records.get(id)).filter(Boolean),now);
       if (query.sort === 'deadline') sorted.sort((a,b) => expiration(a) - expiration(b));
       if (query.sort === 'newest') sorted.sort((a,b) => b.first_seen_at.localeCompare(a.first_seen_at));
-      const order = sorted.map(row => row.id).join(' ');
+      const order = sorted.map(row => (row.editorial && expired(row,now) ? '!' : '') + row.id).join(' ');
       let visible = 0;
+      let matchingArchive = 0;
       for (const row of sorted) {
         const card = byId.get(row.id);
-        card.hidden = affiliateExpired(card,now) || !matches(row,query,lang,now);
-        if (!card.hidden) visible++;
-        if (order !== currentOrder) parent.append(card);
+        const ended = row.editorial && expired(row,now);
+        const matchesFilters = !affiliateExpired(card,now) && matches(row,query,lang,now);
+        if (row.editorial) card.querySelector('[data-editorial-ended]').hidden = !ended;
+        // Keep the archive browsable while the default result count covers open listings.
+        const display = ended && query.status === 'open'
+          ? matches(row,{...query,status:'ended'},lang,now) : matchesFilters;
+        card.hidden = !display;
+        if (ended && display) matchingArchive++;
+        if (matchesFilters) visible++;
+        if (order !== currentOrder) (ended ? archiveList : parent).append(card);
       }
       currentOrder = order;
-      const selected = Object.entries(query).filter(([,value]) => value.trim());
+      if (archive) {
+        archive.hidden = matchingArchive === 0;
+        if (updateURL || archive.dataset.status !== query.status) {
+          archive.open = query.status !== 'open';
+          archive.dataset.status = query.status;
+        }
+      }
+      const selected = Object.entries(query).filter(([key,value]) => value.trim() && !(key === 'status' && value === 'open'));
       active.querySelector('ul').replaceChildren(...selected.map(([key,value]) => {
         const input = form.elements.namedItem(key);
         const item = document.createElement('li');

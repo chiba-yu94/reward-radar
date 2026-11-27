@@ -16,5 +16,11 @@
     "languages": ["ja", "en"],
     "first_published_at": "2026-11-25T03:35:54Z",
     "evidence_url": "https://github.com/chiba-yu94/reward-radar/actions/runs/45540955256"
+  },
+  {
+    "listing": "opportunities/twinkii-high-score-contest-3",
+    "languages": ["ja", "en"],
+    "first_published_at": "2026-11-27T01:02:36Z",
+    "evidence_url": "https://github.com/chiba-yu94/reward-radar/actions/runs/45920179219"
   }
 ]
