@@ -2281,5 +2281,78 @@
     "description_en": "Choose melon, Miyazaki beef or a Toyama rice set. Each prize goes to 100 randomly selected entrants.",
     "eligibility_ja": "公式の応募規約に居住国の条件は記載されていません。応募フォームで条件をご確認ください。",
     "eligibility_en": "The published rules do not specify a country of residence. Check the eligibility terms on the entry form."
+  },
+  {
+    "id": "twinkii-high-score-contest-3",
+    "source_id": "twinkii-high-score-contest-3",
+    "provider": "Twinkii Project",
+    "category": "sweepstakes",
+    "eligible_countries": [
+      "JP"
+    ],
+    "eligibility_verified": true,
+    "reward_type": "gift-card",
+    "reward_currency": "JPY",
+    "reward_amount": null,
+    "reward_conditions": {
+      "ja": "賞品はAmazonギフトカードです。1位5,000円分、2位3,000円分、3位2,000円分。参加者の中から抽選で2名に各500円分。公式 @twinkii_project から、応募に使ったXアカウントへギフトカードコードをDMで送る予定です。同点時の扱い、参加賞の抽選細則、受取時に追加で求められる情報は未確認です。",
+      "en": "Amazon gift cards worth ¥5,000 for first place, ¥3,000 for second, and ¥2,000 for third. Two entrants drawn at random each receive ¥500. The organizer plans to send gift card codes by DM from @twinkii_project to the X account used to enter. Tie-breaks, the draw rules, and any further information needed to claim a prize are unconfirmed."
+    },
+    "required_expense": {
+      "kind": "free",
+      "amount": 0,
+      "currency": null
+    },
+    "estimated_effort_minutes": null,
+    "participation_method": "social",
+    "deadline": "2026-12-06T14:59:00Z",
+    "deadline_timezone": "Asia/Tokyo",
+    "official_url": "https://twinkiiproject.com/news/twinkii-high-score-contest-3",
+    "affiliate_url": null,
+    "affiliate_approval_status": "none",
+    "source_url": "https://twinkiiproject.com/news/twinkii-high-score-contest-3",
+    "source_permission_status": "editorial-summary",
+    "first_seen_at": "2026-11-24T10:23:23Z",
+    "last_checked_at": "2026-11-27T00:45:11Z",
+    "verification_status": "verified",
+    "risk_flags": [],
+    "published_status": "approved",
+    "language": "ja",
+    "certainty": "chance",
+    "redemption_difficulty": null,
+    "commission": null,
+    "prize_category": "cash-gift",
+    "entry": {
+      "registration": "social",
+      "application": [
+        "social-account"
+      ],
+      "winner": [
+        "social-account"
+      ],
+      "steps": {
+        "ja": "2026年11月27日00:00（日本時間）受付開始。無料の「トゥインキィーのパズルプリプリチェイス」で遊び、ゲームオーバー画面に今回の SCORE（BEST SCOREではない）が見えるスクリーンショットを撮ります。その画像を添え、#トゥインキィーチャレンジ を付けてXに投稿します。",
+        "en": "Entries opened November 27, 2026 at 00:00 JST. Play the free Twinkii puzzle game. At game over, take a screenshot showing the current run’s SCORE rather than BEST SCORE, then post the image to X with #トゥインキィーチャレンジ."
+      }
+    },
+    "title_ja": "第3回トゥインキィー ハイスコア王",
+    "title_en": "Twinkii High Score Contest #3",
+    "description_ja": "無料のスマホゲームでスコアを競う大会です。上位3位と、参加者の中から抽選で選ばれた2名がAmazonギフトカードの対象です。応募にはX投稿が必要です。",
+    "description_en": "Compete for a high score in a free mobile game. Amazon gift cards are awarded to the top three ranked entrants and two entrants drawn at random. Entry requires a post on X.",
+    "eligibility_ja": "日本在住者も応募できます。日本以外の居住条件は未確認です。応募に使うXアカウントが必要です。",
+    "eligibility_en": "Japan residents can enter. Eligibility for residents of other countries or regions is unconfirmed. You need an X account to enter.",
+    "application": {
+      "web_only": false,
+      "sns_required": true,
+      "platforms": [
+        "x"
+      ],
+      "operations": [
+        "create-post"
+      ],
+      "free_registration": null,
+      "source_url": "https://x.com/twinkii_project/status/2125968067079663653",
+      "checked_at": "2026-11-27T00:45:11Z"
+    }
   }
 ]

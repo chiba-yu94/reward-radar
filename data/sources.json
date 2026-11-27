@@ -624,5 +624,29 @@
     "supporting_urls": [
       "https://www.ja-kyosai.or.jp/news/2026/20261001-2.html"
     ]
+  },
+  {
+    "id": "twinkii-high-score-contest-3",
+    "provider": "Twinkii Project",
+    "official_url": "https://twinkiiproject.com/news/twinkii-high-score-contest-3",
+    "approved_destination": "https://twinkiiproject.com/news/twinkii-high-score-contest-3",
+    "country": "JP",
+    "language": "ja",
+    "method": "manual",
+    "permission": "editorial-summary",
+    "terms_status": "Official launch post and image reviewed on 2026-11-27 for open entry, current SCORE and the public X entry. Organizer reply on 2026-11-24 confirms JST dates, eligibility from Japan and planned gift card code delivery by the official account to the entrant’s X account. Public entry uses the X account and the screenshot’s game score. Additional claim information, tie-breaks and draw details are unconfirmed.",
+    "last_verification_date": "2026-11-27T00:45:11Z",
+    "last_successful_collection": null,
+    "error_status": null,
+    "collection_frequency": "manual",
+    "active": true,
+    "organizer_verified": true,
+    "free_entry_reviewed": true,
+    "privacy_reviewed": true,
+    "enhanced_review": true,
+    "supporting_urls": [
+      "https://x.com/twinkii_project/status/2125968067079663653",
+      "https://prtimes.jp/main/html/rd/p/000000004.000191834.html"
+    ]
   }
 ]
