@@ -152,10 +152,24 @@ import assert from 'node:assert/strict';
     const toolbar = app.locator('[data-history-controls]');
     const back = toolbar.getByRole('button',{name:'戻る'});
     const forward = toolbar.getByRole('button',{name:'進む'});
+    const refresh = app.locator('[data-pull-refresh]');
+    const touch = await app.context().newCDPSession(app);
+    const sendTouch = (type, x, y) => touch.send('Input.dispatchTouchEvent', {
+      type, touchPoints:x === undefined ? [] : [{x,y}]
+    });
+    const swipe = async (fromX, fromY, toX, toY) => {
+      await sendTouch('touchStart',fromX,fromY);
+      await sendTouch('touchMove',toX,toY);
+      await sendTouch('touchEnd');
+    };
     const home = base + '/ja/';
     const recent = home + 'recent/';
     await app.goto(home);
     assert.equal(await toolbar.isVisible(),false);
+    await sendTouch('touchStart',35,115);
+    await sendTouch('touchMove',35,225);
+    assert.equal(await refresh.isVisible(),false,'the app refresh indicator stays hidden in browser mode');
+    await sendTouch('touchCancel');
     await app.addInitScript(() => Object.defineProperty(navigator,'standalone',{value:true}));
     await app.reload();
     await toolbar.waitFor({state:'visible'});
@@ -167,7 +181,40 @@ import assert from 'node:assert/strict';
     await app.waitForURL(recent);
     await Promise.all([app.waitForURL(home),back.click()]);
     await Promise.all([app.waitForURL(recent),forward.click()]);
+    await Promise.all([app.waitForURL(home),swipe(35,115,205,115)]);
+    await Promise.all([app.waitForURL(recent),swipe(205,115,35,115)]);
+
+    await app.waitForFunction(() => scrollY === 0 && document.documentElement.classList.contains('has-home-screen-gestures'));
+    const timeOrigin = await app.evaluate(() => performance.timeOrigin);
+    await sendTouch('touchStart',35,115);
+    await sendTouch('touchMove',35,150);
+    await refresh.filter({hasText:'下に引いて更新'}).waitFor({state:'visible'});
+    await sendTouch('touchEnd');
+    assert.equal(await refresh.isVisible(),false);
+    assert.equal(await app.evaluate(() => performance.timeOrigin),timeOrigin);
+
+    await sendTouch('touchStart',35,115);
+    await sendTouch('touchMove',35,225);
+    assert.equal(await refresh.textContent(),'指を離して更新');
+    await Promise.all([app.waitForEvent('framenavigated'),sendTouch('touchEnd')]);
+    await toolbar.waitFor({state:'visible'});
+    assert.equal(app.url(),recent);
+    assert.equal(await app.evaluate(() => performance.getEntriesByType('navigation')[0].type),'reload');
+    assert.equal(await refresh.isVisible(),false);
+
+    const reloadedTimeOrigin = await app.evaluate(() => performance.timeOrigin);
+    const scrollStart = await app.evaluate(() => {
+      window.scrollTo(0,240);
+      return window.scrollY;
+    });
+    assert.ok(scrollStart > 0);
+    await sendTouch('touchStart',35,115);
+    await sendTouch('touchMove',35,225);
+    assert.equal(await refresh.isVisible(),false,'pulling from a scrolled position remains ordinary scrolling');
+    await sendTouch('touchEnd');
+    await app.waitForFunction(start => scrollY < start,scrollStart);
+    assert.equal(await app.evaluate(() => performance.timeOrigin),reloadedTimeOrigin);
     await app.close();
-    console.log('Home Screen navigation: toolbar scope, back and forward passed');
+    console.log('Home Screen navigation: toolbar, swipe history and pull-to-refresh passed');
   } finally { await browser.close(); }
 })().catch(error=>{console.error(error);process.exitCode=1;});

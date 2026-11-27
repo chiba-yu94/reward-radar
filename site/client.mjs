@@ -1,4 +1,5 @@
 import {matches, ordered, allowedFilters, expiration, expired, timestamp} from './domain.mjs';
+import {enableHomeScreenGestures} from './gestures.mjs';
 import {updateDates} from './status.mjs';
 
 const lang = document.documentElement.lang;
@@ -34,6 +35,8 @@ if (historyControls && (navigator.standalone === true || matchMedia('(display-mo
   updateHistoryControls();
   historyControls.hidden = false;
   document.body.classList.add('has-history-controls');
+  const pullRefresh = document.querySelector('[data-pull-refresh]');
+  if (pullRefresh) enableHomeScreenGestures(back, forward, pullRefresh);
 }
 
 function checkDates() {

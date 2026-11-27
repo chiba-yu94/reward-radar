@@ -44,6 +44,9 @@ nav a[aria-current] { font-weight:750; text-decoration-thickness:.15em; }
 .history-controls .wrap { display:flex; justify-content:center; gap:.75rem; }
 .history-controls button { width:44px; padding:0; border-color:transparent; color:var(--accent); }
 .history-controls button:disabled { color:var(--muted); background:transparent; opacity:.55; }
+.has-home-screen-gestures { overscroll-behavior:none; }
+.pull-refresh { position:fixed; inset-block-start:calc(.5rem + env(safe-area-inset-top, 0px)); inset-inline:0; width:max-content; margin-inline:auto; z-index:6; padding:.35rem .8rem; border:1px solid var(--line); border-radius:2rem; background:var(--page); box-shadow:0 2px 8px #20273320; color:var(--ink); font-size:var(--type-small); pointer-events:none; }
+.pull-refresh[data-ready] { background:var(--accent); color:white; border-color:var(--accent); }
 .hero { margin-top:clamp(1.25rem,3vw,2.75rem); max-width:49rem; }
 .hero h1 { margin-bottom:.55rem; }
 .hero .eyebrow { font-size:.75rem; color:var(--muted); font-weight:650; letter-spacing:.04em; }

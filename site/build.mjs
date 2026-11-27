@@ -66,7 +66,7 @@ const iconVersion = '5cf2e8207d44';
 const versionedIcon = path => path.replace(/\.([^.]+)$/, `-${iconVersion}.$1`);
 const iconAssets = ['favicon.ico', 'apple-touch-icon.png', 'assets/mark.svg'];
 
-for (const asset of ['style.css', 'client.mjs', 'domain.mjs', 'status.mjs', 'mark.svg', 'social.png', 'chevron.svg']) {
+for (const asset of ['style.css', 'client.mjs', 'gestures.mjs', 'domain.mjs', 'status.mjs', 'mark.svg', 'social.png', 'chevron.svg']) {
   await copyFile('site/' + asset, dist + '/assets/' + asset);
 }
 for (const asset of ['favicon.ico', 'apple-touch-icon.png']) {
@@ -210,7 +210,9 @@ ${consent?.settings || ''}<p class="muted">© ${t.copyright}</p></div></footer>
 <div class="history-controls" data-history-controls hidden><div class="wrap" role="group" aria-label="${e(t.pageHistory.label)}">
 <button type="button" aria-label="${e(t.pageHistory.back)}" title="${e(t.pageHistory.back)}">◀</button>
 <button type="button" aria-label="${e(t.pageHistory.forward)}" title="${e(t.pageHistory.forward)}">▶</button>
-</div></div></body></html>`;
+</div></div>
+<div class="pull-refresh" data-pull-refresh data-pull="${e(t.pullRefresh.pull)}" data-release="${e(t.pullRefresh.release)}" aria-hidden="true" hidden></div>
+</body></html>`;
 }
 
 const expiryValue = row => Number.isFinite(expiration(row)) ? new Date(expiration(row)).toISOString() : '';
